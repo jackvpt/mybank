@@ -1,6 +1,7 @@
 import React from "react"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Header from "../components/Header/Header"
+import Login from "../pages/Login/Login"
 import Error from "../pages/Error/Error"
 
 
@@ -18,6 +19,7 @@ export default function Router() {
       <main className="container">
         <section className="section__main">
           <Routes>
+            <Route path="/login" element={<Login />} />
             <Route path="*" element={<Error />} />
           </Routes>
         </section>
