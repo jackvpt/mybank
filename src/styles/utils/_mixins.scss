@@ -1,0 +1,24 @@
+@use "../utils/variables" as *;
+@use "sass:map";
+
+/* Responsive */
+@mixin responsive-mobile {
+  @media all and (min-width: map.get($breakpoints, mobile)) {
+    @content;
+  }
+}
+@mixin responsive-tablet {
+  @media all and (min-width: map.get($breakpoints, tablet)) {
+    @content;
+  }
+}
+@mixin responsive-desktop {
+  @media all and (min-width: map.get($breakpoints, desktop)) {
+    @content;
+  }
+}
+@mixin responsive-large-desktop {
+  @media all and (min-width: map.get($breakpoints, large-desktop)) {
+    @content;
+  }
+}

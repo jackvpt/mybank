@@ -1,0 +1,91 @@
+/* Responsive */
+/* Responsive */
+* {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+@media all and (min-width: 768px) {
+  * {
+    font-size: 14px;
+  }
+}
+@media all and (min-width: 1024px) {
+  * {
+    font-size: 16px;
+  }
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+html {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  margin: 0 auto;
+  max-width: 1440px;
+  width: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.75rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+p {
+  font-size: 1rem;
+}
+
+main {
+  display: flex;
+  flex-direction: row;
+}
+
+.section__main {
+  margin: 0 auto;
+  padding: 10px;
+}
+@media all and (min-width: 1024px) {
+  .section__main {
+    padding: 20px 30px;
+  }
+}
+@media all and (min-width: 1280px) {
+  .section__main {
+    padding: 30px 50px;
+  }
+}/*# sourceMappingURL=main.css.map */

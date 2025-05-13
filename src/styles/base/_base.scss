@@ -1,0 +1,19 @@
+@use "../utils/mixins" as *;
+
+main {
+  display: flex;
+  flex-direction: row;
+}
+
+.section__main {
+  margin: 0 auto;
+  padding: 10px;
+
+  @include responsive-desktop {
+    padding: 20px 30px;
+  }
+
+  @include responsive-large-desktop {
+    padding: 30px 50px;
+  }
+}
