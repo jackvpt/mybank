@@ -7,6 +7,20 @@
  * @returns {Promise<Object>} A promise that resolves to the matched bank account object.
  * @throws {Error} If the fetch fails or the account is not found.
  */
+export const fetchBankAccounts = async ()=>{
+  try {
+    const response = await fetch("/__mocks__/bankAccounts.json")
+    if (!response.ok) throw new Error("Mock data request failed")
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error(
+      `Error fetching accounts data from mock data: ${error.message}`
+    )
+    throw error
+  }
+}
+
 export const fetchBankAccountByName = async (name) => {
   try {
     const response = await fetch("/__mocks__/bankAccounts.json")

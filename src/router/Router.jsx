@@ -22,7 +22,7 @@ export default function Router() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/transactions" element={<Transactions />} />
-            <Route path="*" element={<Error />} />
+            <Route path="*" element={<Transactions />} />
           </Routes>
         </section>
       </main>
