@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Header from "../components/Header/Header"
 import Login from "../pages/Login/Login"
 import Error from "../pages/Error/Error"
+import Transactions from "../pages/Transactions/Transactions"
 
 
 /**
@@ -20,6 +21,7 @@ export default function Router() {
         <section className="section__main">
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/transactions" element={<Transactions />} />
             <Route path="*" element={<Error />} />
           </Routes>
         </section>

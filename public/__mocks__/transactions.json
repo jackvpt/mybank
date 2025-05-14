@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "account":"Courant",
+    "date": "2025-05-14",
+    "type": "card",
+    "checkNumber":"",
+    "label": "Leclerc",
+    "category": "Courses",
+    "subcategory": "",
+    "debit": 50.75,
+    "credit": 0,
+    "pointed": false,
+    "validated": false,
+    "destination": "",
+    "periodicity": ""
+  }
+]

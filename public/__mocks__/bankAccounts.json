@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "name": "Courant",
+    "bankName": "Crédit Agricole",
+    "bankAbbreviation": "CA",
+    "IBAN": "FR7612345678901234567890123",
+    "BIC": "CRLYFRPP",
+    "initialBalance": 1000,
+    "createdAt": "2025-05-14T10:00:00Z",
+    "currentBalance": 950,
+    "updatedAt": "2025-05-14T10:00:00Z"
+  }
+]
