@@ -1,0 +1,14 @@
+/* Responsive */
+/* Responsive */
+.transaction-row {
+  height: 12px;
+}
+.transaction-row:nth-of-type(even) {
+  background-color: #a6bff9; /* gris clair pour lignes paires */
+}
+
+.transaction-row > .MuiTableCell-root {
+  padding-top: 2px !important; /* forcer le padding */
+  padding-bottom: 2px !important;
+  height: 36px !important;
+}/*# sourceMappingURL=Transactions.css.map */

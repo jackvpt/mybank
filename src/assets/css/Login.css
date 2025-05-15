@@ -1,33 +1,17 @@
 /* Responsive */
 /* Responsive */
-.error {
+.container-login {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  margin-top: 20px;
 }
-.error h1 {
-  color: #fafafa;
-  margin: 20px auto;
-  font-size: 10rem;
-}
-@media all and (min-width: 768px) {
-  .error h1 {
-    margin: 80px auto;
-    font-size: 15rem;
-  }
-}
-.error h2 {
-  color: #fafafa;
-  margin: 0 auto;
-  text-align: center;
-  font-weight: 500;
-  line-height: 2rem;
-  font-size: 2rem;
-}
-.error__link {
-  color: #000;
-  text-decoration: underline;
-  text-align: center;
-  margin: 120px auto 100px;
-  font-size: 1.2rem;
+.container-login form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 300px;
+  gap: 1.5rem;
 }/*# sourceMappingURL=Login.css.map */

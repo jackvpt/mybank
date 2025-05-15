@@ -1,0 +1,14 @@
+/* Responsive */
+/* Responsive */
+.container-dashboard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+@media all and (min-width: 768px) {
+  .container-dashboard {
+    flex-direction: row;
+  }
+}/*# sourceMappingURL=Dashboard.css.map */

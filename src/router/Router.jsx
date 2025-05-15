@@ -4,6 +4,7 @@ import Header from "../components/Header/Header"
 import Login from "../pages/Login/Login"
 import Error from "../pages/Error/Error"
 import Transactions from "../pages/Transactions/Transactions"
+import Dashboard from "../pages/Dashboard/Dashboard"
 
 
 /**
@@ -22,7 +23,8 @@ export default function Router() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/transactions" element={<Transactions />} />
-            <Route path="*" element={<Transactions />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="*" element={<Dashboard />} />
           </Routes>
         </section>
       </main>

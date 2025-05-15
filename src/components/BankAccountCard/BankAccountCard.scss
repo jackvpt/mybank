@@ -1,0 +1,31 @@
+@use "../../styles/utils/variables" as *;
+@use "../../styles/utils/mixins" as *;
+
+.container-bankAccountCard {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background-color: $primary-color-3;
+  padding: 5px;
+  border-radius: 5px;
+
+  @include responsive-tablet {
+    padding: 10px;
+  }
+
+  .bankAccountName {
+    font-size: 1rem;
+    @include responsive-tablet {
+      font-size: 1.2rem;
+    }
+  }
+
+  .currentBalance {
+    font-size: 0.8rem;
+    @include responsive-tablet {
+      font-size: 1rem;
+    }
+  }
+}

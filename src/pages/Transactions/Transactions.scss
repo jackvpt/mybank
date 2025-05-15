@@ -1,2 +1,15 @@
 @use "../../styles/utils/variables" as *;
 @use "../../styles/utils/mixins" as *;
+
+.transaction-row {
+    height:12px;
+  &:nth-of-type(even) {
+    background-color: $primary-color-3; /* gris clair pour lignes paires */
+  }
+}
+
+.transaction-row > .MuiTableCell-root {
+  padding-top: 2px !important;    /* forcer le padding */
+  padding-bottom: 2px !important;
+  height: 36px !important;
+}
