@@ -9,12 +9,11 @@ function App() {
     queryFn: fetchBankAccounts,
   })
 
-
   useQuery({
     queryKey: ["transactions"],
     queryFn: fetchAllTransactions,
   })
-  
+
   return <Router />
 }
 

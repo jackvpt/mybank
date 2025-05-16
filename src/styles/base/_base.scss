@@ -21,12 +21,6 @@ body {
 }
 
 main {
-  display: flex;
-  flex-direction: row;
-}
-
-.section__main {
-  margin: 0 auto;
   padding: 10px;
 
   @include responsive-desktop {

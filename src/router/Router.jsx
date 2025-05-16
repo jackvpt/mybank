@@ -6,7 +6,6 @@ import Error from "../pages/Error/Error"
 import Transactions from "../pages/Transactions/Transactions"
 import Dashboard from "../pages/Dashboard/Dashboard"
 
-
 /**
  * Application router component using React Router v6.
  *
@@ -18,15 +17,13 @@ export default function Router() {
   return (
     <BrowserRouter>
       <Header />
-      <main className="container">
-        <section className="section__main">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="*" element={<Dashboard />} />
-          </Routes>
-        </section>
+      <main>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="*" element={<Dashboard />} />
+        </Routes>
       </main>
     </BrowserRouter>
   )

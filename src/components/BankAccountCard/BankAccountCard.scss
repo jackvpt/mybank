@@ -8,24 +8,23 @@
   align-items: center;
   width: 100%;
   background-color: $primary-color-3;
-  padding: 5px;
+  padding: 10px;
   border-radius: 5px;
 
   @include responsive-tablet {
-    padding: 10px;
+    padding: 15px;
   }
 
   .bankAccountName {
-    font-size: 1rem;
+    font-size: 1.2rem;
     @include responsive-tablet {
-      font-size: 1.2rem;
+      font-size: 1.5rem;
     }
   }
 
   .currentBalance {
-    font-size: 0.8rem;
     @include responsive-tablet {
-      font-size: 1rem;
+      font-size: 1.2rem;
     }
   }
 }
