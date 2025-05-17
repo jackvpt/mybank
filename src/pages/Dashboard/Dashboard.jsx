@@ -5,6 +5,7 @@ import BankAccountCard from "../../components/BankAccountCard/BankAccountCard"
 import { fetchAllTransactions } from "../../api/transactions"
 
 const Dashboard = () => {
+
   const {
     data: bankAccounts,
     isLoading: isLoadingAccounts,

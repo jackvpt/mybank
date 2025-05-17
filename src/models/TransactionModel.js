@@ -4,7 +4,7 @@
 export default class TransactionModel {
   /**
    * Creates an instance of TransactionModel.
-   * 
+   *
    * @param {Object} data - The transaction data.
    * @param {string} data.id - Unique identifier of the transaction.
    * @param {string} data.account - The account involved in the transaction.
@@ -51,6 +51,14 @@ export default class TransactionModel {
 
     /** @type {number} */
     this.credit = data.credit ?? 0
+
+    /** @type {string} */
+    this.amountSummary =
+      this.debit > 0
+        ? `-${this.debit.toFixed(2)}€`
+        : this.credit > 0
+        ? `+${this.credit.toFixed(2)}€`
+        : "0.00€"
 
     /** @type {boolean} */
     this.pointed = data.pointed ?? false

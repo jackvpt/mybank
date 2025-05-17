@@ -1,14 +1,9 @@
 import "./Transactions.scss"
-import { fetchBankAccounts } from "../../api/bankAccounts"
 import { fetchTransactionsByAccountName } from "../../api/transactions"
 import { useQuery } from "@tanstack/react-query"
 import {
   Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
   Paper,
-  Select,
   Table,
   TableBody,
   TableCell,
@@ -18,33 +13,22 @@ import {
   TableSortLabel,
 } from "@mui/material"
 import { useState } from "react"
+import { useSelector } from "react-redux"
 
 const Transactions = () => {
-  const [bankAccountName, setBankAccountName] = useState("Courant")
+  const bankAccountName = useSelector((state) => state.settings.bankAccount)
 
   const {
-    data: bankAccounts,
-    isLoading: isLoadingAccounts,
-    error: accountError,
-  } = useQuery({
-    queryKey: ["bankAccounts"],
-    queryFn: fetchBankAccounts,
-  })
-
-  const {
-    data: transactions,
+    data: transactions=[],
     isLoading: isLoadingTransactions,
     error: transactionsError,
   } = useQuery({
     queryKey: ["transactions", bankAccountName],
     queryFn: () => fetchTransactionsByAccountName(bankAccountName),
-    enabled: !!bankAccountName, // ne lance la requête que si un nom est sélectionné
+    enabled: !!bankAccountName,
   })
 
-  const handleBankAccountNameChange = (e) => {
-    setBankAccountName(e.target.value)
-  }
-
+  console.log('isLoadingTransactions :>> ', isLoadingTransactions);
   const [order, setOrder] = useState("asc")
   const [orderBy, setOrderBy] = useState("date")
 
@@ -53,9 +37,6 @@ const Transactions = () => {
     setOrder(isAsc ? "desc" : "asc")
     setOrderBy(property)
   }
-
-  if (isLoadingAccounts) return <p>Chargement des comptes...</p>
-  if (accountError) return <p>Erreur comptes : {accountError.message}</p>
 
   const sortedTransactions = [...transactions].sort((a, b) => {
     const aValue = a[orderBy]
@@ -68,39 +49,19 @@ const Transactions = () => {
       : String(bValue).localeCompare(String(aValue))
   })
 
+  if (isLoadingTransactions) return <p>Chargement des transactions...</p>
+  if (transactionsError)  return <p>Erreur transactions : {transactionsError.message}</p>
+  if (!transactions) return <p>Aucune transaction trouvée.</p>
+
   return (
     <section className="container-transactions">
       <h1>Transactions</h1>
-      <FormControl fullWidth variant="outlined" required size="small">
-        <InputLabel id="bankAccountName-label">Compte</InputLabel>
-        <Select
-          labelId="bankAccountName-label"
-          id="bankAccountName"
-          name="bankAccountName"
-          value={bankAccountName}
-          onChange={handleBankAccountNameChange}
-          label="Compte"
-          variant="standard"
-        >
-          {bankAccounts.map((account) => (
-            <MenuItem
-              key={account.id}
-              value={account.name}
-              sx={{ minHeight: "32px", paddingY: "4px" }}
-            >
-              {account.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      {isLoadingTransactions && <p>Chargement des transactions...</p>}
-      {transactionsError && (
-        <p>Erreur transactions : {transactionsError.message}</p>
-      )}
 
       {transactions && (
-        <TableContainer component={Paper}>
+        <TableContainer
+          component={Paper}
+          sx={{ maxHeight: "70vh", overflow: "auto" }}
+        >
           <Table aria-label="transactions table">
             <TableHead>
               <TableRow>

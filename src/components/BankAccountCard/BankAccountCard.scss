@@ -3,16 +3,42 @@
 
 .container-bankAccountCard {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 10px;
   width: 100%;
   background-color: $primary-color-3;
   padding: 10px;
   border-radius: 5px;
+  cursor: pointer;
 
   @include responsive-tablet {
     padding: 15px;
+  }
+
+  &__summary {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    * {
+      font-size: 0.8rem;
+      font-weight: 400;
+    }
+    .details-label {
+      flex: 1;
+      text-align: left;
+      font-style: italic;
+    }
+    .details-name,
+    .details-amount {
+      text-align: right;
+    }
   }
 
   .bankAccountName {

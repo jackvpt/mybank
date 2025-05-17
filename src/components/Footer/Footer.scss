@@ -1,0 +1,15 @@
+@use "../../styles/utils/variables" as *;
+@use "../../styles/utils/mixins" as *;
+
+footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  background-color: $primary-color-2;
+  padding: 10px;
+
+  .navbar__icon {
+    font-size: 2rem;
+    color: $text-color-2;
+  }
+}
