@@ -3,6 +3,7 @@ import { fetchTransactionsByAccountName } from "../../api/transactions"
 import { useQuery } from "@tanstack/react-query"
 import {
   Box,
+  createTheme,
   Paper,
   Table,
   TableBody,
@@ -11,15 +12,31 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
+  useMediaQuery,
 } from "@mui/material"
 import { useState } from "react"
 import { useSelector } from "react-redux"
 
 const Transactions = () => {
   const bankAccountName = useSelector((state) => state.settings.bankAccount)
+  const theme = createTheme({
+    breakpoints: {
+      values: {
+        tablet: 768,
+      },
+    },
+  })
+  const isMobileScreen = useMediaQuery(theme.breakpoints.down("tablet"))
+
+  const visibleColumns = [
+    { id: "date", label: "Date", show: true },
+    { id: "label", label: "Libellé", show: true },
+    { id: "debit", label: "Débit", show: !isMobileScreen },
+    { id: "credit", label: "Crédit", show: !isMobileScreen },
+  ]
 
   const {
-    data: transactions=[],
+    data: transactions = [],
     isLoading: isLoadingTransactions,
     error: transactionsError,
   } = useQuery({
@@ -28,7 +45,7 @@ const Transactions = () => {
     enabled: !!bankAccountName,
   })
 
-  console.log('isLoadingTransactions :>> ', isLoadingTransactions);
+  console.log("isLoadingTransactions :>> ", isLoadingTransactions)
   const [order, setOrder] = useState("asc")
   const [orderBy, setOrderBy] = useState("date")
 
@@ -50,12 +67,13 @@ const Transactions = () => {
   })
 
   if (isLoadingTransactions) return <p>Chargement des transactions...</p>
-  if (transactionsError)  return <p>Erreur transactions : {transactionsError.message}</p>
+  if (transactionsError)
+    return <p>Erreur transactions : {transactionsError.message}</p>
   if (!transactions) return <p>Aucune transaction trouvée.</p>
 
   return (
     <section className="container-transactions">
-      <h1>Transactions</h1>
+      <h1>{bankAccountName}</h1>
 
       {transactions && (
         <TableContainer
@@ -65,23 +83,38 @@ const Transactions = () => {
           <Table aria-label="transactions table">
             <TableHead>
               <TableRow>
-                {[
-                  { id: "date", label: "Date" },
-                  { id: "label", label: "Libellé" },
-                  { id: "debit", label: "Débit" },
-                  { id: "credit", label: "Crédit" },
-                ].map((headCell) => (
-                  <TableCell key={headCell.id}>
-                    <TableSortLabel
-                      active={orderBy === headCell.id}
-                      direction={orderBy === headCell.id ? order : "asc"}
-                      onClick={() => handleSort(headCell.id)}
+                {visibleColumns
+                  .filter((column) => column.show)
+                  .map((headCell) => (
+                    <TableCell
+                      key={headCell.id}
+                      sx={{
+                        position: "sticky",
+                        top: 0,
+                        backgroundColor: "#f5f5f5",
+                        "z-index": 1,
+                      }}
                     >
-                      {headCell.label}
-                    </TableSortLabel>
-                  </TableCell>
-                ))}
-                <TableCell align="center">Val.</TableCell>
+                      <TableSortLabel
+                        active={orderBy === headCell.id}
+                        direction={orderBy === headCell.id ? order : "asc"}
+                        onClick={() => handleSort(headCell.id)}
+                      >
+                        {headCell.label}
+                      </TableSortLabel>
+                    </TableCell>
+                  ))}
+                <TableCell
+                  align="center"
+                  sx={{
+                    position: "sticky",
+                    top: 0,
+                    backgroundColor: "#f5f5f5",
+                    "z-index": 1,
+                  }}
+                >
+                  Val.
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

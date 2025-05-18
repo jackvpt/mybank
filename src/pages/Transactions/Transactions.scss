@@ -1,15 +1,27 @@
 @use "../../styles/utils/variables" as *;
 @use "../../styles/utils/mixins" as *;
 
-.transaction-row {
-    height:12px;
-  &:nth-of-type(even) {
-    background-color: $primary-color-3; /* gris clair pour lignes paires */
-  }
+.container-transactions {
+h1 {
+  margin-bottom: 20px;
 }
 
-.transaction-row > .MuiTableCell-root {
-  padding-top: 2px !important;    /* forcer le padding */
-  padding-bottom: 2px !important;
-  height: 36px !important;
+  .transaction-row {
+    height: 12px;
+    cursor: pointer;
+
+    &:nth-of-type(even) {
+      background-color: $primary-color-3;
+    }
+
+    &:hover{
+      background-color: $primary-color-4;
+    }
+  }
+
+  .transaction-row > .MuiTableCell-root {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    height: 36px !important;
+  }
 }

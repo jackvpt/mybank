@@ -15,7 +15,7 @@
     padding: 15px;
   }
 
-  &__summary {
+  &__amount {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -42,7 +42,7 @@
   }
 
   .bankAccountName {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     @include responsive-tablet {
       font-size: 1.5rem;
     }
