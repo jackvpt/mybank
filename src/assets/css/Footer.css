@@ -1,0 +1,14 @@
+/* Responsive */
+/* Responsive */
+footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1.5rem;
+  background-color: #3657c3;
+  padding: 10px;
+}
+footer .navbar__icon {
+  font-size: 1.75rem;
+  color: #fff;
+}/*# sourceMappingURL=Footer.css.map */

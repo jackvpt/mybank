@@ -12,6 +12,7 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
+  Typography,
   useMediaQuery,
 } from "@mui/material"
 import { useState } from "react"
@@ -33,6 +34,7 @@ const Transactions = () => {
     { id: "label", label: "Libellé", show: true },
     { id: "debit", label: "Débit", show: !isMobileScreen },
     { id: "credit", label: "Crédit", show: !isMobileScreen },
+    { id: "status", label: "Val.", show: !isMobileScreen },
   ]
 
   const {
@@ -45,7 +47,6 @@ const Transactions = () => {
     enabled: !!bankAccountName,
   })
 
-  console.log("isLoadingTransactions :>> ", isLoadingTransactions)
   const [order, setOrder] = useState("asc")
   const [orderBy, setOrderBy] = useState("date")
 
@@ -58,9 +59,17 @@ const Transactions = () => {
   const sortedTransactions = [...transactions].sort((a, b) => {
     const aValue = a[orderBy]
     const bValue = b[orderBy]
+
+    if (orderBy === "date") {
+      const aDate = new Date(aValue)
+      const bDate = new Date(bValue)
+      return order === "asc" ? aDate - bDate : bDate - aDate
+    }
+
     if (typeof aValue === "number" && typeof bValue === "number") {
       return order === "asc" ? aValue - bValue : bValue - aValue
     }
+
     return order === "asc"
       ? String(aValue).localeCompare(String(bValue))
       : String(bValue).localeCompare(String(aValue))
@@ -78,7 +87,7 @@ const Transactions = () => {
       {transactions && (
         <TableContainer
           component={Paper}
-          sx={{ maxHeight: "70vh", overflow: "auto" }}
+          sx={{ maxHeight: "75vh", overflow: "auto" }}
         >
           <Table aria-label="transactions table">
             <TableHead>
@@ -88,6 +97,7 @@ const Transactions = () => {
                   .map((headCell) => (
                     <TableCell
                       key={headCell.id}
+                      align="center"
                       sx={{
                         position: "sticky",
                         top: 0,
@@ -104,43 +114,33 @@ const Transactions = () => {
                       </TableSortLabel>
                     </TableCell>
                   ))}
-                <TableCell
-                  align="center"
-                  sx={{
-                    position: "sticky",
-                    top: 0,
-                    backgroundColor: "#f5f5f5",
-                    "z-index": 1,
-                  }}
-                >
-                  Val.
-                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {sortedTransactions.map((tx) => (
                 <TableRow key={tx.id} className="transaction-row">
-                  <TableCell>
+                  <TableCell align="center">
                     {new Date(tx.date).toLocaleDateString()}
                   </TableCell>
                   <TableCell>{tx.label}</TableCell>
-                  <TableCell align="right">
+                  <TableCell align="center">
                     {tx.debit ? tx.debit.toFixed(2) + " €" : ""}
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="center">
                     {tx.credit ? tx.credit.toFixed(2) + " €" : ""}
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <Box
                       sx={{
                         width: 12,
                         height: 12,
                         borderRadius: "50%",
-                        backgroundColor: tx.validated
-                          ? "green"
-                          : tx.pointed
-                          ? "blue"
-                          : "white",
+                        backgroundColor:
+                          tx.status === "validated"
+                            ? "green"
+                            : tx.status === "pointed"
+                            ? "blue"
+                            : "white",
                         border: "1px solid #ccc",
                         margin: "0 auto",
                       }}

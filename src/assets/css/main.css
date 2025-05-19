@@ -70,21 +70,16 @@ body {
 }
 
 main {
-  display: flex;
-  flex-direction: row;
-}
-
-.section__main {
-  margin: 0 auto;
+  flex: 1;
   padding: 10px;
 }
 @media all and (min-width: 1024px) {
-  .section__main {
-    padding: 20px 30px;
+  main {
+    padding: 10px 20px;
   }
 }
 @media all and (min-width: 1280px) {
-  .section__main {
-    padding: 30px 50px;
+  main {
+    padding: 10px 30px;
   }
 }/*# sourceMappingURL=main.css.map */

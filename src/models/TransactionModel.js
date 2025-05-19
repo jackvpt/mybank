@@ -16,8 +16,7 @@ export default class TransactionModel {
    * @param {string} [data.subCategory] - A more specific sub-category (optional).
    * @param {number} [data.debit=0] - The debit amount (money going out).
    * @param {number} [data.credit=0] - The credit amount (money coming in).
-   * @param {boolean} [data.pointed=false] - Whether the transaction is pointed (pre-validated).
-   * @param {boolean} [data.validated=false] - Whether the transaction is fully validated (by bank).
+   * @param {string} [data.status] - Status of the transaction (null, "pointed","validated").
    * @param {string} [data.destination] - Destination of the transfer, if applicable.
    * @param {string} [data.periodicity=""] - Periodicity of the transaction (e.g. "monthly", "weekly").
    */
@@ -67,11 +66,9 @@ export default class TransactionModel {
         ? `+${this.credit.toFixed(2)}€`
         : "0.00€"
 
-    /** @type {boolean} */
-    this.pointed = data.pointed ?? false
 
-    /** @type {boolean} */
-    this.validated = data.validated ?? false
+    /** @type {string} */
+    this.status = data.status ?? null
 
     /** @type {string | undefined} */
     this.destination = data.destination

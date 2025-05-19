@@ -1,14 +1,19 @@
 /* Responsive */
 /* Responsive */
-.transaction-row {
-  height: 12px;
+.container-transactions h1 {
+  margin-bottom: 20px;
 }
-.transaction-row:nth-of-type(even) {
-  background-color: #a6bff9; /* gris clair pour lignes paires */
+.container-transactions .transaction-row {
+  cursor: pointer;
 }
-
-.transaction-row > .MuiTableCell-root {
-  padding-top: 2px !important; /* forcer le padding */
+.container-transactions .transaction-row:nth-of-type(even) {
+  background-color: #a6bff9;
+}
+.container-transactions .transaction-row:hover {
+  background-color: #D8D9E0;
+}
+.container-transactions .transaction-row > .MuiTableCell-root {
+  padding-top: 2px !important;
   padding-bottom: 2px !important;
-  height: 36px !important;
+  height: 24px !important;
 }/*# sourceMappingURL=Transactions.css.map */
