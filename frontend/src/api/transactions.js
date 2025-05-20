@@ -12,7 +12,7 @@ import TransactionModel from "../models/TransactionModel"
  */
 export const fetchTransactionsByAccountName = async (accountName) => {
   try {
-    const response = await fetch("/__mocks__/transactions.json")
+    const response = await fetch("http://localhost:3000/api/transactions")
     if (!response.ok) throw new Error("Mock data request failed")
 
     const data = await response.json()
