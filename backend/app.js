@@ -40,6 +40,8 @@ app.use((req, res, next) => {
 
 /** Transactions routes */
 app.use("/api/transactions", rateLimiter[1], transactionsRoutes)
+
+/** Accounts routes */
 app.use("/api/accounts", rateLimiter[1], accountsRoutes)
 
 module.exports = app

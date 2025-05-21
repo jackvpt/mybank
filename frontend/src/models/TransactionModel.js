@@ -6,7 +6,6 @@ export default class TransactionModel {
    * Creates an instance of TransactionModel.
    *
    * @param {Object} data - The transaction data.
-   * @param {string} data.id - Unique identifier of the transaction.
    * @param {string} data.account - The account involved in the transaction.
    * @param {string|Date} data.date - The date of the transaction (ISO string or Date object).
    * @param {string} data.type - The type of transaction (e.g. "card", "check", "transfer", "auto debit").
@@ -21,9 +20,6 @@ export default class TransactionModel {
    * @param {string} [data.periodicity=""] - Periodicity of the transaction (e.g. "monthly", "weekly").
    */
   constructor(data) {
-    /** @type {string} */
-    this.id = data.id
-
     /** @type {string} */
     this.account = data.account
 

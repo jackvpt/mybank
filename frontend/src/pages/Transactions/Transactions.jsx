@@ -53,6 +53,7 @@ const Transactions = () => {
 
   // Set current year for filtering
   const currentYear = new Date().getFullYear()
+  // Set current month for filtering
   const currentMonth = new Date().getMonth() + 1
 
   const [dateFilter, setDateFilter] = useState("all")
@@ -79,6 +80,8 @@ const Transactions = () => {
       }
       case "currentMonth":
         return txYear === currentYear && txMonth === currentMonth
+      case "previousMonth":
+        return txYear === currentYear && txMonth === currentMonth - 1
       case "last3months": {
         const today = new Date()
         const startDate = new Date(today.getFullYear(), today.getMonth() - 2, 1)
@@ -137,33 +140,24 @@ const Transactions = () => {
       <div className="container-transactions__tools">
         <h1>{bankAccountName}</h1>
         <FormControl className="date-form-control" size="small">
-          <InputLabel id="date-filter-label">
-            Dates
-          </InputLabel>
+          <InputLabel id="date-filter-label">Dates</InputLabel>
           <Select
             labelId="date-filter-label"
             value={dateFilter}
             label="Dates"
             onChange={(e) => setDateFilter(e.target.value)}
           >
-            <MenuItem value={"all"}>
-              Toutes
-            </MenuItem>
+            <MenuItem value={"all"}>Toutes</MenuItem>
             <MenuItem value={"currentYear"}>
               Année en cours ({currentYear})
             </MenuItem>
             <MenuItem value={"lastYear"}>
               Année précédente ({currentYear - 1})
             </MenuItem>
-            <MenuItem value={"last12months"}>
-              12 derniers mois
-            </MenuItem>
-            <MenuItem value={"currentMonth"}>
-              Mois en cours{" "}
-            </MenuItem>
-            <MenuItem value={"last3months"}>
-              3 derniers mois complets
-            </MenuItem>
+            <MenuItem value={"last12months"}>12 derniers mois</MenuItem>
+            <MenuItem value={"currentMonth"}>Mois en cours</MenuItem>
+            <MenuItem value={"previousMonth"}>Mois précédent</MenuItem>
+            <MenuItem value={"last3months"}>3 derniers mois complets</MenuItem>
           </Select>
         </FormControl>
       </div>

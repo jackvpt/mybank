@@ -1,0 +1,1511 @@
+!Type:Bank
+D29/08'2015
+T0.00
+CX
+PSolde initial
+L[B For Bank]
+^
+D29/08'2015
+CX
+T500.00
+L[SG courant]
+^
+D28/09'2015
+CX
+T200.00
+L[SG courant]
+^
+D30/09'2015
+CX
+T-351.17
+PDépenses mensuelles
+LDivers
+^
+D12/10'2015
+CX
+T80.00
+PDivers
+^
+D30/10'2015
+CX
+T-351.90
+PDépenses mensuelles
+LDivers
+^
+D02/11'2015
+CX
+T300.00
+L[SG courant]
+^
+D30/11'2015
+CX
+T-293.18
+PDépenses mensuelles
+LDivers
+^
+D01/12'2015
+CX
+T200.00
+L[SG courant]
+^
+D23/12'2015
+CX
+T300.00
+L[SG courant]
+^
+D31/12'2015
+CX
+T-292.15
+PDépenses mensuelles
+LDivers
+^
+D28/01'2016
+CX
+T200.00
+L[SG courant]
+^
+D31/01'2016
+CX
+T-233.92
+PDépenses mensuelles
+LDivers
+^
+D28/02'2016
+CX
+T200.00
+L[SG courant]
+^
+D29/02'2016
+CX
+T-173.55
+PDépenses mensuelles
+LDivers
+^
+D19/03'2016
+CX
+T300.00
+L[SG courant]
+^
+D25/03'2016
+CX
+T-342.09
+PDépenses mensuelles
+LDivers
+^
+D26/04'2016
+CX
+T-181.88
+PDépenses mensuelles
+LDivers
+^
+D29/04'2016
+CX
+T200.00
+L[SG courant]
+^
+D25/05'2016
+CX
+T-186.78
+PDépenses mensuelles
+LDivers
+^
+D30/05'2016
+CX
+T100.00
+L[SG courant]
+^
+D23/06'2016
+CX
+T400.00
+L[SG courant]
+^
+D25/06'2016
+CX
+T-313.45
+PDépenses mensuelles
+LDivers
+^
+D12/07'2016
+CX
+T500.00
+L[SG courant]
+^
+D26/07'2016
+CX
+T-235.55
+PDépenses mensuelles
+LDivers
+^
+D11/08'2016
+CX
+T300.00
+L[SG courant]
+^
+D27/08'2016
+CX
+T300.00
+L[SG courant]
+^
+D31/08'2016
+CX
+T-745.35
+PDépenses mensuelles
+LDivers
+^
+D25/09'2016
+CX
+T-268.17
+PDépenses mensuelles
+LDivers
+^
+D30/09'2016
+CX
+T300.00
+L[SG courant]
+^
+D31/10'2016
+CX
+T-159.65
+PDépenses mensuelles
+LDivers
+^
+D30/11'2016
+CX
+T-144.55
+PDépenses mensuelles
+LDivers
+^
+D01/12'2016
+CX
+T200.00
+L[SG courant]
+^
+D29/12'2016
+CX
+T300.00
+L[SG courant]
+^
+D30/12'2016
+CX
+T-231.40
+PDépenses mensuelles
+LDivers
+^
+D28/01'2017
+CX
+T300.00
+L[SG courant]
+^
+D31/01'2017
+CX
+T-386.90
+PDépenses mensuelles
+LDivers
+^
+D28/02'2017
+CX
+T-258.53
+PDépenses mensuelles
+LDivers
+^
+D28/02'2017
+CX
+T300.00
+L[SG courant]
+^
+D28/03'2017
+CX
+T150.00
+L[SG courant]
+^
+D31/03'2017
+CX
+T-142.96
+PDépenses mensuelles
+LDivers
+^
+D30/04'2017
+CX
+T-253.80
+PDépenses mensuelles
+LDivers
+^
+D30/04'2017
+CX
+T200.00
+L[SG courant]
+^
+D24/05'2017
+CX
+T300.00
+L[SG courant]
+^
+D31/05'2017
+CX
+T-332.66
+PDépenses mensuelles
+LDivers
+^
+D29/06'2017
+CX
+T300.00
+L[SG courant]
+^
+D30/06'2017
+CX
+T-251.53
+PDépenses mensuelles
+LDivers
+^
+D27/07'2017
+CX
+T300.00
+L[SG courant]
+^
+D31/07'2017
+CX
+T-248.19
+PDépenses mensuelles
+LDivers
+^
+D31/08'2017
+CX
+T-157.63
+PDépenses mensuelles
+LDivers
+^
+D30/09'2017
+CX
+T400.00
+L[SG courant]
+^
+D30/09'2017
+CX
+T-304.44
+PDépenses mensuelles
+LDivers
+^
+D29/10'2017
+CX
+T300.00
+L[SG courant]
+^
+D31/10'2017
+CX
+T-291.55
+PDépenses mensuelles
+LDivers
+^
+D25/11'2017
+CX
+T-223.15
+PDépenses mensuelles
+LDivers
+^
+D29/11'2017
+CX
+T300.00
+L[SG courant]
+^
+D21/12'2017
+CX
+T400.00
+L[SG courant]
+^
+D31/12'2017
+CX
+T-353.93
+PDépenses mensuelles
+LDivers
+^
+D28/01'2018
+CX
+T200.00
+L[SG courant]
+^
+D31/01'2018
+CX
+T-271.23
+PDépenses mensuelles
+LDivers
+^
+D28/02'2018
+CX
+T400.00
+L[SG courant]
+^
+D28/02'2018
+CX
+T-390.91
+PDépenses mensuelles
+LDivers
+^
+D29/03'2018
+CX
+T-180.73
+PDépenses mensuelles
+LDivers
+^
+D30/03'2018
+CX
+T200.00
+L[SG courant]
+^
+D30/04'2018
+CX
+T400.00
+L[SG courant]
+^
+D30/04'2018
+CX
+T-377.13
+PDépenses mensuelles
+LDivers
+^
+D26/05'2018
+CX
+T-358.48
+PDépenses mensuelles
+LDivers
+^
+D28/05'2018
+CX
+T400.00
+L[SG courant]
+^
+D29/06'2018
+CX
+T-236.12
+PDépenses mensuelles
+LDivers
+^
+D29/06'2018
+CX
+T200.00
+L[SG courant]
+^
+D26/07'2018
+CX
+T-324.09
+PDépenses mensuelles
+LDivers
+^
+D26/07'2018
+CX
+T300.00
+L[SG courant]
+^
+D24/08'2018
+CX
+T600.00
+L[SG courant]
+^
+D25/08'2018
+CX
+T-737.23
+PDépenses mensuelles
+LDivers
+^
+D27/09'2018
+CX
+T300.00
+L[SG courant]
+^
+D30/09'2018
+CX
+T250.00
+L[SG courant]
+^
+D24/10'2018
+CX
+T400.00
+L[SG courant]
+^
+D25/10'2018
+CX
+T-405.20
+PDépenses mensuelles
+LDivers
+^
+D25/10'2018
+CX
+T-478.19
+PDépenses mensuelles
+LDivers
+^
+D25/11'2018
+CX
+T-304.68
+PDépenses mensuelles
+LDivers
+^
+D28/11'2018
+CX
+T400.00
+L[SG courant]
+^
+D24/12'2018
+CX
+T500.00
+L[SG courant]
+^
+D25/12'2018
+CX
+T-413.83
+PDépenses mensuelles
+LDivers
+^
+D27/01'2019
+CX
+T-301.86
+PDépenses mensuelles
+LDivers
+^
+D27/01'2019
+CX
+T200.00
+L[SG courant]
+^
+D25/02'2019
+CX
+T400.00
+L[SG courant]
+^
+D27/02'2019
+CX
+T-573.25
+PDépenses mensuelles
+LDivers
+^
+D30/03'2019
+CX
+T300.00
+L[SG courant]
+^
+D31/03'2019
+CX
+T-321.76
+PDépenses mensuelles
+LDivers
+^
+D29/04'2019
+CX
+T300.00
+L[SG courant]
+^
+D30/04'2019
+CX
+T-257.76
+PDépenses mensuelles
+LDivers
+^
+D30/05'2019
+CX
+T300.00
+L[SG courant]
+^
+D31/05'2019
+CX
+T-207.75
+PDépenses mensuelles
+LDivers
+^
+D30/06'2019
+CX
+T300.00
+L[SG courant]
+^
+D30/06'2019
+CX
+T-478.36
+PDépenses mensuelles
+LDivers
+^
+D28/07'2019
+CX
+T300.00
+L[SG courant]
+^
+D31/07'2019
+CX
+T-230.96
+PDépenses mensuelles
+LDivers
+^
+D29/08'2019
+CX
+T300.00
+L[SG courant]
+^
+D31/08'2019
+CX
+T-303.54
+PDépenses mensuelles
+LDivers
+^
+D28/09'2019
+CX
+T300.00
+L[SG courant]
+^
+D29/09'2019
+CX
+T300.00
+L[Compte commun]
+^
+D30/09'2019
+CX
+T-356.39
+PDépenses mensuelles
+LDivers
+^
+D29/10'2019
+CX
+T300.00
+L[Compte commun]
+^
+D31/10'2019
+CX
+T-289.06
+PDépenses mensuelles
+LDivers
+^
+D26/11'2019
+CX
+T300.00
+L[Compte commun]
+^
+D29/11'2019
+CX
+T-352.56
+PDépenses mensuelles
+LDivers
+^
+D26/12'2019
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D29/12'2019
+CX
+T-225.32
+PDépenses mensuelles
+LDivers
+^
+D26/01'2020
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/01'2020
+CX
+T-290.10
+PDépenses mensuelles
+LDivers
+^
+D26/02'2020
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D26/02'2020
+CX
+T-311.23
+PDépenses mensuelles
+LDivers
+^
+D26/03'2020
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D27/03'2020
+CX
+T-329.10
+PDépenses mensuelles
+LDivers
+^
+D25/04'2020
+CX
+T-288.13
+PDépenses mensuelles
+LDivers
+^
+D26/04'2020
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D26/05'2020
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/05'2020
+CX
+T-380.72
+PDépenses mensuelles
+LDivers
+^
+D26/06'2020
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D30/06'2020
+CX
+T-326.74
+PDépenses mensuelles
+LDivers
+^
+D26/07'2020
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/07'2020
+CX
+T-586.66
+PDépenses mensuelles
+LDivers
+^
+D26/08'2020
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/08'2020
+CX
+T-241.94
+PDépenses mensuelles
+LDivers
+^
+D27/09'2020
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D30/09'2020
+CX
+T-356.82
+PDépenses mensuelles
+LDivers
+^
+D23/10'2020
+CX
+T200.00
+L[Compte commun]
+^
+D26/10'2020
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/10'2020
+CX
+T-433.48
+PDépenses mensuelles
+LDivers
+^
+D26/11'2020
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D30/11'2020
+CX
+T-295.92
+PDépenses mensuelles
+LDivers
+^
+D26/12'2020
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/12'2020
+CX
+T-332.86
+PDépenses mensuelles
+LDivers
+^
+D24/01'2021
+CX
+T100.00
+L[Compte commun]
+^
+D26/01'2021
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/01'2021
+CX
+T-463.96
+PDépenses mensuelles
+LDivers
+^
+D26/02'2021
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D28/02'2021
+CX
+T-216.70
+PDépenses mensuelles
+LDivers
+^
+D26/03'2021
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D02/04'2021
+CX
+T-303.97
+PDépenses mensuelles
+LDivers
+^
+D26/04'2021
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D30/04'2021
+CX
+T-205.39
+PDépenses mensuelles
+LDivers
+^
+D26/05'2021
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/05'2021
+CX
+T-225.18
+PDépenses mensuelles
+LDivers
+^
+D26/06'2021
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D30/06'2021
+CX
+T-507.17
+PDépenses mensuelles
+LDivers
+^
+D23/07'2021
+CX
+T200.00
+L[Compte commun]
+^
+D26/07'2021
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/07'2021
+CX
+T-436.72
+PDépenses mensuelles
+LDivers
+^
+D26/08'2021
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/08'2021
+CX
+T-401.10
+PDépenses mensuelles
+LDivers
+^
+D26/09'2021
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D27/09'2021
+CX
+T100.00
+L[Compte commun]
+^
+D30/09'2021
+CX
+T-371.20
+PDépenses mensuelles
+LDivers
+^
+D26/10'2021
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/10'2021
+CX
+T-229.76
+PDépenses mensuelles
+LDivers
+^
+D26/11'2021
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D30/11'2021
+CX
+T-316.80
+PDépenses mensuelles
+LDivers
+^
+D26/12'2021
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/12'2021
+CX
+T-363.08
+PDépenses mensuelles
+LDivers
+^
+D26/01'2022
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/01'2022
+CX
+T-356.70
+PDépenses mensuelles
+LDivers
+^
+D13/02'2022
+CX
+T200.00
+L[Compte commun]
+^
+D26/02'2022
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D28/02'2022
+CX
+T-450.34
+PDépenses mensuelles
+LDivers
+^
+D26/03'2022
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/03'2022
+CX
+T-170.25
+PDépenses mensuelles
+LDivers
+^
+D28/04'2022
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D30/04'2022
+CX
+T-276.72
+PDépenses mensuelles
+LDivers
+^
+D26/05'2022
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/05'2022
+CX
+T-407.67
+PDépenses mensuelles
+LDivers
+^
+D26/06'2022
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D26/06'2022
+CX
+T100.00
+L[Compte commun]
+^
+D30/06'2022
+CX
+T-425.49
+PDépenses mensuelles
+LDivers
+^
+D26/07'2022
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/07'2022
+CX
+T-386.09
+PDépenses mensuelles
+LDivers
+^
+D29/08'2022
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/08'2022
+CX
+T-299.40
+PDépenses mensuelles
+LDivers
+^
+D27/09'2022
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D30/09'2022
+CX
+T-184.27
+PDépenses mensuelles
+LDivers
+^
+D23/10'2022
+CX
+T100.00
+L[Compte commun]
+^
+D26/10'2022
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D26/10'2022
+CX
+T100.00
+L[Compte commun]
+^
+D31/10'2022
+CX
+T-535.95
+PDépenses mensuelles
+LDivers
+^
+D26/11'2022
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D30/11'2022
+CX
+T-358.15
+PDépenses mensuelles
+LDivers
+^
+D16/12'2022
+CX
+T100.00
+L[Compte commun]
+^
+D26/12'2022
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/12'2022
+CX
+T-377.34
+PDépenses mensuelles
+LDivers
+^
+D26/01'2023
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D26/01'2023
+CX
+T100.00
+L[Compte commun]
+^
+D31/01'2023
+CX
+T-350.55
+PDépenses mensuelles
+LDivers
+^
+D25/02'2023
+CX
+T100.00
+L[Compte commun]
+^
+D26/02'2023
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D28/02'2023
+CX
+T-395.40
+PDépenses mensuelles
+LDivers
+^
+D24/03'2023
+CX
+T100.00
+L[Compte commun]
+^
+D26/03'2023
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/03'2023
+CX
+T-412.10
+PDépenses mensuelles
+LDivers
+^
+D22/04'2023
+CX
+T100.00
+L[Compte commun]
+^
+D26/04'2023
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D30/04'2023
+CX
+T-453.48
+PDépenses mensuelles
+LDivers
+^
+D26/05'2023
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/05'2023
+CX
+T-232.89
+PDépenses mensuelles
+LDivers
+^
+D26/06'2023
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D30/06'2023
+CX
+T-353.99
+PDépenses mensuelles
+LDivers
+^
+D24/07'2023
+CX
+T200.00
+L[Compte commun]
+^
+D24/07'2023
+CX
+T47.35
+PCourses
+LCourses
+^
+D26/07'2023
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D31/07'2023
+CX
+T-465.79
+PDépenses mensuelles
+LDivers
+^
+D26/08'2023
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D26/08'2023
+CX
+T100.00
+L[Compte commun]
+^
+D31/08'2023
+CX
+T-485.64
+PDépenses mensuelles
+LDivers
+^
+D23/09'2023
+CX
+T100.00
+L[Compte commun]
+^
+D26/09'2023
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D30/09'2023
+CX
+T-402.25
+PDépenses mensuelles
+LDivers
+^
+D22/10'2023
+CX
+T100.00
+L[Compte commun]
+^
+D26/10'2023
+CX
+T300.00
+PVirement
+L[Compte commun]
+^
+D26/10'2023
+CX
+T100.00
+L[Compte commun]
+^
+D31/10'2023
+CX
+T-456.52
+PDépenses mensuelles
+LDivers
+^
+D26/11'2023
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D30/11'2023
+CX
+T-465.54
+PDépenses mensuelles
+LDivers
+^
+D26/12'2023
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D30/12'2023
+CX
+T-368.88
+PDépenses mensuelles
+LDivers
+^
+D26/01'2024
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D31/01'2024
+CX
+T-348.96
+PDépenses mensuelles
+LDivers
+^
+D24/02'2024
+CX
+T100.00
+L[Compte commun]
+^
+D26/02'2024
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D29/02'2024
+CX
+T-560.13
+PDépenses mensuelles
+LDivers
+^
+D26/03'2024
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D31/03'2024
+CX
+T-411.68
+PDépenses mensuelles
+LDivers
+^
+D25/04'2024
+CX
+T100.00
+L[Compte commun]
+^
+D26/04'2024
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D30/04'2024
+CX
+T-431.48
+PDépenses mensuelles
+LDivers
+^
+D26/05'2024
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D31/05'2024
+CX
+T-464.09
+PDépenses mensuelles
+LDivers
+^
+D25/06'2024
+CX
+T100.00
+L[Compte commun]
+^
+D26/06'2024
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D30/06'2024
+CX
+T-524.46
+PDépenses mensuelles
+LDivers
+^
+D05/07'2024
+CX
+T200.00
+L[Compte commun]
+^
+D26/07'2024
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D28/07'2024
+CX
+T100.00
+L[Compte commun]
+^
+D31/07'2024
+CX
+T-626.73
+PDépenses mensuelles
+LDivers
+^
+D23/08'2024
+CX
+T100.00
+L[Compte commun]
+^
+D26/08'2024
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D31/08'2024
+CX
+T-542.32
+PDépenses mensuelles
+LDivers
+^
+D21/09'2024
+CX
+T200.00
+L[Compte commun]
+^
+D26/09'2024
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D30/09'2024
+CX
+T-577.31
+PDépenses mensuelles
+LDivers
+^
+D25/10'2024
+CX
+T100.00
+L[Compte commun]
+^
+D26/10'2024
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D31/10'2024
+CX
+T-512.96
+PDépenses mensuelles
+LDivers
+^
+D26/11'2024
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D30/11'2024
+CX
+T-430.45
+PDépenses mensuelles
+LDivers
+^
+D26/12'2024
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D31/12'2024
+CX
+T-358.40
+PDépenses mensuelles
+LDivers
+^
+D26/01'2025
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D26/01'2025
+CX
+T100.00
+L[Compte commun]
+^
+D31/01'2025
+CX
+T-508.88
+PDépenses mensuelles
+LDivers
+^
+D22/02'2025
+CX
+T100.00
+L[Compte commun]
+^
+D26/02'2025
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D28/02'2025
+CX
+T-524.10
+PDépenses mensuelles
+LDivers
+^
+D26/03'2025
+CX
+T400.00
+PVirement
+L[Compte commun]
+^
+D31/03'2025
+CX
+T-328.54
+PDépenses mensuelles
+LDivers
+^
+D26/04'2025
+T400.00
+PVirement
+L[Compte commun]
+^
+D26/04'2025
+T200.00
+L[Compte commun]
+^
+D26/05'2025
+T400.00
+PVirement
+L[Compte commun]
+^

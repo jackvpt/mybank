@@ -1,12 +1,12 @@
-import { faker } from "@faker-js/faker"
+// import { faker } from "@faker-js/faker"
 import fs from "fs/promises"
 import { writeFileSync } from "fs"
 import path from "path"
 import { fileURLToPath } from "url"
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const filePath = path.join(__dirname, "comptes2017.qif")
+// const __filename = fileURLToPath(import.meta.url)
+// const __dirname = path.dirname(__filename)
+// const filePath = path.join(__dirname, "comptes2017.qif")
 
 function parseDate(qifDate) {
   // Exemple : "D09/08'2019" → "2019-08-09"
@@ -34,7 +34,7 @@ function parseQIF(content, bankAccountName) {
     const lines = entry.split("\n").map((line) => line.trim())
     const transaction = {}
 
-    transaction.id = faker.string.uuid()
+    // transaction.id = faker.string.uuid()
     transaction.account = bankAccountName
 
     let type = "card"
@@ -93,8 +93,11 @@ function parseQIF(content, bankAccountName) {
   return result
 }
 
-async function convertQIFtoJSON(bankAccountName) {
+async function convertQIFtoJSON(bankAccountName, fileName) {
   try {
+    const __filename = fileURLToPath(import.meta.url)
+    const __dirname = path.dirname(__filename)
+    const filePath = path.join(__dirname, fileName)
     const rawData = await fs.readFile(filePath, "utf-8")
     const transactions = parseQIF(rawData, bankAccountName)
     const jsonString = JSON.stringify(transactions, null, 2)
@@ -114,4 +117,4 @@ async function convertQIFtoJSON(bankAccountName) {
   }
 }
 
-convertQIFtoJSON("Courant")
+convertQIFtoJSON("Courant", "courant.qif")
