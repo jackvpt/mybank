@@ -6,7 +6,7 @@ const express = require("express")
 const mongoose = require("mongoose")
 const rateLimiter = require("./middleware/rate-limiter")
 const transactionsRoutes = require("./routes/transactions")
-const accountsRoutes = require("./routes/accounts")
+const bankAccountsRoutes = require("./routes/bankAccounts")
 
 /** Create an express application */
 const app = express()
@@ -42,6 +42,6 @@ app.use((req, res, next) => {
 app.use("/api/transactions", rateLimiter[1], transactionsRoutes)
 
 /** Accounts routes */
-app.use("/api/accounts", rateLimiter[1], accountsRoutes)
+app.use("/api/bankaccounts", rateLimiter[1], bankAccountsRoutes)
 
 module.exports = app

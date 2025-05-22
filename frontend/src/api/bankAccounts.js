@@ -9,7 +9,7 @@
  */
 export const fetchBankAccounts = async ()=>{
   try {
-    const response = await fetch("http://localhost:3000/api/accounts")
+    const response = await fetch("http://localhost:3000/api/bankaccounts")
     if (!response.ok) throw new Error("Mock data request failed")
     const data = await response.json()
     return data

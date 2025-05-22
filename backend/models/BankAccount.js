@@ -2,7 +2,7 @@
 const mongoose = require("mongoose")
 
 /** Create a mongoose Schema */
-const accountSchema = mongoose.Schema({
+const bankAccountSchema = mongoose.Schema({
   name: { type: String, required: true },
   bankName: { type: String, required: true },
   bankAbbreviation: { type: String, required: true },
@@ -16,6 +16,6 @@ const accountSchema = mongoose.Schema({
 
 /** Model methods converts Schema in usable model */
 module.exports = mongoose.model(
-  "Account",
-  accountSchema
-) /** 'Transaction' is the collection name which becomes 'Transactions' */
+  "BankAccount",
+  bankAccountSchema
+) /** 'BankAccount' is the collection name which becomes 'BankAccounts' */
