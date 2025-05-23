@@ -22,8 +22,18 @@ import {
 import { useState } from "react"
 import { useSelector } from "react-redux"
 
+/**
+ * Transactions component that fetches and displays transactions for a selected bank account.
+ * It allows filtering by date and sorting by various columns.
+ * @returns {JSX.Element} Transactions component
+ */
 const Transactions = () => {
   const bankAccountName = useSelector((state) => state.settings.bankAccount)
+
+  /**
+   * Create a theme for responsive design.
+   * This theme defines breakpoints for different screen sizes.
+   */
   const theme = createTheme({
     breakpoints: {
       values: {
@@ -31,16 +41,19 @@ const Transactions = () => {
       },
     },
   })
+
   const isMobileScreen = useMediaQuery(theme.breakpoints.down("tablet"))
 
+  // Define which columns should be visible based on screen size
   const visibleColumns = [
     { id: "date", label: "Date", show: true },
-    { id: "label", label: "Libellé", show: true },
-    { id: "debit", label: "Débit", show: !isMobileScreen },
-    { id: "credit", label: "Crédit", show: !isMobileScreen },
-    { id: "status", label: "Val.", show: !isMobileScreen },
+    { id: "label", label: "Label", show: true },
+    { id: "debit", label: "Debit", show: !isMobileScreen },
+    { id: "credit", label: "Credit", show: !isMobileScreen },
+    { id: "status", label: "Status", show: !isMobileScreen },
   ]
 
+  // Fetch transactions using React Query
   const {
     data: transactions = [],
     isLoading: isLoadingTransactions,
@@ -51,16 +64,13 @@ const Transactions = () => {
     enabled: !!bankAccountName,
   })
 
-  // Set current year for filtering
   const currentYear = new Date().getFullYear()
-  // Set current month for filtering
   const currentMonth = new Date().getMonth() + 1
-
   const [dateFilter, setDateFilter] = useState("all")
 
   /**
-   * Filter transactions based on the selected year.
-   * If the year is 0, all transactions are shown.
+   * Filter transactions based on the selected date range.
+   * @returns {Array} filtered list of transactions
    */
   const filteredTransactions = transactions.filter((tx) => {
     const txYear = new Date(tx.date).getFullYear()
@@ -96,10 +106,8 @@ const Transactions = () => {
   const [orderBy, setOrderBy] = useState("date")
 
   /**
-   *
-   * @param {string} property
-   * @description Handles sorting of transactions based on the selected property.
-   * Toggles the order between ascending and descending.
+   * Handle sorting logic when a column header is clicked.
+   * @param {string} property - The property to sort by
    */
   const handleSort = (property) => {
     const isAsc = orderBy === property && order === "asc"
@@ -108,8 +116,8 @@ const Transactions = () => {
   }
 
   /**
-   * Sort transactions based on the selected property and order.
-   * The sorting is done using the JavaScript sort method.
+   * Sort transactions based on selected order and column.
+   * @returns {Array} sorted list of transactions
    */
   const sortedTransactions = [...filteredTransactions].sort((a, b) => {
     const aValue = a[orderBy]
@@ -130,15 +138,17 @@ const Transactions = () => {
       : String(bValue).localeCompare(String(aValue))
   })
 
-  if (isLoadingTransactions) return <p>Chargement des transactions...</p>
+  if (isLoadingTransactions) return <p>Loading transactions...</p>
   if (transactionsError)
-    return <p>Erreur transactions : {transactionsError.message}</p>
-  if (!transactions) return <p>Aucune transaction trouvée.</p>
+    return <p>Error fetching transactions: {transactionsError.message}</p>
+  if (!transactions) return <p>No transactions found.</p>
 
   return (
     <section className="container-transactions">
       <div className="container-transactions__tools">
         <h1>{bankAccountName}</h1>
+
+        {/* FormControl for date filtering */}
         <FormControl className="date-form-control" size="small">
           <InputLabel id="date-filter-label">Dates</InputLabel>
           <Select
@@ -147,106 +157,106 @@ const Transactions = () => {
             label="Dates"
             onChange={(e) => setDateFilter(e.target.value)}
           >
-            <MenuItem value={"all"}>Toutes</MenuItem>
+            <MenuItem value={"all"}>All</MenuItem>
             <MenuItem value={"currentYear"}>
-              Année en cours ({currentYear})
+              Current Year ({currentYear})
             </MenuItem>
             <MenuItem value={"lastYear"}>
-              Année précédente ({currentYear - 1})
+              Last Year ({currentYear - 1})
             </MenuItem>
-            <MenuItem value={"last12months"}>12 derniers mois</MenuItem>
-            <MenuItem value={"currentMonth"}>Mois en cours</MenuItem>
-            <MenuItem value={"previousMonth"}>Mois précédent</MenuItem>
-            <MenuItem value={"last3months"}>3 derniers mois complets</MenuItem>
+            <MenuItem value={"last12months"}>Last 12 Months</MenuItem>
+            <MenuItem value={"currentMonth"}>Current Month</MenuItem>
+            <MenuItem value={"previousMonth"}>Previous Month</MenuItem>
+            <MenuItem value={"last3months"}>Last 3 Full Months</MenuItem>
           </Select>
         </FormControl>
       </div>
       {transactions && (
-        <>
-          <TableContainer
-            component={Paper}
-            sx={{ maxHeight: "75vh", overflow: "auto" }}
-          >
-            <Table aria-label="transactions table">
-              <TableHead>
-                <TableRow>
-                  {visibleColumns
-                    .filter((column) => column.show)
-                    .map((headCell) => (
-                      <TableCell
-                        key={headCell.id}
-                        align="center"
+        <TableContainer
+          component={Paper}
+          sx={{ maxHeight: "75vh", overflow: "auto" }}
+        >
+          <Table aria-label="transactions table">
+            {/* Table header */}
+            <TableHead>
+              <TableRow>
+                {visibleColumns
+                  .filter((column) => column.show)
+                  .map((headCell) => (
+                    <TableCell
+                      key={headCell.id}
+                      align="center"
+                      sx={{
+                        height: 14,
+                        paddingTop: 1,
+                        paddingBottom: 1,
+                        lineHeight: 1,
+                        position: "sticky",
+                        top: 0,
+                        backgroundColor: "#f5f5f5",
+                        zIndex: 1,
+                      }}
+                    >
+                      <TableSortLabel
+                        active={orderBy === headCell.id}
+                        direction={orderBy === headCell.id ? order : "asc"}
+                        onClick={() => handleSort(headCell.id)}
                         sx={{
-                          height: 14,
-                          paddingTop: 1,
-                          paddingBottom: 1,
-                          lineHeight: 1,
-                          position: "sticky",
-                          top: 0,
-                          backgroundColor: "#f5f5f5",
-                          zIndex: 1,
+                          fontSize: "0.9rem",
+                          fontWeight: "bold",
+                          color: "#333",
                         }}
                       >
-                        <TableSortLabel
-                          active={orderBy === headCell.id}
-                          direction={orderBy === headCell.id ? order : "asc"}
-                          onClick={() => handleSort(headCell.id)}
-                          sx={{
-                            fontSize: "0.9rem",
-                            fontWeight: "bold",
-                            color: "#333",
-                          }}
-                        >
-                          {headCell.label}
-                        </TableSortLabel>
-                      </TableCell>
-                    ))}
+                        {headCell.label}
+                      </TableSortLabel>
+                    </TableCell>
+                  ))}
+              </TableRow>
+            </TableHead>
+            {/* Table body */}
+            <TableBody>
+              {sortedTransactions.map((tx) => (
+                <TableRow key={tx.id} className="transaction-row">
+                  <TableCell align="center">
+                    {new Date(tx.date).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>{tx.label}</TableCell>
+                  <TableCell align="center">
+                    {tx.debit ? tx.debit.toFixed(2) + " €" : ""}
+                  </TableCell>
+                  <TableCell align="center">
+                    {tx.credit ? tx.credit.toFixed(2) + " €" : ""}
+                  </TableCell>
+                  <TableCell align="center">
+                    <Box
+                      sx={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: "50%",
+                        backgroundColor:
+                          tx.status === "validated"
+                            ? "green"
+                            : tx.status === "pointed"
+                            ? "blue"
+                            : "white",
+                        border: "1px solid #ccc",
+                        margin: "0 auto",
+                      }}
+                    />
+                  </TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {sortedTransactions.map((tx) => (
-                  <TableRow key={tx.id} className="transaction-row">
-                    <TableCell align="center">
-                      {new Date(tx.date).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>{tx.label}</TableCell>
-                    <TableCell align="center">
-                      {tx.debit ? tx.debit.toFixed(2) + " €" : ""}
-                    </TableCell>
-                    <TableCell align="center">
-                      {tx.credit ? tx.credit.toFixed(2) + " €" : ""}
-                    </TableCell>
-                    <TableCell align="center">
-                      <Box
-                        sx={{
-                          width: 12,
-                          height: 12,
-                          borderRadius: "50%",
-                          backgroundColor:
-                            tx.status === "validated"
-                              ? "green"
-                              : tx.status === "pointed"
-                              ? "blue"
-                              : "white",
-                          border: "1px solid #ccc",
-                          margin: "0 auto",
-                        }}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            {transactions.length === 0 && (
-              <Typography
-                variant="body2"
-                sx={{ padding: 2, textAlign: "center" }}
-              >
-                No transactions found.
-              </Typography>
-            )}
-          </TableContainer>
-        </>
+              ))}
+            </TableBody>
+          </Table>
+          {transactions.length === 0 && (
+            <Typography
+              variant="body2"
+              sx={{ padding: 2, textAlign: "center" }}
+            >
+              No transactions found.
+            </Typography>
+          )}
+        </TableContainer>
       )}
     </section>
   )

@@ -8,7 +8,9 @@ const userSchema = mongoose.Schema({
   lastName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  privileges: { type: String, required: false }
+  privileges: { type: String, required: false },
+  createdAt: { type: Date, required: true },
+  lastConnection: { type: Date, required: true },
 })
 
 /** Check if Schema is unique */
