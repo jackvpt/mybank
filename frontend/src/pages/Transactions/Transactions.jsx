@@ -54,10 +54,10 @@ const Transactions = () => {
   // Define which columns should be visible based on screen size
   const visibleColumns = [
     { id: "date", label: "Date", show: true },
-    { id: "label", label: "Label", show: true },
-    { id: "debit", label: "Debit", show: !isMobileScreen },
-    { id: "credit", label: "Credit", show: !isMobileScreen },
-    { id: "status", label: "Status", show: !isMobileScreen },
+    { id: "label", label: "Libellé", show: true },
+    { id: "debit", label: "Débit", show: !isMobileScreen },
+    { id: "credit", label: "Crédit", show: !isMobileScreen },
+    { id: "status", label: "Etat", show: !isMobileScreen },
   ]
 
   // Fetch transactions using React Query
@@ -166,17 +166,17 @@ const Transactions = () => {
               label="Dates"
               onChange={(e) => setDateFilter(e.target.value)}
             >
-              <MenuItem value={"all"}>All</MenuItem>
+              <MenuItem value={"all"}>Toutes</MenuItem>
               <MenuItem value={"currentYear"}>
-                Current Year ({currentYear})
+                Année en cours ({currentYear})
               </MenuItem>
               <MenuItem value={"lastYear"}>
-                Last Year ({currentYear - 1})
+                Année dernière ({currentYear - 1})
               </MenuItem>
-              <MenuItem value={"last12months"}>Last 12 Months</MenuItem>
-              <MenuItem value={"currentMonth"}>Current Month</MenuItem>
-              <MenuItem value={"previousMonth"}>Previous Month</MenuItem>
-              <MenuItem value={"last3months"}>Last 3 Full Months</MenuItem>
+              <MenuItem value={"last12months"}>12 derniers mois</MenuItem>
+              <MenuItem value={"currentMonth"}>Mois en cours</MenuItem>
+              <MenuItem value={"previousMonth"}>Mois précédent</MenuItem>
+              <MenuItem value={"last3months"}>3 derniers mois</MenuItem>
             </Select>
           </FormControl>
         </div>

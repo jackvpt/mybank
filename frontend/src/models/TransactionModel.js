@@ -62,7 +62,6 @@ export default class TransactionModel {
         ? `+${this.credit.toFixed(2)}€`
         : "0.00€"
 
-
     /** @type {string} */
     this.status = data.status ?? null
 
@@ -71,5 +70,8 @@ export default class TransactionModel {
 
     /** @type {string} */
     this.periodicity = data.periodicity || ""
+
+    /** @type {string} */
+    this.notes = data.notes || ""
   }
 }

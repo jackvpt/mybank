@@ -9,6 +9,7 @@ const userRoutes = require("./routes/user")
 const bankAccountsRoutes = require("./routes/bankAccounts")
 const transactionsRoutes = require("./routes/transactions")
 const settingsRoutes = require("./routes/settings")
+const categoriesRoutes = require("./routes/categories")
 
 /** Create an express application */
 const app = express()
@@ -51,5 +52,8 @@ app.use("/api/transactions", rateLimiter[1], transactionsRoutes)
 
 /** Settings routes */
 app.use("/api/settings", rateLimiter[1], settingsRoutes)
+
+/** Categories routes */
+app.use("/api/categories", rateLimiter[1], categoriesRoutes)
 
 module.exports = app

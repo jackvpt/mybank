@@ -14,7 +14,8 @@ const transactionSchema = mongoose.Schema({
     category: { type: String, required: false },
     subCategory: { type: String, required: false },
     destination: { type: String, required: false },
-    periodicity: { type: String, required: false }
+    periodicity: { type: String, required: false },
+    notes: { type: String, required: false },
 })
 
 /** Model methods converts Schema in usable model */

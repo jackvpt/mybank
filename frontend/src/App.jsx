@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query"
+import Router from "./router/Router"
 import { fetchAllTransactions } from "./api/transactions"
 import { fetchBankAccounts } from "./api/bankAccounts"
-import Router from "./router/Router"
 import { fetchAllSettings } from "./api/settings"
+import { fetchAllCategories } from "./api/categories"
 
 function App() {
   useQuery({
@@ -18,6 +19,11 @@ function App() {
   useQuery({
     queryKey: ["settings"],
     queryFn: fetchAllSettings,
+  })
+  
+  useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchAllCategories,
   })
 
   return <Router />

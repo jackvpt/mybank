@@ -1,48 +1,52 @@
 import TransactionModel from "../models/TransactionModel"
+import axios from "axios"
+
+const BASE_URL = "http://localhost:3000/api/transactions"
 
 /**
  * Fetches all transactions from the API.
- * @returns {Promise<TransactionModel[]>} - A promise that resolves to an array of TransactionModel instances.
- * @throws {Error} - Throws an error if the fetch request fails.
+ * @returns {Promise<TransactionModel[]>}
  */
 export const fetchAllTransactions = async () => {
   try {
-    const response = await fetch("http://localhost:3000/api/transactions")
-    if (!response.ok) throw new Error("API data request failed")
-
-    const data = await response.json()
-    const allTransactions = data
-      .map((transaction) => new TransactionModel(transaction))
-
-    return allTransactions
+    const { data } = await axios.get(BASE_URL)
+    return data.map((transaction) => new TransactionModel(transaction))
   } catch (error) {
-    console.error(
-      `Error fetching transactions from data: ${error.message}`
-    )
+    console.error("Error fetching all transactions:", error.message)
     throw error
   }
 }
+
 /**
  * Fetches transactions by account name from the API.
- * @async
- * @param {String} accountName 
- * @returns {Promise<TransactionModel[]>} - A promise that resolves to an array of TransactionModel instances. 
+ * @param {String} accountName
+ * @returns {Promise<TransactionModel[]>}
  */
 export const fetchTransactionsByAccountName = async (accountName) => {
   try {
-    const response = await fetch("http://localhost:3000/api/transactions")
-    if (!response.ok) throw new Error("Mock data request failed")
-
-    const data = await response.json()
-    const transactions = data
+    const { data } = await axios.get(BASE_URL)
+    const filtered = data
       .filter((transaction) => transaction.account === accountName)
       .map((transaction) => new TransactionModel(transaction))
 
-    return transactions
+    return filtered
   } catch (error) {
-    console.error(
-      `Error fetching accounts data from mock data: ${error.message}`
-    )
+    console.error("Error fetching transactions by account name:", error.message)
+    throw error
+  }
+}
+
+/**
+ * Posts a new transaction to the API.
+ * @param {Object} transactionData
+ * @returns {Promise<TransactionModel>}
+ */
+export const postTransaction = async (transactionData) => {
+  try {
+    const { data } = await axios.post(BASE_URL, transactionData)
+    return new TransactionModel(data)
+  } catch (error) {
+    console.error("Error posting transaction:", error.message)
     throw error
   }
 }

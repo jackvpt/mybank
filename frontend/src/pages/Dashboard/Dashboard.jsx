@@ -5,7 +5,6 @@ import BankAccountCard from "../../components/BankAccountCard/BankAccountCard"
 import { fetchAllTransactions } from "../../api/transactions"
 
 const Dashboard = () => {
-
   const {
     data: bankAccounts,
     isLoading: isLoadingAccounts,
@@ -35,13 +34,13 @@ const Dashboard = () => {
       {bankAccounts.map((account) => {
         const accountTransactions =
           transactions?.filter((t) => t.account === account.name) || []
-          const lastTransaction =
+        const lastTransaction =
           accountTransactions
-          .slice()
-          .sort((a, b) => new Date(b.date) - new Date(a.date))[0] || null
+            .slice()
+            .sort((a, b) => new Date(b.date) - new Date(a.date))[0] || null
         return (
           <BankAccountCard
-            key={account.id}
+            key={account._id}
             account={account}
             lastTransaction={lastTransaction}
           />
