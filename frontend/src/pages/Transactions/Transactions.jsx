@@ -21,6 +21,8 @@ import {
 } from "@mui/material"
 import { useState } from "react"
 import { useSelector } from "react-redux"
+import ToolBar from "../../components/ToolBar/ToolBar"
+import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
 
 /**
  * Transactions component that fetches and displays transactions for a selected bank account.
@@ -29,6 +31,11 @@ import { useSelector } from "react-redux"
  */
 const Transactions = () => {
   const bankAccountName = useSelector((state) => state.settings.bankAccount)
+  const isEditWindowVisible = useSelector(
+    (state) => state.settings.isEditWindowVisible
+  )
+  // State to manage the visibility of the edit window
+  // This state is used to toggle the visibility of the edit window for transactions
 
   /**
    * Create a theme for responsive design.
@@ -147,116 +154,123 @@ const Transactions = () => {
     <section className="container-transactions">
       <div className="container-transactions__tools">
         <h1>{bankAccountName}</h1>
+        <div className="toggle-tools">
+          <ToolBar />
 
-        {/* FormControl for date filtering */}
-        <FormControl className="date-form-control" size="small">
-          <InputLabel id="date-filter-label">Dates</InputLabel>
-          <Select
-            labelId="date-filter-label"
-            value={dateFilter}
-            label="Dates"
-            onChange={(e) => setDateFilter(e.target.value)}
-          >
-            <MenuItem value={"all"}>All</MenuItem>
-            <MenuItem value={"currentYear"}>
-              Current Year ({currentYear})
-            </MenuItem>
-            <MenuItem value={"lastYear"}>
-              Last Year ({currentYear - 1})
-            </MenuItem>
-            <MenuItem value={"last12months"}>Last 12 Months</MenuItem>
-            <MenuItem value={"currentMonth"}>Current Month</MenuItem>
-            <MenuItem value={"previousMonth"}>Previous Month</MenuItem>
-            <MenuItem value={"last3months"}>Last 3 Full Months</MenuItem>
-          </Select>
-        </FormControl>
+          {/* FormControl for date filtering */}
+          <FormControl className="date-form-control" size="small">
+            <InputLabel id="date-filter-label">Dates</InputLabel>
+            <Select
+              labelId="date-filter-label"
+              value={dateFilter}
+              label="Dates"
+              onChange={(e) => setDateFilter(e.target.value)}
+            >
+              <MenuItem value={"all"}>All</MenuItem>
+              <MenuItem value={"currentYear"}>
+                Current Year ({currentYear})
+              </MenuItem>
+              <MenuItem value={"lastYear"}>
+                Last Year ({currentYear - 1})
+              </MenuItem>
+              <MenuItem value={"last12months"}>Last 12 Months</MenuItem>
+              <MenuItem value={"currentMonth"}>Current Month</MenuItem>
+              <MenuItem value={"previousMonth"}>Previous Month</MenuItem>
+              <MenuItem value={"last3months"}>Last 3 Full Months</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
       </div>
       {transactions && (
-        <TableContainer
-          component={Paper}
-          sx={{ maxHeight: "75vh", overflow: "auto" }}
-        >
-          <Table aria-label="transactions table">
-            {/* Table header */}
-            <TableHead>
-              <TableRow>
-                {visibleColumns
-                  .filter((column) => column.show)
-                  .map((headCell) => (
-                    <TableCell
-                      key={headCell.id}
-                      align="center"
-                      sx={{
-                        height: 14,
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                        lineHeight: 1,
-                        position: "sticky",
-                        top: 0,
-                        backgroundColor: "#f5f5f5",
-                        zIndex: 1,
-                      }}
-                    >
-                      <TableSortLabel
-                        active={orderBy === headCell.id}
-                        direction={orderBy === headCell.id ? order : "asc"}
-                        onClick={() => handleSort(headCell.id)}
+        <>
+          {isEditWindowVisible && <TransactionEdit />}
+          <TableContainer
+            component={Paper}
+            sx={{ maxHeight: "75vh", overflow: "auto" }}
+          >
+            <Table aria-label="transactions table">
+              {/* Table header */}
+              <TableHead>
+                <TableRow>
+                  {visibleColumns
+                    .filter((column) => column.show)
+                    .map((headCell) => (
+                      <TableCell
+                        key={headCell.id}
+                        align="center"
                         sx={{
-                          fontSize: "0.9rem",
-                          fontWeight: "bold",
-                          color: "#333",
+                          height: 14,
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                          lineHeight: 1,
+                          position: "sticky",
+                          top: 0,
+                          backgroundColor: "#f5f5f5",
+                          zIndex: 1,
                         }}
                       >
-                        {headCell.label}
-                      </TableSortLabel>
-                    </TableCell>
-                  ))}
-              </TableRow>
-            </TableHead>
-            {/* Table body */}
-            <TableBody>
-              {sortedTransactions.map((tx) => (
-                <TableRow key={tx.id} className="transaction-row">
-                  <TableCell align="center">
-                    {new Date(tx.date).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>{tx.label}</TableCell>
-                  <TableCell align="center">
-                    {tx.debit ? tx.debit.toFixed(2) + " €" : ""}
-                  </TableCell>
-                  <TableCell align="center">
-                    {tx.credit ? tx.credit.toFixed(2) + " €" : ""}
-                  </TableCell>
-                  <TableCell align="center">
-                    <Box
-                      sx={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: "50%",
-                        backgroundColor:
-                          tx.status === "validated"
-                            ? "green"
-                            : tx.status === "pointed"
-                            ? "blue"
-                            : "white",
-                        border: "1px solid #ccc",
-                        margin: "0 auto",
-                      }}
-                    />
-                  </TableCell>
+                        <TableSortLabel
+                          active={orderBy === headCell.id}
+                          direction={orderBy === headCell.id ? order : "asc"}
+                          onClick={() => handleSort(headCell.id)}
+                          sx={{
+                            fontSize: "0.9rem",
+                            fontWeight: "bold",
+                            color: "#333",
+                          }}
+                        >
+                          {headCell.label}
+                        </TableSortLabel>
+                      </TableCell>
+                    ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          {transactions.length === 0 && (
-            <Typography
-              variant="body2"
-              sx={{ padding: 2, textAlign: "center" }}
-            >
-              No transactions found.
-            </Typography>
-          )}
-        </TableContainer>
+              </TableHead>
+              {/* Table body */}
+              <TableBody>
+                {sortedTransactions.map((tx) => (
+                  <TableRow key={tx.id} className="transaction-row">
+                    <TableCell align="center">
+                      {new Date(tx.date).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>{tx.label}</TableCell>
+                    <TableCell align="center">
+                      {tx.debit ? tx.debit.toFixed(2) + " €" : ""}
+                    </TableCell>
+                    <TableCell align="center">
+                      {tx.credit ? tx.credit.toFixed(2) + " €" : ""}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Box
+                        sx={{
+                          width: 12,
+                          height: 12,
+                          borderRadius: "50%",
+                          backgroundColor:
+                            tx.status === "validated"
+                              ? "green"
+                              : tx.status === "pointed"
+                              ? "blue"
+                              : "white",
+                          border: "1px solid #ccc",
+                          margin: "0 auto",
+                        }}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            {transactions.length === 0 && (
+              <Typography
+                variant="body2"
+                sx={{ padding: 2, textAlign: "center" }}
+              >
+                No transactions found.
+              </Typography>
+            )}
+          </TableContainer>
+        </>
       )}
     </section>
   )

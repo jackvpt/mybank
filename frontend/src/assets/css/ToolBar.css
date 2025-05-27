@@ -1,0 +1,20 @@
+/* Responsive */
+/* Responsive */
+.toggle-edit-btn {
+  min-width: 30px;
+  height: 30px;
+  padding: 4px;
+  background-color: rgba(255, 255, 0, 0.2);
+  color: orange;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: all 0.2s ease-in-out;
+}
+.toggle-edit-btn:hover {
+  background-color: #a6bff9;
+}
+.toggle-edit-btn.active {
+  background-color: rgba(255, 0, 0, 0.2);
+  color: red;
+  border-color: #3657c3;
+}/*# sourceMappingURL=ToolBar.css.map */

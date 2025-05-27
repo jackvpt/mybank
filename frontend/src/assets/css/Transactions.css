@@ -15,6 +15,12 @@
   align-items: center;
   margin: 10px 0;
 }
+.container-transactions__tools .toggle-tools {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 10px;
+}
 .container-transactions__tools .date-form-control {
   width: 200px;
   margin-bottom: 1rem;

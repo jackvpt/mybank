@@ -5,8 +5,10 @@ const helmet = require("helmet")
 const express = require("express")
 const mongoose = require("mongoose")
 const rateLimiter = require("./middleware/rate-limiter")
-const transactionsRoutes = require("./routes/transactions")
+const userRoutes = require("./routes/user")
 const bankAccountsRoutes = require("./routes/bankAccounts")
+const transactionsRoutes = require("./routes/transactions")
+const settingsRoutes = require("./routes/settings")
 
 /** Create an express application */
 const app = express()
@@ -38,10 +40,16 @@ app.use((req, res, next) => {
   next() /** Go to next middleware */
 })
 
-/** Transactions routes */
-app.use("/api/transactions", rateLimiter[1], transactionsRoutes)
+/** User routes */
+app.use("/api/auth",rateLimiter[1],userRoutes)
 
 /** Accounts routes */
 app.use("/api/bankaccounts", rateLimiter[1], bankAccountsRoutes)
+
+/** Transactions routes */
+app.use("/api/transactions", rateLimiter[1], transactionsRoutes)
+
+/** Settings routes */
+app.use("/api/settings", rateLimiter[1], settingsRoutes)
 
 module.exports = app

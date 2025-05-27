@@ -18,6 +18,13 @@
     align-items: center;
     margin: 10px 0;
 
+    .toggle-tools{
+      display: flex;
+      flex-direction: row;
+      align-items: baseline;
+      gap:10px;
+    }
+
     .date-form-control {
       width: 200px;
       margin-bottom: 1rem;
