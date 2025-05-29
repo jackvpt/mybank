@@ -2,7 +2,7 @@
 import "./TransactionEdit.scss"
 
 // React imports
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 
 // DEV imports
@@ -23,17 +23,23 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { fetchAllSettings } from "../../api/settings"
 import { fetchBankAccounts } from "../../api/bankAccounts"
 import { fetchAllCategories } from "../../api/categories"
-import { postTransaction } from "../../api/transactions"
+import {
+  fetchTransactionsByAccountName,
+  postTransaction,
+} from "../../api/transactions"
 
 const TransactionEdit = () => {
   const queryClient = useQueryClient()
 
   const bankAccountName = useSelector((state) => state.settings.bankAccount)
+  const selectedTransactionId = useSelector(
+    (state) => state.settings.selectedTransactionId
+  )
 
   const mutation = useMutation({
     mutationFn: postTransaction,
     onSuccess: () => {
-      queryClient.invalidateQueries(["transactions",bankAccountName])
+      queryClient.invalidateQueries(["transactions", bankAccountName])
     },
     onError: (error) => {
       console.error("Erreur lors de la soumission :", error)
@@ -70,6 +76,17 @@ const TransactionEdit = () => {
     queryFn: fetchBankAccounts,
   })
 
+  // Fetch transactions using React Query
+  const {
+    data: transactions = [],
+    isLoading: isLoadingTransactions,
+    error: transactionsError,
+  } = useQuery({
+    queryKey: ["transactions", bankAccountName],
+    queryFn: () => fetchTransactionsByAccountName(bankAccountName),
+    enabled: !!bankAccountName,
+  })
+
   const transactionTypes = settings ? settings[0].types : []
 
   const [formData, setFormData] = useState({
@@ -88,6 +105,27 @@ const TransactionEdit = () => {
     periodicity: "",
     notes: "",
   })
+
+  useEffect(() => {
+    if (selectedTransactionId) {
+      const selected = transactions.find(
+        (transaction) => transaction.id === selectedTransactionId
+      )
+
+      if (selected) {
+        setFormData({
+          ...selected,
+          date: new Date(selected.date),
+          amount: (selected.debit ?? selected.credit ?? 0).toFixed(2),
+          category: selected.category ?? "",
+          subCategory: selected.subCategory ?? "",
+          type: selected.type ?? "card",
+        })
+      }
+
+      console.log("formData :>> ", selected)
+    }
+  }, [selectedTransactionId])
 
   /**
    * Submits the transaction form data.
@@ -133,9 +171,19 @@ const TransactionEdit = () => {
     )
   }
 
-  if (isLoadingSettings || isLoadingBankAccounts || isLoadingCategories)
+  if (
+    isLoadingSettings ||
+    isLoadingBankAccounts ||
+    isLoadingCategories ||
+    isLoadingTransactions
+  )
     return <p>Loading data...</p>
-  if (settingsError || bankAccountsError || categoriesError)
+  if (
+    settingsError ||
+    bankAccountsError ||
+    categoriesError ||
+    transactionsError
+  )
     return (
       <p>
         Error loading data: {settingsError.message || bankAccountsError.message}
@@ -323,6 +371,7 @@ const TransactionEdit = () => {
                 }))
               }
               label="Sous catégorie"
+              disabled={!formData.category}
             >
               {transactionsCategories
                 .filter((category) => category.name === formData.category)
@@ -370,7 +419,7 @@ const TransactionEdit = () => {
               boxShadow: 3,
             }}
           >
-            {mutation.isPending ? "Envoi en cours..." : "Valider"}
+            {mutation.isPending ? "Envoi..." : "Ajouter"}
           </Button>
         </form>
       </LocalizationProvider>

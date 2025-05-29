@@ -3,6 +3,7 @@ import fs from "fs/promises"
 import { writeFileSync } from "fs"
 import path from "path"
 import { fileURLToPath } from "url"
+import { faker, Faker } from "@faker-js/faker"
 
 // const __filename = fileURLToPath(import.meta.url)
 // const __dirname = path.dirname(__filename)
@@ -34,7 +35,7 @@ function parseQIF(content, bankAccountName) {
     const lines = entry.split("\n").map((line) => line.trim())
     const transaction = {}
 
-    // transaction.id = faker.string.uuid()
+    transaction.id = faker.string.uuid()
     transaction.account = bankAccountName
 
     let type = "card"
@@ -79,15 +80,17 @@ function parseQIF(content, bankAccountName) {
           transaction.category = "Virement"
         } else {
           transaction.category = category.split(":")[0].trim()
-          transaction.subcategory = category.split(":")[1]?.trim() || null
+          transaction.subcategory = category.split(":")[1]?.trim() || ""
           transaction.category = category.split(":")[0].trim()
-          transaction.subcategory = category.split(":")[1]?.trim() || null
+          transaction.subcategory = category.split(":")[1]?.trim() || ""
         }
       }
       transaction.type = type
     }
 
-    if (Object.keys(transaction).length > 0) result.push(transaction)
+    if (Object.keys(transaction).length > 0) {
+      if (new Date(transaction.date) > new Date(2025, 1, 1)) result.push(transaction)
+    }
   }
 
   return result

@@ -20,9 +20,10 @@ import {
   useMediaQuery,
 } from "@mui/material"
 import { useState } from "react"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import ToolBar from "../../components/ToolBar/ToolBar"
 import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
+import { selectTransactionId } from "../../features/settingsSlice"
 
 /**
  * Transactions component that fetches and displays transactions for a selected bank account.
@@ -30,6 +31,8 @@ import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
  * @returns {JSX.Element} Transactions component
  */
 const Transactions = () => {
+  const dispatch = useDispatch()
+
   const bankAccountName = useSelector((state) => state.settings.bankAccount)
   const isEditWindowVisible = useSelector(
     (state) => state.settings.isEditWindowVisible
@@ -145,6 +148,10 @@ const Transactions = () => {
       : String(bValue).localeCompare(String(aValue))
   })
 
+  const handleRowClick = (transaction) => {
+    dispatch(selectTransactionId(transaction.id))
+  }
+
   if (isLoadingTransactions) return <p>Loading transactions...</p>
   if (transactionsError)
     return <p>Error fetching transactions: {transactionsError.message}</p>
@@ -228,7 +235,11 @@ const Transactions = () => {
               {/* Table body */}
               <TableBody>
                 {sortedTransactions.map((tx) => (
-                  <TableRow key={tx.id} className="transaction-row">
+                  <TableRow
+                    key={tx.id}
+                    className="transaction-row"
+                    onClick={() => handleRowClick(tx)}
+                  >
                     <TableCell align="center">
                       {new Date(tx.date).toLocaleDateString()}
                     </TableCell>

@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit"
 
 const initialState = {
   bankAccount: null,
-  isEditWindowVisible:true
+  isEditWindowVisible: true,
+  selectedTransactionId: null,
 }
 
 const settingsSlice = createSlice({
@@ -15,9 +16,20 @@ const settingsSlice = createSlice({
     setIsEditWindowVisible: (state, action) => {
       state.isEditWindowVisible = action.payload
     },
+    selectTransactionId(state, action) {
+      state.selectedTransactionId = action.payload
+    },
+    clearSelectedTransactionId(state) {
+      state.selectedTransactionId = null
+    },
   },
 })
 
-export const { setBankAccount,setIsEditWindowVisible } = settingsSlice.actions
+export const {
+  setBankAccount,
+  setIsEditWindowVisible,
+  selectTransactionId,
+  clearSelectedTransactionId,
+} = settingsSlice.actions
 
 export default settingsSlice.reducer

@@ -21,6 +21,9 @@ export default class TransactionModel {
    */
   constructor(data) {
     /** @type {string} */
+    this.id = data.id || null
+
+    /** @type {string} */
     this.account = data.account
 
     /** @type {Date} */
