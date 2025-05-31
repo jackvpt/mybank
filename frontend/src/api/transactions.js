@@ -50,3 +50,35 @@ export const postTransaction = async (transactionData) => {
     throw error
   }
 }
+
+/**
+ * Updates an existing transaction by ID.
+ * @param {string} params.id - The ID of the transaction to update.
+ * @param {Object} params.updatedData - The data to update the transaction with.
+ * @returns {Promise<TransactionModel>}
+ */
+export const updateTransaction = async ({ id, updatedData }) => {
+  try {
+    const { data } = await axios.put(`${BASE_URL}/${id}`, updatedData)
+    return new TransactionModel(data)
+  } catch (error) {
+    console.error("Error updating transaction:", error.message)
+    throw error
+  }
+}
+
+/**
+ * Deletes a transaction by ID.
+ * @param {string} id - The ID of the transaction to delete.
+ * @returns {Promise<Object>} - The response data from the API.
+ * @throws {Error} - Throws an error if the request fails.
+ */
+export const deleteTransaction = async (id) => {
+  try {
+    const response = await axios.delete(`${BASE_URL}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la suppression :", error.message);
+    throw error;
+  }
+};

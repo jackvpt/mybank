@@ -8,6 +8,7 @@ exports.getAllTransactions = async (req, res) => {
   try {
     const allTransactions = await Transaction.find()
     res.status(200).json(allTransactions)
+    console.log(`${allTransactions.length} transactions retrieved`)
   } catch (error) {
     res
       .status(400)
@@ -26,8 +27,13 @@ exports.createTransaction = async (req, res) => {
 
     await transaction.save()
     res.status(201).json(transaction)
+    console.log(
+      `Transaction created: ${transaction._id} - ${transaction.label}`
+    )
   } catch (error) {
-    res.status(400).json({ error: error.message || "Error adding transaction!" })
+    res
+      .status(400)
+      .json({ error: error.message || "Error adding transaction!" })
   }
 }
 
@@ -44,6 +50,9 @@ exports.updateTransaction = async (req, res) => {
       { new: true }
     )
     res.status(200).json(updatedTransaction)
+    console.log(
+      `Transaction updated: ${updatedTransaction._id} - ${updatedTransaction.label}`
+    )
   } catch (error) {
     res.status(401).json({ error })
   }
@@ -54,7 +63,10 @@ exports.deleteTransaction = async (req, res) => {
   try {
     await Transaction.deleteOne({ _id: req.params.id })
     res.status(200).json({ message: "Transaction deleted successfully!" })
+    console.log(`Transaction deleted: ${req.params.id}`)
   } catch (error) {
-    res.status(500).json({ error: error.message || "Error deleting transaction!" })
+    res
+      .status(500)
+      .json({ error: error.message || "Error deleting transaction!" })
   }
 }

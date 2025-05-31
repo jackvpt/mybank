@@ -15,8 +15,16 @@ import {
   MenuItem,
   Select,
   TextField,
+  Snackbar,
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material"
-import { CheckCircleOutline } from "@mui/icons-material"
+
+import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
 
 /** API imports */
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -26,25 +34,85 @@ import { fetchAllCategories } from "../../api/categories"
 import {
   fetchTransactionsByAccountName,
   postTransaction,
+  updateTransaction,
+  deleteTransaction,
 } from "../../api/transactions"
 
 const TransactionEdit = () => {
   const queryClient = useQueryClient()
+
+  const [toastOpen, setToastOpen] = useState(false)
+  const [toastMessage, setToastMessage] = useState("")
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [transactionToDelete, setTransactionToDelete] = useState(null)
+
+  const handleOpenConfirm = (id) => {
+    setTransactionToDelete(id)
+    setConfirmOpen(true)
+  }
+
+  const handleConfirmDelete = () => {
+    if (transactionToDelete) {
+      deleteMutation.mutate(transactionToDelete)
+      setConfirmOpen(false)
+      setTransactionToDelete(null)
+    }
+  }
 
   const bankAccountName = useSelector((state) => state.settings.bankAccount)
   const selectedTransactionId = useSelector(
     (state) => state.settings.selectedTransactionId
   )
 
+  /**
+   * Mutation to post a new transaction.
+   * It uses React Query's useMutation hook to handle the mutation.
+   **/
   const mutation = useMutation({
     mutationFn: postTransaction,
     onSuccess: () => {
       queryClient.invalidateQueries(["transactions", bankAccountName])
+      setToastMessage("Transaction ajoutée")
+      setToastOpen(true)
     },
     onError: (error) => {
       console.error("Erreur lors de la soumission :", error)
     },
   })
+
+  const updateMutation = useMutation({
+    mutationFn: updateTransaction,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["transactions", bankAccountName])
+      setToastMessage("Transaction modifiée")
+      setToastOpen(true)
+    },
+    onError: (error) => {
+      console.error("Erreur lors de la modification :", error)
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteTransaction,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["transactions", bankAccountName])
+      setToastMessage("Transaction supprimée")
+      setToastOpen(true) // Toast de confirmation de suppression
+    },
+    onError: (error) => {
+      console.error("Erreur lors de la suppression :", error)
+    },
+  })
+
+  /**
+   * Handles the closing of the toast notification.
+   * @param {Event} event - The event that triggered the close.
+   * @param {string} reason - The reason for closing the toast (e.g., "clickaway").
+   */
+  const handleToastClose = (event, reason) => {
+    if (reason === "clickaway") return
+    setToastOpen(false)
+  }
 
   // Fetch settings using React Query
   const {
@@ -89,22 +157,31 @@ const TransactionEdit = () => {
 
   const transactionTypes = settings ? settings[0].types : []
 
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     date: new Date(),
     account: bankAccountName,
     type: "card",
     checkNumber: "",
     label: "",
-    category: "",
+    category: null,
     subCategory: "",
     amount: 0,
     debit: 0,
     credit: 0,
     status: null,
     destination: "",
-    periodicity: "",
+    periodicity: null,
     notes: "",
-  })
+  }
+  const [formData, setFormData] = useState(initialFormData)
+
+  const periodicities = [
+    { monthly: "Mensuel" },
+    { quarterly: "Trimestriel" },
+    { semiAnnually: "Semestriel" },
+    { annually: "Annuel" },
+    { oneTime: "Unique" },
+  ]
 
   useEffect(() => {
     if (selectedTransactionId) {
@@ -122,19 +199,35 @@ const TransactionEdit = () => {
           type: selected.type ?? "card",
         })
       }
-
-      console.log("formData :>> ", selected)
+    } else {
+      setFormData(initialFormData)
     }
   }, [selectedTransactionId])
 
   /**
-   * Submits the transaction form data.
+   * Handles the modification of a transaction.
+   * It checks for form errors and if none are found,
+   * it calls the updateMutation to update the transaction.
+   * @param {Event} e - The event object.
+   * @returns {void}
+   */
+  const handleModifyTransaction = (e) => {
+    e.preventDefault()
+    if (!formHasErrors()) {
+      updateMutation.mutate({
+        id: selectedTransactionId,
+        updatedData: formData,
+      })
+    }
+  }
+
+  /**
+   * Add the transaction.
    * @param {Event} e
    */
-  const handleSubmit = (e) => {
+  const handleAddTransaction = (e) => {
     e.preventDefault()
-    mutation.mutate(formData)
-    console.log("Transaction sent :", formData)
+    if (!formHasErrors()) mutation.mutate(formData)
   }
 
   /**
@@ -166,6 +259,7 @@ const TransactionEdit = () => {
       (formData.type === "transfer" && formData.destination === "") ||
       (formData.type === "check" && formData.checkNumber === "") ||
       formData.amount === 0 ||
+      formData.amount === "" ||
       isNaN(formData.amount) ||
       formData.label === ""
     )
@@ -193,7 +287,7 @@ const TransactionEdit = () => {
   return (
     <section className="container-transaction-edit">
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <form onSubmit={handleSubmit}>
+        <form>
           {/* DATE PICKER */}
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
@@ -334,7 +428,7 @@ const TransactionEdit = () => {
               labelId="category-label"
               id="category"
               name="category"
-              value={formData.category}
+              value={formData.category ?? ""}
               onChange={(e) =>
                 setFormData((prev) => ({
                   ...prev,
@@ -385,6 +479,37 @@ const TransactionEdit = () => {
             </Select>
           </FormControl>
 
+          {/* PERIODICITY SELECT */}
+          <FormControl
+            fullWidth
+            size="small"
+            sx={{ width: "auto", minWidth: 240 }}
+          >
+            <InputLabel>Périodicité</InputLabel>
+            <Select
+              labelId="periodicity-label"
+              id="periodicity"
+              name="periodicity"
+              value={formData.periodicty ?? ""}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  periodicity: e.target.value,
+                }))
+              }
+              label="Périodicité"
+            >
+              {periodicities.map((periodicity) => {
+                const key = Object.keys(periodicity)[0]
+                return (
+                  <MenuItem key={key} value={key}>
+                    {periodicity[key]}
+                  </MenuItem>
+                )
+              })}
+            </Select>
+          </FormControl>
+
           {/* NOTES */}
           <TextField
             type="text"
@@ -399,11 +524,37 @@ const TransactionEdit = () => {
             size="small"
             sx={{ minWidth: 200 }}
           />
+
+          {/* DELETE TRANSACTION BUTTON */}
           <Button
-            type="submit"
             variant="contained"
-            startIcon={<CheckCircleOutline />}
+            startIcon={<Delete />}
+            disabled={!selectedTransactionId}
+            onClick={() => handleOpenConfirm(selectedTransactionId)}
+            sx={{
+              minWidth: 100,
+              backgroundColor: "red",
+              color: "#fff",
+              "&:hover": {
+                backgroundColor: "darkred",
+              },
+              textTransform: "none",
+              fontWeight: 600,
+              px: 3,
+              py: 1,
+              borderRadius: 1,
+              boxShadow: 3,
+            }}
+          >
+            {mutation.isPending ? "Supprime..." : "Supprimer"}
+          </Button>
+
+          {/* MODIFY TRANSACTION BUTTON */}
+          <Button
+            variant="contained"
+            startIcon={<ChangeCircle />}
             disabled={formHasErrors()}
+            onClick={handleModifyTransaction}
             sx={{
               minWidth: 100,
               backgroundColor: "#1976d2",
@@ -419,10 +570,79 @@ const TransactionEdit = () => {
               boxShadow: 3,
             }}
           >
-            {mutation.isPending ? "Envoi..." : "Ajouter"}
+            {mutation.isPending ? "Modifie..." : "Modifier"}
+          </Button>
+
+          {/* ADD TRANSACTION BUTTON */}
+          <Button
+            variant="contained"
+            startIcon={<AddCircle />}
+            disabled={formHasErrors()}
+            onClick={handleAddTransaction}
+            sx={{
+              minWidth: 100,
+              backgroundColor: "green",
+              color: "#fff",
+              "&:hover": {
+                backgroundColor: "darkgreen",
+              },
+              textTransform: "none",
+              fontWeight: 600,
+              px: 3,
+              py: 1,
+              borderRadius: 1,
+              boxShadow: 3,
+            }}
+          >
+            {mutation.isPending ? "Ajout..." : "Ajouter"}
           </Button>
         </form>
       </LocalizationProvider>
+
+      {/* Toast notification for success messages */}
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={3000}
+        onClose={handleToastClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleToastClose}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {toastMessage}
+        </Alert>
+      </Snackbar>
+
+      {/** Modal Dialog Box */}
+      <Dialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        aria-labelledby="confirm-dialog-title"
+      >
+        <DialogTitle id="confirm-dialog-title">
+          Confirmer la suppression
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Êtes-vous sûr de vouloir supprimer cette transaction ? Cette action
+            est irréversible.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmOpen(false)} color="primary">
+            Annuler
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+          >
+            Supprimer
+          </Button>
+        </DialogActions>
+      </Dialog>
     </section>
   )
 }

@@ -21,7 +21,7 @@ export default class TransactionModel {
    */
   constructor(data) {
     /** @type {string} */
-    this.id = data.id || null
+    this.id = data._id 
 
     /** @type {string} */
     this.account = data.account
@@ -46,7 +46,7 @@ export default class TransactionModel {
     this.label = data.label
 
     /** @type {string} */
-    this.category = data.category
+    this.category =convertCategory(data.category)
 
     /** @type {string | undefined} */
     this.subCategory = data.subCategory
@@ -72,9 +72,15 @@ export default class TransactionModel {
     this.destination = data.destination
 
     /** @type {string} */
-    this.periodicity = data.periodicity || ""
+    this.periodicity = data.periodicity || "oneTime"
 
     /** @type {string} */
     this.notes = data.notes || ""
+  }
+}
+
+const convertCategory = (category) => {
+  if (category === "Traitements et salaires") {
+    return "Revenus"
   }
 }

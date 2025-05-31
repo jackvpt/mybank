@@ -3,7 +3,6 @@ import fs from "fs/promises"
 import { writeFileSync } from "fs"
 import path from "path"
 import { fileURLToPath } from "url"
-import { faker, Faker } from "@faker-js/faker"
 
 // const __filename = fileURLToPath(import.meta.url)
 // const __dirname = path.dirname(__filename)
@@ -35,7 +34,6 @@ function parseQIF(content, bankAccountName) {
     const lines = entry.split("\n").map((line) => line.trim())
     const transaction = {}
 
-    transaction.id = faker.string.uuid()
     transaction.account = bankAccountName
 
     let type = "card"

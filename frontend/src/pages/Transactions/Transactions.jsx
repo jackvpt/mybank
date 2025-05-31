@@ -34,6 +34,9 @@ const Transactions = () => {
   const dispatch = useDispatch()
 
   const bankAccountName = useSelector((state) => state.settings.bankAccount)
+  const selectedTransactionId = useSelector(
+    (state) => state.settings.selectedTransactionId
+  )
   const isEditWindowVisible = useSelector(
     (state) => state.settings.isEditWindowVisible
   )
@@ -237,7 +240,9 @@ const Transactions = () => {
                 {sortedTransactions.map((tx) => (
                   <TableRow
                     key={tx.id}
-                    className="transaction-row"
+                    className={`transaction-row ${
+                      selectedTransactionId === tx.id ? "rowSelected" : ""
+                    }`}
                     onClick={() => handleRowClick(tx)}
                   >
                     <TableCell align="center">
