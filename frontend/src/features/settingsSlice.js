@@ -4,6 +4,7 @@ const initialState = {
   bankAccount: null,
   isEditWindowVisible: true,
   selectedTransactionId: null,
+  selectedRecurringTransactionId: null,
 }
 
 const settingsSlice = createSlice({
@@ -22,6 +23,12 @@ const settingsSlice = createSlice({
     clearSelectedTransactionId(state) {
       state.selectedTransactionId = null
     },
+    selectRecurringTransactionId(state, action) {
+      state.selectedRecurringTransactionId = action.payload
+    },
+    clearSelectedRecurringTransactionId(state) {
+      state.selectedRecurringTransactionId = null
+    },
   },
 })
 
@@ -30,6 +37,8 @@ export const {
   setIsEditWindowVisible,
   selectTransactionId,
   clearSelectedTransactionId,
+  selectRecurringTransactionId,
+  clearSelectedRecurringTransactionId,
 } = settingsSlice.actions
 
 export default settingsSlice.reducer

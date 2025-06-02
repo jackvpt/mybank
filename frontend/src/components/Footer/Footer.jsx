@@ -1,20 +1,25 @@
 import "./Footer.scss"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faHouse, faRightFromBracket } from "@fortawesome/free-solid-svg-icons"
-import { faTableList } from "@fortawesome/free-solid-svg-icons"
+
+import  HomeIcon from "@mui/icons-material/Home"
+import  ViewListIcon from "@mui/icons-material/ViewList"
+import  RepeatIcon from "@mui/icons-material/Repeat"
+import  LogOutIcon from "@mui/icons-material/LogOut"
 import { Link } from "react-router-dom"
 
 const Footer = () => {
   return (
     <footer>
       <Link to={"/dashboard"}>
-        <FontAwesomeIcon icon={faHouse} className="navbar__icon" />
+        <HomeIcon className="navbar__icon"/>
       </Link>
       <Link to={"/transactions"}>
-        <FontAwesomeIcon icon={faTableList} className="navbar__icon" />
+        <ViewListIcon className="navbar__icon"/>
       </Link>
-            <Link to={"/transactions"}>
-        <FontAwesomeIcon icon={faRightFromBracket} className="navbar__icon" />
+      <Link to={"/recurringtransactions"}>
+        <RepeatIcon className="navbar__icon"/>
+      </Link>
+      <Link to={"/transactions"}>
+        <LogOutIcon className="navbar__icon"/>
       </Link>
     </footer>
   )

@@ -6,6 +6,8 @@ import Error from "../pages/Error/Error"
 import Transactions from "../pages/Transactions/Transactions"
 import Dashboard from "../pages/Dashboard/Dashboard"
 import Footer from "../components/Footer/Footer"
+import RecurringTransactionEdit from "../components/RecurringTransactionEdit/RecurringTransactionEdit"
+import RecurringTransactions from "../pages/RecurringTransactions/RecurringTransactions"
 
 /**
  * Application router component using React Router v6.
@@ -21,8 +23,9 @@ export default function Router() {
       <main>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/transactions" element={<Transactions />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/recurringtransactions" element={<RecurringTransactions />} />
           <Route path="*" element={<Dashboard />} />
         </Routes>
       </main>

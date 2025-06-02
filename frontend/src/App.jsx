@@ -7,6 +7,7 @@ import { fetchAllCategories } from "./api/categories"
 import { useDispatch } from "react-redux"
 import { useEffect } from "react"
 import { selectTransactionId } from "./features/settingsSlice"
+import { fetchAllRecurringTransactions } from "./api/recurringTransactions"
 
 function App() {
   const dispatch = useDispatch()
@@ -19,6 +20,11 @@ function App() {
   useQuery({
     queryKey: ["transactions"],
     queryFn: fetchAllTransactions,
+  })
+
+  useQuery({
+    queryKey: ["recurringTransactions"],
+    queryFn: fetchAllRecurringTransactions,
   })
 
   useQuery({

@@ -78,7 +78,7 @@ export const deleteTransaction = async (id) => {
     const response = await axios.delete(`${BASE_URL}/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Erreur lors de la suppression :", error.message);
+    console.error("Error deleting transaction :", error.message);
     throw error;
   }
 };

@@ -8,6 +8,7 @@ const rateLimiter = require("./middleware/rate-limiter")
 const userRoutes = require("./routes/user")
 const bankAccountsRoutes = require("./routes/bankAccounts")
 const transactionsRoutes = require("./routes/transactions")
+const recurringTransactionsRoutes = require("./routes/recurringtransactions")
 const settingsRoutes = require("./routes/settings")
 const categoriesRoutes = require("./routes/categories")
 
@@ -49,6 +50,8 @@ app.use("/api/bankaccounts", rateLimiter[1], bankAccountsRoutes)
 
 /** Transactions routes */
 app.use("/api/transactions", rateLimiter[1], transactionsRoutes)
+
+app.use("/api/recurringtransactions", rateLimiter[1], recurringTransactionsRoutes)
 
 /** Settings routes */
 app.use("/api/settings", rateLimiter[1], settingsRoutes)
