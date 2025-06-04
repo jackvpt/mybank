@@ -21,9 +21,9 @@ const Header = () => {
           <img
             className="logo__image"
             src={logo}
-            alt="Logo SportSee"
-            width="36"
-            height="36"
+            alt="Logo myBank"
+            width="24"
+            height="24"
           ></img>
         </Link>
       </div>

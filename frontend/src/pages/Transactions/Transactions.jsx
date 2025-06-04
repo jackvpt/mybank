@@ -194,98 +194,101 @@ const Transactions = () => {
       {transactions && (
         <>
           {isEditWindowVisible && <TransactionEdit />}
-          <TableContainer
-            component={Paper}
-            sx={{ maxHeight: "75vh", overflow: "auto" }}
-          >
-            <Table aria-label="transactions table">
-              {/* Table header */}
-              <TableHead>
-                <TableRow>
-                  {visibleColumns
-                    .filter((column) => column.show)
-                    .map((headCell) => (
-                      <TableCell
-                        key={headCell.id}
-                        align="center"
-                        sx={{
-                          height: 14,
-                          paddingTop: 1,
-                          paddingBottom: 1,
-                          lineHeight: 1,
-                          position: "sticky",
-                          top: 0,
-                          backgroundColor: "#f5f5f5",
-                          zIndex: 1,
-                        }}
-                      >
-                        <TableSortLabel
-                          active={orderBy === headCell.id}
-                          direction={orderBy === headCell.id ? order : "asc"}
-                          onClick={() => handleSort(headCell.id)}
+          <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
+            <TableContainer
+              component={Paper}
+              sx={{ flex: 1, overflow: "auto" }}
+              // Adjust the height to fit within the viewport}}
+            >
+              <Table aria-label="transactions table">
+                {/* Table header */}
+                <TableHead>
+                  <TableRow>
+                    {visibleColumns
+                      .filter((column) => column.show)
+                      .map((headCell) => (
+                        <TableCell
+                          key={headCell.id}
+                          align="center"
                           sx={{
-                            fontSize: "0.9rem",
-                            fontWeight: "bold",
-                            color: "#333",
+                            height: 14,
+                            paddingTop: 1,
+                            paddingBottom: 1,
+                            lineHeight: 1,
+                            position: "sticky",
+                            top: 0,
+                            backgroundColor: "#f5f5f5",
+                            zIndex: 1,
                           }}
                         >
-                          {headCell.label}
-                        </TableSortLabel>
-                      </TableCell>
-                    ))}
-                </TableRow>
-              </TableHead>
-              {/* Table body */}
-              <TableBody>
-                {sortedTransactions.map((tx) => (
-                  <TableRow
-                    key={tx.id}
-                    className={`transaction-row ${
-                      selectedTransactionId === tx.id ? "rowSelected" : ""
-                    }`}
-                    onClick={() => handleRowClick(tx)}
-                  >
-                    <TableCell align="center">
-                      {new Date(tx.date).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>{tx.label}</TableCell>
-                    <TableCell align="center">
-                      {tx.debit ? tx.debit.toFixed(2) + " €" : ""}
-                    </TableCell>
-                    <TableCell align="center">
-                      {tx.credit ? tx.credit.toFixed(2) + " €" : ""}
-                    </TableCell>
-                    <TableCell align="center">
-                      <Box
-                        sx={{
-                          width: 12,
-                          height: 12,
-                          borderRadius: "50%",
-                          backgroundColor:
-                            tx.status === "validated"
-                              ? "green"
-                              : tx.status === "pointed"
-                              ? "blue"
-                              : "white",
-                          border: "1px solid #ccc",
-                          margin: "0 auto",
-                        }}
-                      />
-                    </TableCell>
+                          <TableSortLabel
+                            active={orderBy === headCell.id}
+                            direction={orderBy === headCell.id ? order : "asc"}
+                            onClick={() => handleSort(headCell.id)}
+                            sx={{
+                              fontSize: "0.9rem",
+                              fontWeight: "bold",
+                              color: "#333",
+                            }}
+                          >
+                            {headCell.label}
+                          </TableSortLabel>
+                        </TableCell>
+                      ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHead>
+                {/* Table body */}
+                <TableBody>
+                  {sortedTransactions.map((tx) => (
+                    <TableRow
+                      key={tx.id}
+                      className={`transaction-row ${
+                        selectedTransactionId === tx.id ? "rowSelected" : ""
+                      }`}
+                      onClick={() => handleRowClick(tx)}
+                    >
+                      <TableCell align="center">
+                        {new Date(tx.date).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>{tx.label}</TableCell>
+                      <TableCell align="center">
+                        {tx.debit ? tx.debit.toFixed(2) + " €" : ""}
+                      </TableCell>
+                      <TableCell align="center">
+                        {tx.credit ? tx.credit.toFixed(2) + " €" : ""}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Box
+                          sx={{
+                            width: 12,
+                            height: 12,
+                            borderRadius: "50%",
+                            backgroundColor:
+                              tx.status === "validated"
+                                ? "green"
+                                : tx.status === "pointed"
+                                ? "blue"
+                                : "white",
+                            border: "1px solid #ccc",
+                            margin: "0 auto",
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
 
-            {transactions.length === 0 && (
-              <Typography
-                variant="body2"
-                sx={{ padding: 2, textAlign: "center" }}
-              >
-                No transactions found.
-              </Typography>
-            )}
-          </TableContainer>
+              {transactions.length === 0 && (
+                <Typography
+                  variant="body2"
+                  sx={{ padding: 2, textAlign: "center" }}
+                >
+                  No transactions found.
+                </Typography>
+              )}
+            </TableContainer>
+          </Box>
         </>
       )}
     </section>

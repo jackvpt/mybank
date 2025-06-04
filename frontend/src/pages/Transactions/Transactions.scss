@@ -10,7 +10,21 @@
   }
 }
 
+.MuiBox-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+
 .container-transactions {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+
   &__tools {
     display: flex;
     flex-direction: row;

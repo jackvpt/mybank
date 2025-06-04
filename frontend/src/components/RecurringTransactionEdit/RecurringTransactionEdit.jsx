@@ -8,6 +8,8 @@ import { useSelector } from "react-redux"
 // DEV imports
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
+import { frFR } from "@mui/x-date-pickers/locales"
+
 import {
   Button,
   FormControl,
@@ -22,6 +24,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  createTheme,
+  ThemeProvider,
 } from "@mui/material"
 
 import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
@@ -32,10 +36,12 @@ import { fetchAllSettings } from "../../api/settings"
 import { fetchBankAccounts } from "../../api/bankAccounts"
 import { fetchAllCategories } from "../../api/categories"
 import {
-  fetchTransactionsByAccountName,
-
-} from "../../api/transactions"
-import { deleteRecurringTransaction, postRecurringTransaction, updateRecurringTransaction } from "../../api/recurringTransactions"
+  deleteRecurringTransaction,
+  fetchAllRecurringTransactions,
+  postRecurringTransaction,
+  updateRecurringTransaction,
+} from "../../api/recurringTransactions"
+import { fr } from "date-fns/locale"
 
 const RecurringTransactionEdit = () => {
   const queryClient = useQueryClient()
@@ -43,28 +49,30 @@ const RecurringTransactionEdit = () => {
   const [toastOpen, setToastOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState("")
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [transactionToDelete, setTransactionToDelete] = useState(null)
+  const [recurringTransactionToDelete, setRecurringTransactionToDelete] =
+    useState(null)
+
+  const theme = createTheme({}, frFR)
 
   const handleOpenConfirm = (id) => {
-    setTransactionToDelete(id)
+    setRecurringTransactionToDelete(id)
     setConfirmOpen(true)
   }
 
   const handleConfirmDelete = () => {
-    if (transactionToDelete) {
-      deleteMutation.mutate(transactionToDelete)
+    if (recurringTransactionToDelete) {
+      deleteMutation.mutate(recurringTransactionToDelete)
       setConfirmOpen(false)
-      setTransactionToDelete(null)
+      setRecurringTransactionToDelete(null)
     }
   }
 
-  const bankAccountName = useSelector((state) => state.settings.bankAccount)
-  const selectedTransactionId = useSelector(
-    (state) => state.settings.selectedTransactionId
+  const selectedRecurringTransactionId = useSelector(
+    (state) => state.settings.selectedRecurringTransactionId
   )
 
   /**
-   * Mutation to post a new transaction.
+   * Mutation to post a new recurringtransaction.
    * It uses React Query's useMutation hook to handle the mutation.
    **/
   const addMutation = useMutation({
@@ -145,20 +153,20 @@ const RecurringTransactionEdit = () => {
 
   // Fetch transactions using React Query
   const {
-    data: transactions = [],
-    isLoading: isLoadingTransactions,
-    error: transactionsError,
+    data: recurringTransactions = [],
+    isLoading: isLoadingRecurringTransactions,
+    error: recurringTransactionsError,
   } = useQuery({
-    queryKey: ["transactions", bankAccountName],
-    queryFn: () => fetchTransactionsByAccountName(bankAccountName),
-    enabled: !!bankAccountName,
+    queryKey: ["transactions"],
+    queryFn: () => fetchAllRecurringTransactions(),
   })
 
   const transactionTypes = settings ? settings[0].types : []
 
   const initialFormData = {
     date: new Date(),
-    account: bankAccountName,
+    bankAccountName: "",
+    bankAccountId: "",
     type: "card",
     checkNumber: "",
     label: "",
@@ -177,16 +185,16 @@ const RecurringTransactionEdit = () => {
   const periodicities = settings[0]?.periodicities
 
   useEffect(() => {
-    if (selectedTransactionId) {
-      const selected = transactions.find(
-        (transaction) => transaction.id === selectedTransactionId
+    if (selectedRecurringTransactionId) {
+      const selected = recurringTransactions.find(
+        (recurringTransaction) =>
+          recurringTransaction.id === selectedRecurringTransactionId
       )
 
       if (selected) {
         setFormData({
           ...selected,
           date: new Date(selected.date),
-          amount: (selected.debit ?? selected.credit ?? 0).toFixed(2),
           category: selected.category ?? "",
           subCategory: selected.subCategory ?? "",
           type: selected.type ?? "card",
@@ -195,7 +203,7 @@ const RecurringTransactionEdit = () => {
     } else {
       setFormData(initialFormData)
     }
-  }, [selectedTransactionId])
+  }, [selectedRecurringTransactionId])
 
   /**
    * Handles the modification of a transaction.
@@ -208,7 +216,7 @@ const RecurringTransactionEdit = () => {
     e.preventDefault()
     if (!formHasErrors()) {
       updateMutation.mutate({
-        id: selectedTransactionId,
+        id: selectedRecurringTransactionId,
         updatedData: formData,
       })
     }
@@ -262,14 +270,14 @@ const RecurringTransactionEdit = () => {
     isLoadingSettings ||
     isLoadingBankAccounts ||
     isLoadingCategories ||
-    isLoadingTransactions
+    isLoadingRecurringTransactions
   )
     return <p>Loading data...</p>
   if (
     settingsError ||
     bankAccountsError ||
     categoriesError ||
-    transactionsError
+    recurringTransactionsError
   )
     return (
       <p>
@@ -282,22 +290,58 @@ const RecurringTransactionEdit = () => {
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <form>
           {/* DATE PICKER */}
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <DatePicker
-              label="Date"
-              value={formData.date}
-              onChange={(newValue) =>
-                setFormData((prev) => ({ ...prev, date: newValue }))
+          <ThemeProvider theme={theme}>
+            <LocalizationProvider
+              dateAdapter={AdapterDateFns}
+              adapterLocale={fr}
+            >
+              <DatePicker
+                label="Date"
+                value={formData.date}
+                onChange={(newValue) =>
+                  setFormData((prev) => ({ ...prev, date: newValue }))
+                }
+                format="dd/MM/yyyy"
+                sx={{ width: "auto", minWidth: 150, maxWidth: 180 }}
+                slotProps={{
+                  textField: {
+                    size: "small",
+                  },
+                }}
+              />
+            </LocalizationProvider>
+          </ThemeProvider>
+
+          {/* BANK ACCOUNT SELECT */}
+          <FormControl
+            fullWidth
+            variant="outlined"
+            required
+            size="small"
+            sx={{ width: "auto", minWidth: 240 }}
+          >
+            <InputLabel id="account-label">Compte</InputLabel>
+            <Select
+              labelId="account-label"
+              id="account"
+              name="account"
+              value={formData.account}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  bankAccountName: e.target.value,
+                  bankAccountId: e.target.key,
+                }))
               }
-              format="dd/MM/yyyy"
-              sx={{ width: "auto", minWidth: 150, maxWidth: 180 }}
-              slotProps={{
-                textField: {
-                  size: "small",
-                },
-              }}
-            />
-          </LocalizationProvider>
+              label="Account"
+            >
+              {bankAccounts.map((account) => (
+                <MenuItem key={account._id} value={account.name}>
+                  {account.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
           {/* TYPE SELECT */}
           <FormControl
@@ -521,8 +565,8 @@ const RecurringTransactionEdit = () => {
           <Button
             variant="contained"
             startIcon={<Delete />}
-            disabled={!selectedTransactionId}
-            onClick={() => handleOpenConfirm(selectedTransactionId)}
+            disabled={!selectedRecurringTransactionId}
+            onClick={() => handleOpenConfirm(selectedRecurringTransactionId)}
             sx={{
               minWidth: 100,
               backgroundColor: "red",

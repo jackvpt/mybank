@@ -70,6 +70,7 @@ const RecurringTransactions = () => {
     { id: "debit", label: "Débit", show: !isMobileScreen },
     { id: "credit", label: "Crédit", show: !isMobileScreen },
     { id: "periodicity", label: "Périodicité", show: true },
+    { id: "notes", label: "Notes", show: !isMobileScreen },
   ]
 
   // Fetch recurring transactions using React Query
@@ -134,11 +135,27 @@ const RecurringTransactions = () => {
     )
   if (!recurringTransactions) return <p>No recurring transactions found.</p>
 
+  /**
+   * Convert periodicity to text based on settings.
+   * @param {string} periodicity
+   * @returns {string} Text representation of the periodicity
+   */
   const convertPeriodicityToText = (periodicity) => {
     const periodicities = settings[0].periodicities
     const text = periodicities.find((p) => p.name === periodicity)?.text
     return text
   }
+  /**
+   * Convert periodicity to text based on settings.
+   * @param {string} type
+   * @returns {string} Text representation of the periodicity
+   */
+  const convertTypeToText = (type) => {
+    const types = settings[0].types
+    const text = types.find((p) => p.name === type)?.text
+    return text
+  }
+
   return (
     <section className="container-transactions">
       {recurringTransactions && (
@@ -156,19 +173,33 @@ const RecurringTransactions = () => {
                     .filter((column) => column.show)
                     .map((headCell) => (
                       <TableCell
-                        key={headCell.id}
-                        align="center"
-                        sx={{
+                      
+                      key={headCell.id}
+                      align="center"
+                      sx={{
+                          cursor:"pointer",
                           height: 14,
                           paddingTop: 1,
                           paddingBottom: 1,
                           lineHeight: 1,
-                          position: "sticky",
                           top: 0,
                           backgroundColor: "#f5f5f5",
                           zIndex: 1,
+                          textAlign: "center",
+                          position: "relative",
                         }}
                       >
+                        <span
+                          style={{
+                            fontSize: "0.9rem",
+                            fontWeight: "bold",
+                            color: "#333",
+                          }}
+                                  onClick={() => handleSort(headCell.id)}
+                             
+                        >
+                          {headCell.label}
+                        </span>
                         <TableSortLabel
                           active={orderBy === headCell.id}
                           direction={orderBy === headCell.id ? order : "asc"}
@@ -177,9 +208,17 @@ const RecurringTransactions = () => {
                             fontSize: "0.9rem",
                             fontWeight: "bold",
                             color: "#333",
+                            position: "absolute",
+                            right: 8,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            "& .MuiTableSortLabel-icon": {
+                              color: "#666",
+                              fontSize: "1rem",
+                            },
                           }}
                         >
-                          {headCell.label}
+                   
                         </TableSortLabel>
                       </TableCell>
                     ))}
@@ -200,16 +239,21 @@ const RecurringTransactions = () => {
                     <TableCell align="center">
                       {new Date(tx.date).toLocaleDateString()}
                     </TableCell>
-                    <TableCell>{tx.account}</TableCell>
-                    <TableCell>{tx.type}</TableCell>
-                    <TableCell>{tx.label}</TableCell>
+                    <TableCell align="center">{tx.account}</TableCell>
                     <TableCell align="center">
-                      {tx.debit ? tx.debit.toFixed(2) + " €" : ""}
+                      {convertTypeToText(tx.type)}
+                    </TableCell>
+                    <TableCell align="center">{tx.label}</TableCell>
+                    <TableCell align="center">
+                      {tx.debit ? tx.debit.toFixed(2) + " €" : "-"}
                     </TableCell>
                     <TableCell align="center">
-                      {tx.credit ? tx.credit.toFixed(2) + " €" : ""}
+                      {tx.credit ? tx.credit.toFixed(2) + " €" : "-"}
                     </TableCell>
-                    <TableCell align="center">{convertPeriodicityToText(tx.periodicity)}</TableCell>
+                    <TableCell align="center">
+                      {convertPeriodicityToText(tx.periodicity)}
+                    </TableCell>
+                    <TableCell align="center">{tx.notes}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

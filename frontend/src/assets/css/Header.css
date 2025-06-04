@@ -1,7 +1,10 @@
 /* Responsive */
 /* Responsive */
 header {
-  padding: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 10px 30px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -21,15 +24,14 @@ header .logo {
 }
 @media all and (min-width: 768px) {
   header .logo__image {
-    width: 48px;
-    height: 48px;
+    width: 36px;
+    height: 36px;
   }
 }
 header .logo__title {
   font-family: "Delicious Handrawn";
   font-size: 3rem;
   color: #fafafa;
-  margin-right: 2rem;
 }
 
 .navbar {

@@ -1,1 +1,1 @@
-.container-transaction-edit form{display:flex;flex-direction:row;justify-content:space-evenly;align-items:baseline;margin-bottom:10px;padding:10px;gap:10px}/*# sourceMappingURL=TransactionEdit.min.css.map */
+.container-transaction-edit form{display:flex;flex-direction:row;justify-content:flex-start;align-items:center;flex-wrap:wrap;margin-bottom:10px;padding:10px;gap:10px}/*# sourceMappingURL=TransactionEdit.min.css.map */

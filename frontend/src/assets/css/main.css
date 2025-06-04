@@ -50,15 +50,10 @@ p {
   font-size: 1rem;
 }
 
-html {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
+html,
 body {
-  margin: 0 auto;
-  width: 100%;
+  height: 100%;
+  margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -67,10 +62,14 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  height: 100%;
 }
 
 main {
+  display: flex;
+  flex-direction: column;
   flex: 1;
+  min-height: 0;
   padding: 10px;
 }
 @media all and (min-width: 1024px) {
