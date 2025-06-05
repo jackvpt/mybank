@@ -21,7 +21,7 @@ import {
 } from "@mui/material"
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import ToolBar from "../../components/ToolBar/ToolBar"
+import TransactionsToolBar from "../../components/TransactionsToolBar/TransactionsToolBar"
 import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
 import { selectTransactionId } from "../../features/settingsSlice"
 
@@ -37,8 +37,8 @@ const Transactions = () => {
   const selectedTransactionId = useSelector(
     (state) => state.settings.selectedTransactionId
   )
-  const isEditWindowVisible = useSelector(
-    (state) => state.settings.isEditWindowVisible
+  const isTransactionEditWindowVisible = useSelector(
+    (state) => state.settings.isTransactionEditWindowVisible
   )
   // State to manage the visibility of the edit window
   // This state is used to toggle the visibility of the edit window for transactions
@@ -165,7 +165,7 @@ const Transactions = () => {
       <div className="container-transactions__tools">
         <h1>{bankAccountName}</h1>
         <div className="toggle-tools">
-          <ToolBar />
+          <TransactionsToolBar />
 
           {/* FormControl for date filtering */}
           <FormControl className="date-form-control" size="small">
@@ -193,7 +193,7 @@ const Transactions = () => {
       </div>
       {transactions && (
         <>
-          {isEditWindowVisible && <TransactionEdit />}
+          {isTransactionEditWindowVisible && <TransactionEdit />}
           <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
             <TableContainer
               component={Paper}

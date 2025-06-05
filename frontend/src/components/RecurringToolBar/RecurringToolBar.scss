@@ -1,0 +1,16 @@
+@use "../../styles/utils/variables" as *;
+@use "../../styles/utils/mixins" as *;
+@use "../../styles/base/buttons" as *;
+
+.container-recurring-toolbar {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.toolbar-insert {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border: 1px solid $primary-color-3;
+}

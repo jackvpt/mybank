@@ -81,4 +81,22 @@ main {
   main {
     padding: 10px 30px;
   }
+}
+
+.toggle-edit-btn {
+  min-width: 30px;
+  height: 30px;
+  padding: 4px;
+  background-color: red;
+  color: #000;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: all 0.2s ease-in-out;
+}
+.toggle-edit-btn:hover {
+  background-color: #3657c3;
+}
+.toggle-edit-btn.active {
+  background-color: #3657c3;
+  color: #fff;
 }/*# sourceMappingURL=main.css.map */

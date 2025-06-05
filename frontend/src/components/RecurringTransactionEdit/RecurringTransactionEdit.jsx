@@ -79,7 +79,7 @@ const RecurringTransactionEdit = () => {
     mutationFn: postRecurringTransaction,
     onSuccess: () => {
       queryClient.invalidateQueries("recurringTransactions")
-      setToastMessage("Transaction ajoutée")
+      setToastMessage("Transaction récurrente ajoutée")
       setToastOpen(true)
     },
     onError: (error) => {
@@ -91,7 +91,7 @@ const RecurringTransactionEdit = () => {
     mutationFn: updateRecurringTransaction,
     onSuccess: () => {
       queryClient.invalidateQueries("recurringTransactions")
-      setToastMessage("Transaction modifiée")
+      setToastMessage("Transaction récurrente modifiée")
       setToastOpen(true)
     },
     onError: (error) => {
@@ -103,7 +103,7 @@ const RecurringTransactionEdit = () => {
     mutationFn: deleteRecurringTransaction,
     onSuccess: () => {
       queryClient.invalidateQueries("recurringTransactions")
-      setToastMessage("Transaction supprimée")
+      setToastMessage("Transaction récurrente supprimée")
       setToastOpen(true)
     },
     onError: (error) => {
@@ -157,27 +157,31 @@ const RecurringTransactionEdit = () => {
     isLoading: isLoadingRecurringTransactions,
     error: recurringTransactionsError,
   } = useQuery({
-    queryKey: ["transactions"],
+    queryKey: ["recurringTransactions"],
     queryFn: () => fetchAllRecurringTransactions(),
   })
 
   const transactionTypes = settings ? settings[0].types : []
 
   const initialFormData = {
-    date: new Date(),
-    bankAccountName: "",
-    bankAccountId: "",
-    type: "card",
+    date: (() => {
+      const d = new Date()
+      d.setMonth(d.getMonth() + 1)
+      d.setDate(1)
+      return d
+    })(),
+    account: "",
+    type: "autodebit",
     checkNumber: "",
     label: "",
-    category: null,
+    category: "",
     subCategory: "",
     amount: 0,
     debit: 0,
     credit: 0,
-    status: null,
+    status: "",
     destination: "",
-    periodicity: null,
+    periodicity: "monthly",
     notes: "",
   }
   const [formData, setFormData] = useState(initialFormData)
@@ -192,6 +196,7 @@ const RecurringTransactionEdit = () => {
       )
 
       if (selected) {
+        console.log("selected :>> ", selected.account)
         setFormData({
           ...selected,
           date: new Date(selected.date),
@@ -325,19 +330,18 @@ const RecurringTransactionEdit = () => {
               labelId="account-label"
               id="account"
               name="account"
-              value={formData.account}
+              value={formData.account ?? ""}
               onChange={(e) =>
                 setFormData((prev) => ({
                   ...prev,
-                  bankAccountName: e.target.value,
-                  bankAccountId: e.target.key,
+                  account: e.target.value,
                 }))
               }
-              label="Account"
+              label="Compte"
             >
               {bankAccounts.map((account) => (
                 <MenuItem key={account._id} value={account.name}>
-                  {account.name}
+                  {account.name} - {account.bankAbbreviation}
                 </MenuItem>
               ))}
             </Select>
@@ -356,7 +360,7 @@ const RecurringTransactionEdit = () => {
               labelId="type-label"
               id="type"
               name="type"
-              value={formData.type}
+              value={formData.type ?? ""}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, type: e.target.value }))
               }
@@ -396,7 +400,7 @@ const RecurringTransactionEdit = () => {
               size="small"
               sx={{ width: "auto", minWidth: 240 }}
             >
-              <InputLabel id="type-label">Destination</InputLabel>
+              <InputLabel id="destination-label">Destination</InputLabel>
               <Select
                 labelId="destination-label"
                 id="destination"
@@ -460,7 +464,7 @@ const RecurringTransactionEdit = () => {
             size="small"
             sx={{ width: "auto", minWidth: 240 }}
           >
-            <InputLabel>Catégorie</InputLabel>
+            <InputLabel id="category-label">Catégorie</InputLabel>
             <Select
               labelId="category-label"
               id="category"
@@ -489,12 +493,12 @@ const RecurringTransactionEdit = () => {
             size="small"
             sx={{ width: "auto", minWidth: 240 }}
           >
-            <InputLabel>Sous catégorie</InputLabel>
+            <InputLabel id="subCategory-label">Sous catégorie</InputLabel>
             <Select
               labelId="subCategory-label"
               id="subCategory"
               name="subCategory"
-              value={formData.subCategory}
+              value={formData.subCategory ?? ""}
               onChange={(e) =>
                 setFormData((prev) => ({
                   ...prev,
@@ -522,7 +526,7 @@ const RecurringTransactionEdit = () => {
             size="small"
             sx={{ width: "auto", minWidth: 240 }}
           >
-            <InputLabel>Périodicité</InputLabel>
+            <InputLabel id="periodicity-label">Périodicité</InputLabel>
             <Select
               labelId="periodicity-label"
               id="periodicity"
@@ -582,7 +586,7 @@ const RecurringTransactionEdit = () => {
               boxShadow: 3,
             }}
           >
-            {deleteMutation.isPending ? "Supprime..." : "Supprimer"}
+            {deleteMutation.isPending ? "Suppr..." : "Supprimer"}
           </Button>
 
           {/* MODIFY TRANSACTION BUTTON */}
@@ -606,7 +610,7 @@ const RecurringTransactionEdit = () => {
               boxShadow: 3,
             }}
           >
-            {updateMutation.isPending ? "Modifie..." : "Modifier"}
+            {updateMutation.isPending ? "Modif..." : "Modifier"}
           </Button>
 
           {/* ADD TRANSACTION BUTTON */}

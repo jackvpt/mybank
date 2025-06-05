@@ -1,0 +1,20 @@
+/* Responsive */
+/* Responsive */
+.MuiToggleButton-root.toggle-edit-btn {
+  min-width: 30px;
+  height: 30px;
+  padding: 4px;
+  background-color: #DFEAFF !important;
+  color: #000;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: all 0.2s ease-in-out;
+}
+.MuiToggleButton-root.toggle-edit-btn.active {
+  background-color: #3657c3 !important;
+  color: #fff;
+}
+.MuiToggleButton-root.toggle-edit-btn:hover {
+  background-color: #a6bff9 !important;
+  color: #000;
+}/*# sourceMappingURL=TransactionsToolBar.css.map */

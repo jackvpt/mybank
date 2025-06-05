@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit"
 
 const initialState = {
   bankAccount: null,
-  isEditWindowVisible: true,
+  isTransactionEditWindowVisible: true,
+  isRecurringEditWindowVisible: true,
   selectedTransactionId: null,
   selectedRecurringTransactionId: null,
 }
@@ -14,8 +15,11 @@ const settingsSlice = createSlice({
     setBankAccount: (state, action) => {
       state.bankAccount = action.payload
     },
-    setIsEditWindowVisible: (state, action) => {
-      state.isEditWindowVisible = action.payload
+    setIsTransactionEditWindowVisible: (state, action) => {
+      state.isTransactionEditWindowVisible = action.payload
+    },
+    setIsRecurringEditWindowVisible: (state, action) => {
+      state.isRecurringEditWindowVisible = action.payload
     },
     selectTransactionId(state, action) {
       state.selectedTransactionId = action.payload
@@ -34,7 +38,8 @@ const settingsSlice = createSlice({
 
 export const {
   setBankAccount,
-  setIsEditWindowVisible,
+  setIsTransactionEditWindowVisible,
+  setIsRecurringEditWindowVisible,
   selectTransactionId,
   clearSelectedTransactionId,
   selectRecurringTransactionId,

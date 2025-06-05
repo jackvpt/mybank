@@ -1,6 +1,6 @@
+import "./styles/_index.scss" 
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
-import "./styles/main.scss" // Import the main SCSS styles
 import App from "./App.jsx"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"

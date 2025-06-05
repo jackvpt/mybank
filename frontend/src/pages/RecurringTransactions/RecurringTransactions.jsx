@@ -24,6 +24,8 @@ import { useDispatch, useSelector } from "react-redux"
 import RecurringTransactionEdit from "../../components/RecurringTransactionEdit/RecurringTransactionEdit"
 import { selectRecurringTransactionId } from "../../features/settingsSlice"
 import { fetchAllSettings } from "../../api/settings"
+import ToolBar from "../../components/TransactionsToolBar/TransactionsToolBar"
+import RecurringToolBar from "../../components/RecurringToolBar/RecurringToolBar"
 
 /**
  * RecurringTransactions component that fetches and displays recurring transactions.
@@ -42,6 +44,10 @@ const RecurringTransactions = () => {
     queryKey: ["settings"],
     queryFn: () => fetchAllSettings(),
   })
+
+  const isRecurringEditWindowVisible = useSelector(
+    (state) => state.settings.isRecurringEditWindowVisible
+  )
 
   const selectedRecurringTransactionId = useSelector(
     (state) => state.settings.selectedRecurringTransactionId
@@ -158,9 +164,12 @@ const RecurringTransactions = () => {
 
   return (
     <section className="container-transactions">
+      <div className="container-transactions__tools">
+        <RecurringToolBar />
+      </div>
       {recurringTransactions && (
         <>
-          <RecurringTransactionEdit />
+          {isRecurringEditWindowVisible && <RecurringTransactionEdit />}
           <TableContainer
             component={Paper}
             sx={{ maxHeight: "75vh", overflow: "auto" }}
@@ -173,11 +182,10 @@ const RecurringTransactions = () => {
                     .filter((column) => column.show)
                     .map((headCell) => (
                       <TableCell
-                      
-                      key={headCell.id}
-                      align="center"
-                      sx={{
-                          cursor:"pointer",
+                        key={headCell.id}
+                        align="center"
+                        sx={{
+                          cursor: "pointer",
                           height: 14,
                           paddingTop: 1,
                           paddingBottom: 1,
@@ -195,8 +203,7 @@ const RecurringTransactions = () => {
                             fontWeight: "bold",
                             color: "#333",
                           }}
-                                  onClick={() => handleSort(headCell.id)}
-                             
+                          onClick={() => handleSort(headCell.id)}
                         >
                           {headCell.label}
                         </span>
@@ -217,9 +224,7 @@ const RecurringTransactions = () => {
                               fontSize: "1rem",
                             },
                           }}
-                        >
-                   
-                        </TableSortLabel>
+                        ></TableSortLabel>
                       </TableCell>
                     ))}
                 </TableRow>

@@ -1,0 +1,23 @@
+@use "../../styles/utils/variables" as *;
+@use "../../styles/utils/mixins" as *;
+
+.MuiToggleButton-root.toggle-edit-btn {
+  min-width: 30px;
+  height: 30px;
+  padding: 4px;
+  background-color: $primary-color-4!important;
+  color: $text-color-1;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: all 0.2s ease-in-out;
+
+  &.active {
+    background-color: $primary-color-2!important;
+    color: $text-color-2;
+  }
+  &:hover {
+    background-color: $primary-color-3!important;
+    color:$text-color-1;
+  }
+
+}
