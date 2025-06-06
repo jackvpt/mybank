@@ -5,51 +5,55 @@
   height: 24px;
 }
 .MuiMenuItem-root:hover {
-  background-color: #FFFAB8 !important;
+  background-color: #fffab8 !important;
 }
 
-.container-transactions__tools {
+.container-recurringTransactions__tools {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin: 10px 0;
   margin-left: auto;
 }
-.container-transactions__tools .toggle-tools {
+.container-recurringTransactions__tools .toggle-tools {
   display: flex;
   flex-direction: row;
   align-items: baseline;
   gap: 10px;
 }
-.container-transactions__tools .date-form-control {
+.container-recurringTransactions__tools .date-form-control {
   width: 200px;
   margin-bottom: 1rem;
 }
-.container-transactions__tools .date-form-control .MuiInputLabel-root {
+.container-recurringTransactions__tools .date-form-control .MuiInputLabel-root {
   font-size: 0.75rem;
 }
-.container-transactions__tools .date-form-control .MuiSelect-root {
+.container-recurringTransactions__tools .date-form-control .MuiSelect-root {
   font-size: 0.8rem;
   height: 34px;
 }
-.container-transactions .transaction-row {
+.container-recurringTransactions .transaction-row {
   cursor: pointer;
 }
-.container-transactions .transaction-row:nth-of-type(even) {
-  background-color: #DFEAFF;
+.container-recurringTransactions .transaction-row:nth-of-type(even) {
+  background-color: #dfeaff;
 }
-.container-transactions .transaction-row:hover {
-  background-color: #FFFAB8;
+.container-recurringTransactions .transaction-row:hover {
+  background-color: #fffab8;
 }
-.container-transactions .transaction-row > .MuiTableCell-root {
+.container-recurringTransactions .transaction-row > .MuiTableCell-root {
   font-size: 0.8rem;
   padding-top: 2px !important;
   padding-bottom: 2px !important;
 }
-.container-transactions .rowSelected {
+.container-recurringTransactions .rowSelected {
   background-color: #3657c3 !important;
 }
-.container-transactions .rowSelected .MuiTableCell-root {
+.container-recurringTransactions .rowSelected .MuiTableCell-root {
   color: white !important;
+}
+.container-recurringTransactions .rowOutdated .MuiTableCell-root {
+  color: #f32929 !important;
+  font-weight: bold;
 }/*# sourceMappingURL=RecurringTransactions.css.map */

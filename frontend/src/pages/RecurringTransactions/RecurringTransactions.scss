@@ -10,11 +10,11 @@
   }
 }
 
-.container-transactions {
+.container-recurringTransactions {
   &__tools {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     margin: 10px 0;
     margin-left:auto;
@@ -63,6 +63,13 @@
     background-color: $primary-color-2 !important;
     .MuiTableCell-root {
       color: white !important;
+    }
+  }
+
+  .rowOutdated{
+        .MuiTableCell-root {
+      color: $text-color-3 !important;
+      font-weight: bold;
     }
   }
 }

@@ -1,24 +1,92 @@
 import "./RecurringToolBar.scss"
 import { useSelector, useDispatch } from "react-redux"
 import {
+  Alert,
   Button,
   FormControl,
+  IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
+  Snackbar,
+  TextField,
   ToggleButton,
 } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit"
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth"
+import ListAddIcon from "@mui/icons-material/PlaylistAdd"
 import { useState } from "react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import {
+  fetchAllRecurringTransactions,
+  updateRecurringTransaction,
+} from "../../api/recurringTransactions"
+import { postTransaction } from "../../api/transactions"
 
 const RecurringToolBar = () => {
+  // Fetch recurring transactions using React Query
+  const {
+    data: recurringTransactions = [],
+    isLoading: isLoadingRecurringTransactions,
+    error: recurringTransactionsError,
+  } = useQuery({
+    queryKey: ["recurringTransactions"],
+    queryFn: () => fetchAllRecurringTransactions(),
+  })
+
   const dispatch = useDispatch()
   const isRecurringEditWindowVisible = useSelector(
     (state) => state.settings.isRecurringEditWindowVisible
   )
 
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth()+1)
+  const queryClient = useQueryClient()
+
+  const [toastOpen, setToastOpen] = useState(false)
+  const [toastMessage, setToastMessage] = useState("")
+
+  /**
+   * Handles the closing of the toast notification.
+   * @param {Event} event - The event that triggered the close.
+   * @param {string} reason - The reason for closing the toast (e.g., "clickaway").
+   */
+  const handleToastClose = (event, reason) => {
+    if (reason === "clickaway") return
+    setToastOpen(false)
+  }
+
+  const addBatchMutation = useMutation({
+    mutationFn: async (transactions) => {
+      return await Promise.all(transactions.map(postTransaction))
+    },
+    onSuccess: (results) => {
+      queryClient.invalidateQueries("recurringTransactions")
+      setToastMessage(
+        `${results.length} transaction${results.length > 1 ? "s" : ""} ajoutée${
+          results.length > 1 ? "s" : ""
+        }`
+      )
+      setToastOpen(true)
+    },
+    onError: (error) => {
+      console.error("Error with batch posts :", error)
+    },
+  })
+
+  /**
+   * Mutation to update a recurring transaction.
+   * It uses React Query's useMutation hook to handle the mutation.
+   *
+   */
+  const updateRecurringMutation = useMutation({
+    mutationFn: updateRecurringTransaction,
+
+    onError: (error) => {
+      console.error("Erreur lors de la modification :", error)
+    },
+  })
+
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
   const months = [
     { value: 0, label: "Janvier" },
     { value: 1, label: "Février" },
@@ -34,14 +102,60 @@ const RecurringToolBar = () => {
     { value: 11, label: "Décembre" },
   ]
 
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+
+  const handleAddRecurring = () => {
+    const newTransactions = []
+    recurringTransactions.forEach((transaction) => {
+      const transactionDate = new Date(transaction.date)
+      if (
+        transactionDate.getMonth() === selectedMonth &&
+        transactionDate.getFullYear() === selectedYear
+      ) {
+        newTransactions.push(transaction)
+
+        // Add one month to the transaction date
+        const newDate = new Date(transactionDate)
+        newDate.setMonth(newDate.getMonth() + 1)
+        transaction.date = newDate
+
+        updateRecurringMutation.mutate({
+          id: transaction.id,
+          updatedData: transaction,
+        })
+      }
+    })
+    if (newTransactions.length > 0) {
+      addBatchMutation.mutate(newTransactions)
+    } else {
+      setToastMessage("Aucune transaction récurrente trouvée pour ce mois")
+      setToastOpen(true)
+    }
+  }
+
+  if (isLoadingRecurringTransactions) {
+    return <div>Loading...</div>
+  }
+
+  if (recurringTransactionsError) {
+    return (
+      <div>
+        Error loading recurring transactions:{" "}
+        {recurringTransactionsError.message}
+      </div>
+    )
+  }
+
   return (
     <section className="container-recurring-toolbar">
       <div className="toolbar-insert">
+        <CalendarMonthIcon />
+
         {/* MONTH SELECT */}
         <FormControl
           size="small"
           sx={{
-            minWidth: 110,
+            minWidth: 120,
             "& .MuiOutlinedInput-notchedOutline": {
               border: "none",
             },
@@ -74,8 +188,47 @@ const RecurringToolBar = () => {
           </Select>
         </FormControl>
 
-        <Button value="edit" className="toggle-edit-btn" size="small">
-          <CalendarMonthIcon fontSize="small" />
+        {/* YEAR INPUT */}
+        <FormControl
+          sx={{
+            width: 80,
+            "& .MuiOutlinedInput-notchedOutline": {
+              padding: 0,
+              border: "none",
+            },
+            "& .MuiInputBase-root": {
+              height: 28,
+              fontSize: "0.75rem",
+            },
+            "& .MuiInputLabel-root": {
+              fontSize: "0.75rem",
+              top: "-5px",
+            },
+            "& input": {
+              textAlign: "center",
+            },
+          }}
+        >
+          <TextField
+            type="number"
+            variant="outlined"
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            slotProps={{
+              inputProps: {
+                style: { textAlign: "center" },
+              },
+            }}
+          />
+        </FormControl>
+
+        <Button
+          value="edit"
+          className="toggle-edit-btn"
+          size="small"
+          onClick={handleAddRecurring}
+        >
+          <ListAddIcon fontSize="small" />
         </Button>
       </div>
       <ToggleButton
@@ -94,6 +247,22 @@ const RecurringToolBar = () => {
       >
         <EditIcon fontSize="small" />
       </ToggleButton>
+
+      {/* Toast notification for success messages */}
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={3000}
+        onClose={handleToastClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleToastClose}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {toastMessage}
+        </Alert>
+      </Snackbar>
     </section>
   )
 }

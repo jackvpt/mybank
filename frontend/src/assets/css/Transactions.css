@@ -5,7 +5,7 @@
   height: 24px;
 }
 .MuiMenuItem-root:hover {
-  background-color: #FFFAB8 !important;
+  background-color: #fffab8 !important;
 }
 
 .MuiBox-root {
@@ -26,7 +26,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
   margin: 10px 0;
 }
 .container-transactions__tools .toggle-tools {
@@ -50,10 +50,10 @@
   cursor: pointer;
 }
 .container-transactions .transaction-row:nth-of-type(even) {
-  background-color: #DFEAFF;
+  background-color: #dfeaff;
 }
 .container-transactions .transaction-row:hover {
-  background-color: #FFFAB8;
+  background-color: #fffab8;
 }
 .container-transactions .transaction-row > .MuiTableCell-root {
   font-size: 0.75rem;

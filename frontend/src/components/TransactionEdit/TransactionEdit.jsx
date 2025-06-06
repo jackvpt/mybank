@@ -2,7 +2,7 @@
 import "./TransactionEdit.scss"
 
 // React imports
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 
 // DEV imports
@@ -22,6 +22,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Divider,
+  ListSubheader,
 } from "@mui/material"
 
 import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
@@ -133,6 +135,14 @@ const TransactionEdit = () => {
     queryKey: ["categories"],
     queryFn: () => fetchAllCategories(),
   })
+  const groupedTransactionsCategories = transactionsCategories.reduce(
+    (acc, category) => {
+      if (!acc[category.type]) acc[category.type] = []
+      acc[category.type].push(category)
+      return acc
+    },
+    {}
+  )
 
   // Fetch bank accounts using React Query
   const {
@@ -429,20 +439,38 @@ const TransactionEdit = () => {
               id="category"
               name="category"
               value={formData.category ?? ""}
-              onChange={(e) =>
+              onChange={(e) => {
                 setFormData((prev) => ({
                   ...prev,
                   category: e.target.value,
                   subCategory: "",
                 }))
-              }
+              }}
               label="Catégorie"
             >
-              {transactionsCategories.map((category) => (
-                <MenuItem key={category.name} value={category.name}>
-                  {category.name}
-                </MenuItem>
-              ))}
+              {Object.entries(groupedTransactionsCategories).map(
+                ([type, categories]) => [
+                  <ListSubheader
+                    key={type}
+                    sx={{
+                      backgroundColor: "#ddd",
+                      color: "#1976d2",
+                      fontWeight: 900,
+                    }}
+                  >
+                    {type === "debit" ? "Débit" : "Crédit"}
+                  </ListSubheader>,
+                  ...categories.map((category) => (
+                    <MenuItem
+                      key={category.name}
+                      value={category.name}
+                      sx={{ fontSize: "0.85rem" }}
+                    >
+                      {category.name}
+                    </MenuItem>
+                  )),
+                ]
+              )}
             </Select>
           </FormControl>
 

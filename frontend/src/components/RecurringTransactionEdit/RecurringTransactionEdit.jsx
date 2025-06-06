@@ -26,6 +26,7 @@ import {
   DialogActions,
   createTheme,
   ThemeProvider,
+  Divider,
 } from "@mui/material"
 
 import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
@@ -151,7 +152,7 @@ const RecurringTransactionEdit = () => {
     queryFn: fetchBankAccounts,
   })
 
-  // Fetch transactions using React Query
+  // Fetch recurring transactions using React Query
   const {
     data: recurringTransactions = [],
     isLoading: isLoadingRecurringTransactions,
@@ -464,26 +465,32 @@ const RecurringTransactionEdit = () => {
             size="small"
             sx={{ width: "auto", minWidth: 240 }}
           >
-            <InputLabel id="category-label">Catégorie</InputLabel>
+            <InputLabel>Catégorie</InputLabel>
             <Select
               labelId="category-label"
               id="category"
               name="category"
               value={formData.category ?? ""}
-              onChange={(e) =>
+              onChange={(e) => {
                 setFormData((prev) => ({
                   ...prev,
                   category: e.target.value,
                   subCategory: "",
                 }))
-              }
+              }}
               label="Catégorie"
             >
-              {transactionsCategories.map((category) => (
-                <MenuItem key={category.name} value={category.name}>
-                  {category.name}
-                </MenuItem>
-              ))}
+              {transactionsCategories.map((category, index) => {
+                const prevCategory = transactionsCategories[index - 1]
+                const showDivider =
+                  index > 0 && category.type !== prevCategory.type
+                return [
+                  showDivider && <Divider key={`divider-${category.name}`} />,
+                  <MenuItem key={category.name} value={category.name}>
+                    {category.name}
+                  </MenuItem>,
+                ]
+              })}
             </Select>
           </FormControl>
 

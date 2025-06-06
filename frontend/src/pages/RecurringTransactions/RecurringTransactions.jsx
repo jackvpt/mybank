@@ -69,7 +69,7 @@ const RecurringTransactions = () => {
 
   // Define which columns should be visible based on screen size
   const visibleColumns = [
-    { id: "date", label: "Date", show: true },
+    { id: "date", label: "Echéance", show: true },
     { id: "account", label: "Compte", show: true },
     { id: "type", label: "Type", show: true },
     { id: "label", label: "Libellé", show: true },
@@ -163,8 +163,8 @@ const RecurringTransactions = () => {
   }
 
   return (
-    <section className="container-transactions">
-      <div className="container-transactions__tools">
+    <section className="container-recurringTransactions">
+      <div className="container-recurringTransactions__tools">
         <RecurringToolBar />
       </div>
       {recurringTransactions && (
@@ -238,7 +238,9 @@ const RecurringTransactions = () => {
                       selectedRecurringTransactionId === tx.id
                         ? "rowSelected"
                         : ""
-                    }`}
+                    }
+                    ${tx.date < new Date() ? "rowOutdated" : ""}
+                    `}
                     onClick={() => handleRowClick(tx)}
                   >
                     <TableCell align="center">
