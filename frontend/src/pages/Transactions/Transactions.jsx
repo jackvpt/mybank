@@ -23,7 +23,11 @@ import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import TransactionsToolBar from "../../components/TransactionsToolBar/TransactionsToolBar"
 import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
-import { selectTransactionId } from "../../features/settingsSlice"
+import {
+  addSelectedTransactionId,
+  removeSelectedTransactionId,
+  setSelectedTransactionIds,
+} from "../../features/settingsSlice"
 
 /**
  * Transactions component that fetches and displays transactions for a selected bank account.
@@ -34,9 +38,10 @@ const Transactions = () => {
   const dispatch = useDispatch()
 
   const bankAccountName = useSelector((state) => state.settings.bankAccount)
-  const selectedTransactionId = useSelector(
-    (state) => state.settings.selectedTransactionId
+  const selectedTransactionIds = useSelector(
+    (state) => state.settings.selectedTransactionIds
   )
+  const [lastSelectedIndex, setLastSelectedIndex] = useState(null)
   const isTransactionEditWindowVisible = useSelector(
     (state) => state.settings.isTransactionEditWindowVisible
   )
@@ -151,8 +156,26 @@ const Transactions = () => {
       : String(bValue).localeCompare(String(aValue))
   })
 
-  const handleRowClick = (transaction) => {
-    dispatch(selectTransactionId(transaction.id))
+  const handleRowClick = (event, transaction, index) => {
+    if (event.shiftKey && lastSelectedIndex !== null) {
+      const start = Math.min(index, lastSelectedIndex)
+      const end = Math.max(index, lastSelectedIndex)
+      const range = sortedTransactions.slice(start, end + 1).map((tx) => tx.id)
+      const newSelection = Array.from(
+        new Set([...selectedTransactionIds, ...range])
+      )
+      dispatch(setSelectedTransactionIds(newSelection))
+    } else if (event.ctrlKey || event.metaKey) {
+      if (selectedTransactionIds.includes(transaction.id)) {
+        dispatch(removeSelectedTransactionId(transaction.id))
+      } else {
+        dispatch(addSelectedTransactionId(transaction.id))
+      }
+      setLastSelectedIndex(index)
+    } else {
+      dispatch(setSelectedTransactionIds([transaction.id]))
+      setLastSelectedIndex(index)
+    }
   }
 
   if (isLoadingTransactions) return <p>Loading transactions...</p>
@@ -239,13 +262,15 @@ const Transactions = () => {
                 </TableHead>
                 {/* Table body */}
                 <TableBody>
-                  {sortedTransactions.map((tx) => (
+                  {sortedTransactions.map((tx, index) => (
                     <TableRow
                       key={tx.id}
                       className={`transaction-row ${
-                        selectedTransactionId === tx.id ? "rowSelected" : ""
+                        selectedTransactionIds.includes(tx.id)
+                          ? "rowSelected"
+                          : ""
                       }`}
-                      onClick={() => handleRowClick(tx)}
+                      onClick={(e) => handleRowClick(e, tx, index)}
                     >
                       <TableCell align="center">
                         {new Date(tx.date).toLocaleDateString()}

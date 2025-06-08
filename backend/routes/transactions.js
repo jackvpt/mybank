@@ -11,5 +11,7 @@ router.get("/", transactionsCtrl.getAllTransactions)
 router.post("/",multer().none(), transactionsCtrl.createTransaction)
 router.put("/:id", multer().none(), transactionsCtrl.updateTransaction)
 router.delete("/:id", transactionsCtrl.deleteTransaction)
+router.post("/bulk-delete", transactionsCtrl.deleteTransactions);
+
 
 module.exports = router

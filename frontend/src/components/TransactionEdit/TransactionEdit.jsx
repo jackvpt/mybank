@@ -2,7 +2,7 @@
 import "./TransactionEdit.scss"
 
 // React imports
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 
 // DEV imports
@@ -22,7 +22,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  Divider,
   ListSubheader,
 } from "@mui/material"
 
@@ -37,7 +36,7 @@ import {
   fetchTransactionsByAccountName,
   postTransaction,
   updateTransaction,
-  deleteTransaction,
+  deleteTransactions,
 } from "../../api/transactions"
 
 const TransactionEdit = () => {
@@ -46,24 +45,24 @@ const TransactionEdit = () => {
   const [toastOpen, setToastOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState("")
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [transactionToDelete, setTransactionToDelete] = useState(null)
+  const [transactionsToDelete, setTransactionsToDelete] = useState([])
 
-  const handleOpenConfirm = (id) => {
-    setTransactionToDelete(id)
+  const handleOpenConfirm = (ids) => {
+    setTransactionsToDelete(ids)
     setConfirmOpen(true)
   }
 
   const handleConfirmDelete = () => {
-    if (transactionToDelete) {
-      deleteMutation.mutate(transactionToDelete)
+    if (transactionsToDelete.length > 0) {
+      deleteMutation.mutate(transactionsToDelete)
       setConfirmOpen(false)
-      setTransactionToDelete(null)
+      setTransactionsToDelete([])
     }
   }
 
   const bankAccountName = useSelector((state) => state.settings.bankAccount)
-  const selectedTransactionId = useSelector(
-    (state) => state.settings.selectedTransactionId
+  const selectedTransactionIds = useSelector(
+    (state) => state.settings.selectedTransactionIds
   )
 
   /**
@@ -95,14 +94,14 @@ const TransactionEdit = () => {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: deleteTransaction,
-    onSuccess: () => {
+    mutationFn: deleteTransactions,
+    onSuccess: (data) => {
       queryClient.invalidateQueries(["transactions", bankAccountName])
-      setToastMessage("Transaction supprimée")
-      setToastOpen(true) // Toast de confirmation de suppression
+      setToastMessage(`${data.deletedCount} transaction(s) supprimée(s)`)
+      setToastOpen(true)
     },
     onError: (error) => {
-      console.error("Erreur lors de la suppression :", error)
+      console.error("Erreur lors de la suppression :", error.message)
     },
   })
 
@@ -194,9 +193,9 @@ const TransactionEdit = () => {
   ]
 
   useEffect(() => {
-    if (selectedTransactionId) {
+    if (selectedTransactionIds.length === 1) {
       const selected = transactions.find(
-        (transaction) => transaction.id === selectedTransactionId
+        (transaction) => transaction.id === selectedTransactionIds[0]
       )
 
       if (selected) {
@@ -212,7 +211,7 @@ const TransactionEdit = () => {
     } else {
       setFormData(initialFormData)
     }
-  }, [selectedTransactionId])
+  }, [selectedTransactionIds])
 
   /**
    * Handles the modification of a transaction.
@@ -225,7 +224,7 @@ const TransactionEdit = () => {
     e.preventDefault()
     if (!formHasErrors()) {
       updateMutation.mutate({
-        id: selectedTransactionId,
+        id: selectedTransactionIds,
         updatedData: formData,
       })
     }
@@ -557,8 +556,8 @@ const TransactionEdit = () => {
           <Button
             variant="contained"
             startIcon={<Delete />}
-            disabled={!selectedTransactionId}
-            onClick={() => handleOpenConfirm(selectedTransactionId)}
+            disabled={!selectedTransactionIds}
+            onClick={() => handleOpenConfirm(selectedTransactionIds)}
             sx={{
               minWidth: 100,
               backgroundColor: "red",
@@ -581,7 +580,7 @@ const TransactionEdit = () => {
           <Button
             variant="contained"
             startIcon={<ChangeCircle />}
-            disabled={formHasErrors()}
+            disabled={formHasErrors() || selectedTransactionIds.length !== 1}
             onClick={handleModifyTransaction}
             sx={{
               minWidth: 100,
@@ -605,7 +604,7 @@ const TransactionEdit = () => {
           <Button
             variant="contained"
             startIcon={<AddCircle />}
-            disabled={formHasErrors()}
+            disabled={formHasErrors() || selectedTransactionIds.length != 1}
             onClick={handleAddTransaction}
             sx={{
               minWidth: 100,
@@ -654,8 +653,9 @@ const TransactionEdit = () => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Êtes-vous sûr de vouloir supprimer cette transaction ? Cette action
-            est irréversible.
+            {transactionsToDelete.length === 1
+              ? "Êtes-vous sûr de vouloir supprimer cette transaction ? Cette action est irréversible."
+              : `Êtes-vous sûr de vouloir supprimer ces ${transactionsToDelete.length} transactions ? Cette action est irréversible.`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

@@ -21,11 +21,21 @@ const settingsSlice = createSlice({
     setIsRecurringEditWindowVisible: (state, action) => {
       state.isRecurringEditWindowVisible = action.payload
     },
-    selectTransactionId(state, action) {
-      state.selectedTransactionId = action.payload
+    setSelectedTransactionIds(state, action) {
+      state.selectedTransactionIds = action.payload
     },
-    clearSelectedTransactionId(state) {
-      state.selectedTransactionId = null
+    addSelectedTransactionId(state, action) {
+      if (!state.selectedTransactionIds.includes(action.payload)) {
+        state.selectedTransactionIds.push(action.payload)
+      }
+    },
+    removeSelectedTransactionId(state, action) {
+      state.selectedTransactionIds = state.selectedTransactionIds.filter(
+        (id) => id !== action.payload
+      )
+    },
+    clearSelectedTransactionIds(state) {
+      state.selectedTransactionIds = []
     },
     selectRecurringTransactionId(state, action) {
       state.selectedRecurringTransactionId = action.payload
@@ -40,8 +50,10 @@ export const {
   setBankAccount,
   setIsTransactionEditWindowVisible,
   setIsRecurringEditWindowVisible,
-  selectTransactionId,
-  clearSelectedTransactionId,
+  setSelectedTransactionIds,
+  addSelectedTransactionId,
+  removeSelectedTransactionId,
+  clearSelectedTransactionIds,
   selectRecurringTransactionId,
   clearSelectedRecurringTransactionId,
 } = settingsSlice.actions

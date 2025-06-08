@@ -17,7 +17,6 @@
   min-height: 0;
 }
 
-
 .container-transactions {
   display: flex;
   flex-direction: column;
@@ -55,6 +54,7 @@
   }
 
   .transaction-row {
+    user-select: none;
     cursor: pointer;
 
     &:nth-of-type(even) {

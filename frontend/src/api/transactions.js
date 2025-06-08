@@ -75,10 +75,26 @@ export const updateTransaction = async ({ id, updatedData }) => {
  */
 export const deleteTransaction = async (id) => {
   try {
-    const response = await axios.delete(`${BASE_URL}/${id}`);
-    return response.data;
+    const response = await axios.delete(`${BASE_URL}/${id}`)
+    return response.data
   } catch (error) {
-    console.error("Error deleting transaction :", error.message);
-    throw error;
+    console.error("Error deleting transaction :", error.message)
+    throw error
   }
-};
+}
+
+export const deleteTransactions = async (transactionsIds) => {
+  if (!Array.isArray(transactionsIds) || transactionsIds.length === 0) {
+    throw new Error("Aucune transaction à supprimer.")
+  }
+
+  try {
+    const response = await axios.post(`${BASE_URL}/bulk-delete`, {
+      ids: transactionsIds,
+    })
+    return response.data
+  } catch (error) {
+    console.error("Error deleting transaction :", error.message)
+    throw error
+  }
+}
