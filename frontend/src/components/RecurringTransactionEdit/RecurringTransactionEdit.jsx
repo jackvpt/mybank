@@ -249,10 +249,10 @@ const RecurringTransactionEdit = () => {
     if (value !== "" && !isNaN(Number(value))) {
       const formatted = parseFloat(value).toFixed(2)
       formData.amount = formatted
-      if (formData.type === "deposit") {
-        setFormData((prev) => ({ ...prev, credit: formatted }))
+      if (formData.type === "directdeposit") {
+        setFormData((prev) => ({ ...prev,debit:"", credit: formatted }))
       } else {
-        setFormData((prev) => ({ ...prev, debit: formatted }))
+        setFormData((prev) => ({ ...prev, debit: formatted, credit:"" }))
       }
     }
   }

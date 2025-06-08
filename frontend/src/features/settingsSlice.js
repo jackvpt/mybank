@@ -4,7 +4,7 @@ const initialState = {
   bankAccount: null,
   isTransactionEditWindowVisible: true,
   isRecurringEditWindowVisible: true,
-  selectedTransactionId: null,
+  selectedTransactionIds: [],
   selectedRecurringTransactionId: null,
 }
 
