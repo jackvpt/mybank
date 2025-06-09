@@ -19,7 +19,7 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import TransactionsToolBar from "../../components/TransactionsToolBar/TransactionsToolBar"
 import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
@@ -35,6 +35,8 @@ import {
  * @returns {JSX.Element} Transactions component
  */
 const Transactions = () => {
+  const tableContainerRef = useRef(null)
+
   const dispatch = useDispatch()
 
   const bankAccountName = useSelector((state) => state.settings.bankAccount)
@@ -66,10 +68,14 @@ const Transactions = () => {
   const visibleColumns = [
     { id: "date", label: "Date", show: true },
     { id: "label", label: "Libellé", show: true },
-    { id: "debit", label: "Débit", show: !isMobileScreen },
-    { id: "credit", label: "Crédit", show: !isMobileScreen },
+    { id: "debit", label: "Débit", show: true },
+    { id: "credit", label: "Crédit", show: true },
+    { id: "balance", label: "Solde", show: !isMobileScreen },
     { id: "status", label: "Etat", show: !isMobileScreen },
   ]
+
+  const initialBalance = 0
+  let runningBalance = initialBalance
 
   // Fetch transactions using React Query
   const {
@@ -120,7 +126,7 @@ const Transactions = () => {
     }
   })
 
-  const [order, setOrder] = useState("desc")
+  const [order, setOrder] = useState("asc")
   const [orderBy, setOrderBy] = useState("date")
 
   /**
@@ -178,6 +184,13 @@ const Transactions = () => {
     }
   }
 
+  useEffect(() => {
+    const container = tableContainerRef.current
+    if (container) {
+      container.scrollTop = container.scrollHeight
+    }
+  }, [sortedTransactions])
+
   if (isLoadingTransactions) return <p>Loading transactions...</p>
   if (transactionsError)
     return <p>Error fetching transactions: {transactionsError.message}</p>
@@ -220,6 +233,7 @@ const Transactions = () => {
           <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
             <TableContainer
               component={Paper}
+              ref={tableContainerRef}
               sx={{ flex: 1, overflow: "auto" }}
               // Adjust the height to fit within the viewport}}
             >
@@ -262,45 +276,53 @@ const Transactions = () => {
                 </TableHead>
                 {/* Table body */}
                 <TableBody>
-                  {sortedTransactions.map((tx, index) => (
-                    <TableRow
-                      key={tx.id}
-                      className={`transaction-row ${
-                        selectedTransactionIds.includes(tx.id)
-                          ? "rowSelected"
-                          : ""
-                      }`}
-                      onClick={(e) => handleRowClick(e, tx, index)}
-                    >
-                      <TableCell align="center">
-                        {new Date(tx.date).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>{tx.label}</TableCell>
-                      <TableCell align="center">
-                        {tx.debit ? tx.debit.toFixed(2) + " €" : ""}
-                      </TableCell>
-                      <TableCell align="center">
-                        {tx.credit ? tx.credit.toFixed(2) + " €" : ""}
-                      </TableCell>
-                      <TableCell align="center">
-                        <Box
-                          sx={{
-                            width: 12,
-                            height: 12,
-                            borderRadius: "50%",
-                            backgroundColor:
-                              tx.status === "validated"
-                                ? "green"
-                                : tx.status === "pointed"
-                                ? "blue"
-                                : "white",
-                            border: "1px solid #ccc",
-                            margin: "0 auto",
-                          }}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {sortedTransactions.map((tx, index) => {
+                    if (tx.credit) {
+                      runningBalance += tx.credit
+                    } else if (tx.debit) {
+                      runningBalance -= tx.debit
+                    }
+                    return (
+                      <TableRow
+                        key={tx.id}
+                        className={`transaction-row ${
+                          selectedTransactionIds.includes(tx.id)
+                            ? "rowSelected"
+                            : ""
+                        }`}
+                        onClick={(e) => handleRowClick(e, tx, index)}
+                      >
+                        <TableCell align="center">
+                          {new Date(tx.date).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>{tx.label}</TableCell>
+                        <TableCell align="right">
+                          {tx.debit ? tx.debit.toFixed(2) : ""}
+                        </TableCell>
+                        <TableCell align="right">
+                          {tx.credit ? tx.credit.toFixed(2) : ""}
+                        </TableCell>
+                        <TableCell align="right">{runningBalance.toFixed(2)}</TableCell>
+                        <TableCell align="center">
+                          <Box
+                            sx={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: "50%",
+                              backgroundColor:
+                                tx.status === "validated"
+                                  ? "green"
+                                  : tx.status === "pointed"
+                                  ? "blue"
+                                  : "white",
+                              border: "1px solid #ccc",
+                              margin: "0 auto",
+                            }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
                 </TableBody>
               </Table>
 

@@ -556,7 +556,7 @@ const TransactionEdit = () => {
           <Button
             variant="contained"
             startIcon={<Delete />}
-            disabled={!selectedTransactionIds}
+            disabled={selectedTransactionIds.length === 0 || mutation.isPending}
             onClick={() => handleOpenConfirm(selectedTransactionIds)}
             sx={{
               minWidth: 100,
