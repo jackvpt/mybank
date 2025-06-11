@@ -70,3 +70,27 @@ exports.deleteRecurringTransaction = async (req, res) => {
       .json({ error: error.message || "Error deleting recurring transaction!" })
   }
 }
+
+/** DELETE Multiple Recurring Transactions */
+exports.deleteRecurringTransactions = async (req, res) => {
+  const { ids } = req.body;
+
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ error: "A non-empty array of IDs is required." });
+  }
+
+  try {
+    const result = await RecurringTransaction.deleteMany({ _id: { $in: ids } });
+
+    res.status(200).json({
+      message: "Recurring transactions deleted successfully!",
+      deletedCount: result.deletedCount,
+    });
+
+    console.log(`Deleted ${result.deletedCount} recurring transactions: ${ids.join(", ")}`);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || "Error deleting recurring transactions!",
+    });
+  }
+};

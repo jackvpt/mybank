@@ -1,0 +1,209 @@
+import "./CheckTransactions.scss"
+import { useState } from "react"
+import { useSelector } from "react-redux"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import {
+  Box,
+  createTheme,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  Typography,
+  useMediaQuery,
+} from "@mui/material"
+
+import {
+  fetchTransactionsByAccountName,
+  updateTransaction,
+} from "../../api/transactions"
+
+const theme = createTheme({
+  breakpoints: { values: { tablet: 768 } },
+})
+
+const visibleColumnsConfig = (isMobile) => [
+  { id: "date", label: "Date", show: true },
+  { id: "label", label: "Libellé", show: true },
+  { id: "debit", label: "Débit", show: true },
+  { id: "credit", label: "Crédit", show: true },
+  { id: "status", label: "État", show: !isMobile },
+]
+
+const CheckTransactions = () => {
+  const queryClient = useQueryClient()
+
+  const updateMutation = useMutation({
+    mutationFn: updateTransaction,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["transactions", bankAccountName])
+    },
+    onError: (error) => {
+      console.error("Erreur lors de la modification :", error)
+    },
+  })
+
+  const bankAccountName = useSelector((state) => state.settings.bankAccount)
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("tablet"))
+  const visibleColumns = visibleColumnsConfig(isMobile)
+
+  const [order, setOrder] = useState("asc")
+  const [orderBy, setOrderBy] = useState("date")
+
+  const {
+    data: transactions = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["transactions", bankAccountName],
+    queryFn: () => fetchTransactionsByAccountName(bankAccountName),
+    enabled: !!bankAccountName,
+  })
+
+  const unvalidatedTransactions = transactions.filter(
+    (tx) => tx.status !== "validated"
+  )
+
+  // Sort transactions
+  const sortedTransactions = [...unvalidatedTransactions].sort((a, b) => {
+    const aValue = a[orderBy],
+      bValue = b[orderBy]
+    if (orderBy === "date")
+      return order === "asc"
+        ? new Date(aValue) - new Date(bValue)
+        : new Date(bValue) - new Date(aValue)
+    if (typeof aValue === "number" && typeof bValue === "number")
+      return order === "asc" ? aValue - bValue : bValue - aValue
+    return order === "asc"
+      ? String(aValue).localeCompare(String(bValue))
+      : String(bValue).localeCompare(String(aValue))
+  })
+
+  const handleSort = (property) => {
+    setOrder(orderBy === property && order === "asc" ? "desc" : "asc")
+    setOrderBy(property)
+  }
+
+  const handleCheckTransaction = (transaction) => {
+    const newStatus = transaction.status === "pointed" ? "" : "pointed"
+    transaction.status = newStatus
+
+    updateMutation.mutate({
+      id: transaction.id,
+      updatedData: transaction
+    })
+    console.log('transaction :>> ', transaction);
+  }
+
+  if (isLoading) return <p>Chargement des transactions...</p>
+  if (error) return <p>Erreur : {error.message}</p>
+
+  return (
+    <section className="container-transactions">
+      <div className="container-transactions__tools">
+        <h1>{bankAccountName}</h1>
+      </div>
+
+      <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
+        <TableContainer component={Paper} sx={{ flex: 1, overflow: "auto" }}>
+          <Table aria-label="transactions">
+            <TableHead>
+              <TableRow>
+                {visibleColumns
+                  .filter((col) => col.show)
+                  .map((col) => (
+                    <TableCell
+                      key={col.id}
+                      align="center"
+                      sx={{
+                        height: 14,
+                        paddingTop: 1,
+                        paddingBottom: 1,
+                        position: "sticky",
+                        top: 0,
+                        backgroundColor: "#f5f5f5",
+                        zIndex: 1,
+                      }}
+                    >
+                      <TableSortLabel
+                        active={orderBy === col.id}
+                        direction={orderBy === col.id ? order : "asc"}
+                        onClick={() => handleSort(col.id)}
+                        sx={{
+                          fontSize: "0.9rem",
+                          fontWeight: "bold",
+                          color: "#333",
+                        }}
+                      >
+                        {col.label}
+                      </TableSortLabel>
+                    </TableCell>
+                  ))}
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {sortedTransactions.map((tx) => {
+                return (
+                  <TableRow key={tx.id} className="transaction-row">
+                    <TableCell align="center">
+                      {new Date(tx.date).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>{tx.label}</TableCell>
+                    <TableCell align="right">
+                      {tx.debit ? tx.debit.toFixed(2) : ""}
+                    </TableCell>
+                    <TableCell align="right">
+                      {tx.credit ? tx.credit.toFixed(2) : ""}
+                    </TableCell>
+
+                    {visibleColumns.find(
+                      (col) => col.id === "status" && col.show
+                    ) && (
+                      <TableCell align="center">
+                        <Box
+                          sx={{
+                            width: 12,
+                            height: 12,
+                            borderRadius: "50%",
+                            backgroundColor:
+                              tx.status === "validated"
+                                ? "green"
+                                : tx.status === "pointed"
+                                ? "blue"
+                                : "white",
+                            border: "1px solid #ccc",
+                            margin: "0 auto",
+                          }}
+                          onClick={() => {
+                            handleCheckTransaction(tx)
+                          }}
+                        />
+                      </TableCell>
+                    )}
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+
+          {sortedTransactions.length === 0 && (
+            <Typography
+              variant="body2"
+              sx={{ padding: 2, textAlign: "center" }}
+            >
+              Aucune transaction trouvée.
+            </Typography>
+          )}
+        </TableContainer>
+      </Box>
+    </section>
+  )
+}
+
+export default CheckTransactions

@@ -17,7 +17,6 @@ export default class TransactionModel {
    * @param {number} [data.credit=0] - The credit amount (money coming in).
    * @param {string} [data.status] - Status of the transaction (null, "pointed","validated").
    * @param {string} [data.destination] - Destination of the transfer, if applicable.
-   * @param {string} [data.periodicity=""] - Periodicity of the transaction (e.g. "monthly", "weekly").
    */
   constructor(data) {
     /** @type {string} */
@@ -70,9 +69,6 @@ export default class TransactionModel {
 
     /** @type {string | undefined} */
     this.destination = data.destination
-
-    /** @type {string} */
-    this.periodicity = data.periodicity || "oneTime"
 
     /** @type {string} */
     this.notes = data.notes || ""

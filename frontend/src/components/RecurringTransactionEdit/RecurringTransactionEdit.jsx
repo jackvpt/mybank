@@ -27,6 +27,7 @@ import {
   createTheme,
   ThemeProvider,
   Divider,
+  CircularProgress,
 } from "@mui/material"
 
 import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
@@ -38,6 +39,7 @@ import { fetchBankAccounts } from "../../api/bankAccounts"
 import { fetchAllCategories } from "../../api/categories"
 import {
   deleteRecurringTransaction,
+  deleteRecurringTransactions,
   fetchAllRecurringTransactions,
   postRecurringTransaction,
   updateRecurringTransaction,
@@ -50,26 +52,26 @@ const RecurringTransactionEdit = () => {
   const [toastOpen, setToastOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState("")
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [recurringTransactionToDelete, setRecurringTransactionToDelete] =
-    useState(null)
+  const [recurringTransactionsToDelete, setRecurringTransactionsToDelete] =
+    useState([])
 
   const theme = createTheme({}, frFR)
 
-  const handleOpenConfirm = (id) => {
-    setRecurringTransactionToDelete(id)
+  const handleOpenConfirm = (ids) => {
+    setRecurringTransactionsToDelete(ids)
     setConfirmOpen(true)
   }
 
   const handleConfirmDelete = () => {
-    if (recurringTransactionToDelete) {
-      deleteMutation.mutate(recurringTransactionToDelete)
+    if (recurringTransactionsToDelete.length > 0) {
+      deleteMutation.mutate(recurringTransactionsToDelete)
       setConfirmOpen(false)
-      setRecurringTransactionToDelete(null)
+      setRecurringTransactionsToDelete([])
     }
   }
 
-  const selectedRecurringTransactionId = useSelector(
-    (state) => state.settings.selectedRecurringTransactionId
+  const selectedRecurringTransactionIds = useSelector(
+    (state) => state.settings.selectedRecurringTransactionIds
   )
 
   /**
@@ -101,10 +103,12 @@ const RecurringTransactionEdit = () => {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: deleteRecurringTransaction,
-    onSuccess: () => {
+    mutationFn: deleteRecurringTransactions,
+    onSuccess: (data) => {
       queryClient.invalidateQueries("recurringTransactions")
-      setToastMessage("Transaction récurrente supprimée")
+      setToastMessage(
+        `${data.deletedCount} transaction(s) récurrente(s) supprimée(s)`
+      )
       setToastOpen(true)
     },
     onError: (error) => {
@@ -190,14 +194,13 @@ const RecurringTransactionEdit = () => {
   const periodicities = settings[0]?.periodicities
 
   useEffect(() => {
-    if (selectedRecurringTransactionId) {
+    if (selectedRecurringTransactionIds.length === 1) {
       const selected = recurringTransactions.find(
         (recurringTransaction) =>
-          recurringTransaction.id === selectedRecurringTransactionId
+          recurringTransaction.id === selectedRecurringTransactionIds[0]
       )
 
       if (selected) {
-        console.log("selected :>> ", selected.account)
         setFormData({
           ...selected,
           date: new Date(selected.date),
@@ -209,7 +212,7 @@ const RecurringTransactionEdit = () => {
     } else {
       setFormData(initialFormData)
     }
-  }, [selectedRecurringTransactionId])
+  }, [selectedRecurringTransactionIds])
 
   /**
    * Handles the modification of a transaction.
@@ -222,7 +225,7 @@ const RecurringTransactionEdit = () => {
     e.preventDefault()
     if (!formHasErrors()) {
       updateMutation.mutate({
-        id: selectedRecurringTransactionId,
+        id: selectedRecurringTransactionIds,
         updatedData: formData,
       })
     }
@@ -234,7 +237,16 @@ const RecurringTransactionEdit = () => {
    */
   const handleAddTransaction = (e) => {
     e.preventDefault()
-    if (!formHasErrors()) addMutation.mutate(formData)
+    if (!formHasErrors()) {
+      if (formData.type === "transfer") {
+        setFormData((prev) => ({
+          ...prev,
+          label: `Virement vers ${formData.destination}`,
+        }))
+      }
+      console.log('formData :>> ', formData);
+      addMutation.mutate(formData)
+    }
   }
 
   /**
@@ -250,9 +262,9 @@ const RecurringTransactionEdit = () => {
       const formatted = parseFloat(value).toFixed(2)
       formData.amount = formatted
       if (formData.type === "directdeposit") {
-        setFormData((prev) => ({ ...prev,debit:"", credit: formatted }))
+        setFormData((prev) => ({ ...prev, debit: "", credit: formatted }))
       } else {
-        setFormData((prev) => ({ ...prev, debit: formatted, credit:"" }))
+        setFormData((prev) => ({ ...prev, debit: formatted, credit: "" }))
       }
     }
   }
@@ -268,7 +280,7 @@ const RecurringTransactionEdit = () => {
       formData.amount === 0 ||
       formData.amount === "" ||
       isNaN(formData.amount) ||
-      formData.label === ""
+      (formData.type !== "transfer" && formData.label === "")
     )
   }
 
@@ -460,72 +472,76 @@ const RecurringTransactionEdit = () => {
           />
 
           {/* CATEGORIES SELECT */}
-          <FormControl
-            fullWidth
-            size="small"
-            sx={{ width: "auto", minWidth: 240 }}
-          >
-            <InputLabel>Catégorie</InputLabel>
-            <Select
-              labelId="category-label"
-              id="category"
-              name="category"
-              value={formData.category ?? ""}
-              onChange={(e) => {
-                setFormData((prev) => ({
-                  ...prev,
-                  category: e.target.value,
-                  subCategory: "",
-                }))
-              }}
-              label="Catégorie"
+          {formData.type !== "transfer" && (
+            <FormControl
+              fullWidth
+              size="small"
+              sx={{ width: "auto", minWidth: 240 }}
             >
-              {transactionsCategories.map((category, index) => {
-                const prevCategory = transactionsCategories[index - 1]
-                const showDivider =
-                  index > 0 && category.type !== prevCategory.type
-                return [
-                  showDivider && <Divider key={`divider-${category.name}`} />,
-                  <MenuItem key={category.name} value={category.name}>
-                    {category.name}
-                  </MenuItem>,
-                ]
-              })}
-            </Select>
-          </FormControl>
+              <InputLabel>Catégorie</InputLabel>
+              <Select
+                labelId="category-label"
+                id="category"
+                name="category"
+                value={formData.category ?? ""}
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    category: e.target.value,
+                    subCategory: "",
+                  }))
+                }}
+                label="Catégorie"
+              >
+                {transactionsCategories.map((category, index) => {
+                  const prevCategory = transactionsCategories[index - 1]
+                  const showDivider =
+                    index > 0 && category.type !== prevCategory.type
+                  return [
+                    showDivider && <Divider key={`divider-${category.name}`} />,
+                    <MenuItem key={category.name} value={category.name}>
+                      {category.name}
+                    </MenuItem>,
+                  ]
+                })}
+              </Select>
+            </FormControl>
+          )}
 
           {/* SUB-CATEGORIES SELECT */}
-          <FormControl
-            fullWidth
-            size="small"
-            sx={{ width: "auto", minWidth: 240 }}
-          >
-            <InputLabel id="subCategory-label">Sous catégorie</InputLabel>
-            <Select
-              labelId="subCategory-label"
-              id="subCategory"
-              name="subCategory"
-              value={formData.subCategory ?? ""}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  subCategory: e.target.value,
-                }))
-              }
-              label="Sous catégorie"
-              disabled={!formData.category}
+          {formData.type !== "transfer" && (
+            <FormControl
+              fullWidth
+              size="small"
+              sx={{ width: "auto", minWidth: 240 }}
             >
-              {transactionsCategories
-                .filter((category) => category.name === formData.category)
-                .flatMap((category) =>
-                  category.subcategories?.map((sub) => (
-                    <MenuItem key={`${category.name}-${sub}`} value={sub}>
-                      {sub}
-                    </MenuItem>
-                  ))
-                )}
-            </Select>
-          </FormControl>
+              <InputLabel id="subCategory-label">Sous catégorie</InputLabel>
+              <Select
+                labelId="subCategory-label"
+                id="subCategory"
+                name="subCategory"
+                value={formData.subCategory ?? ""}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    subCategory: e.target.value,
+                  }))
+                }
+                label="Sous catégorie"
+                disabled={!formData.category}
+              >
+                {transactionsCategories
+                  .filter((category) => category.name === formData.category)
+                  .flatMap((category) =>
+                    category.subcategories?.map((sub) => (
+                      <MenuItem key={`${category.name}-${sub}`} value={sub}>
+                        {sub}
+                      </MenuItem>
+                    ))
+                  )}
+              </Select>
+            </FormControl>
+          )}
 
           {/* PERIODICITY SELECT */}
           <FormControl
@@ -575,9 +591,9 @@ const RecurringTransactionEdit = () => {
           {/* DELETE TRANSACTION BUTTON */}
           <Button
             variant="contained"
-            startIcon={<Delete />}
-            disabled={!selectedRecurringTransactionId}
-            onClick={() => handleOpenConfirm(selectedRecurringTransactionId)}
+            startIcon={!deleteRecurringTransaction.isPending ? <Delete /> : ""}
+            disabled={selectedRecurringTransactionIds.length === 0}
+            onClick={() => handleOpenConfirm(selectedRecurringTransactionIds)}
             sx={{
               minWidth: 100,
               backgroundColor: "red",
@@ -593,13 +609,19 @@ const RecurringTransactionEdit = () => {
               boxShadow: 3,
             }}
           >
-            {deleteMutation.isPending ? "Suppr..." : "Supprimer"}
+            {deleteRecurringTransaction.isPending ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Supprimer"
+            )}{" "}
           </Button>
 
           {/* MODIFY TRANSACTION BUTTON */}
           <Button
             variant="contained"
-            startIcon={<ChangeCircle />}
+            startIcon={
+              !updateRecurringTransaction.isPending ? <ChangeCircle /> : ""
+            }
             disabled={formHasErrors()}
             onClick={handleModifyTransaction}
             sx={{
@@ -617,13 +639,17 @@ const RecurringTransactionEdit = () => {
               boxShadow: 3,
             }}
           >
-            {updateMutation.isPending ? "Modif..." : "Modifier"}
+            {updateRecurringTransaction.isPending ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Modifier"
+            )}{" "}
           </Button>
 
           {/* ADD TRANSACTION BUTTON */}
           <Button
             variant="contained"
-            startIcon={<AddCircle />}
+            startIcon={!addMutation.isPending ? <AddCircle /> : ""}
             disabled={formHasErrors()}
             onClick={handleAddTransaction}
             sx={{
@@ -641,7 +667,11 @@ const RecurringTransactionEdit = () => {
               boxShadow: 3,
             }}
           >
-            {addMutation.isPending ? "Ajout..." : "Ajouter"}
+            {addMutation.isPending ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Ajouter"
+            )}{" "}
           </Button>
         </form>
       </LocalizationProvider>

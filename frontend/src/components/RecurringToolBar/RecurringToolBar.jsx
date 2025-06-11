@@ -104,34 +104,54 @@ const RecurringToolBar = () => {
 
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
 
-  const handleAddRecurring = () => {
-    const newTransactions = []
-    recurringTransactions.forEach((transaction) => {
-      const transactionDate = new Date(transaction.date)
-      if (
-        transactionDate.getMonth() === selectedMonth &&
-        transactionDate.getFullYear() === selectedYear
-      ) {
-        newTransactions.push(transaction)
+const handleAddRecurring = () => {
+  const newTransactions = []
 
-        // Add one month to the transaction date
-        const newDate = new Date(transactionDate)
-        newDate.setMonth(newDate.getMonth() + 1)
-        transaction.date = newDate
+  recurringTransactions.forEach((transaction) => {
+    const transactionDate = new Date(transaction.date)
 
-        updateRecurringMutation.mutate({
-          id: transaction.id,
-          updatedData: transaction,
-        })
+    if (
+      transactionDate.getMonth() === selectedMonth &&
+      transactionDate.getFullYear() === selectedYear
+    ) {
+      const originalTransaction = { ...transaction }
+
+      if (transaction.type === "transfer") {
+        const creditTransaction = {
+          ...transaction,
+          type: "credit",
+          label: `Virement depuis ${transaction.account}`,
+          account: transaction.destination,
+          debit: 0,
+          credit: transaction.amount,
+          destination: ""
+        }
+        newTransactions.push(creditTransaction)
       }
-    })
-    if (newTransactions.length > 0) {
-      addBatchMutation.mutate(newTransactions)
-    } else {
-      setToastMessage("Aucune transaction récurrente trouvée pour ce mois")
-      setToastOpen(true)
+
+      newTransactions.push(originalTransaction)
+
+      const updatedTransaction = {
+        ...transaction,
+        date: new Date(transactionDate.setMonth(transactionDate.getMonth() + 1))
+      }
+
+      updateRecurringMutation.mutate({
+        id: transaction.id,
+        updatedData: updatedTransaction,
+      })
     }
+  })
+
+  if (newTransactions.length > 0) {
+    console.log('newTransactions :>> ', newTransactions);
+    addBatchMutation.mutate(newTransactions)
+  } else {
+    setToastMessage("Aucune transaction récurrente trouvée pour ce mois")
+    setToastOpen(true)
   }
+}
+
 
   if (isLoadingRecurringTransactions) {
     return <div>Loading...</div>

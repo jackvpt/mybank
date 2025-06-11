@@ -5,22 +5,29 @@ const initialState = {
   isTransactionEditWindowVisible: true,
   isRecurringEditWindowVisible: true,
   selectedTransactionIds: [],
-  selectedRecurringTransactionId: null,
+  selectedRecurringTransactionIds: [],
 }
 
 const settingsSlice = createSlice({
   name: "settings",
   initialState,
   reducers: {
+    // BANK ACCOUNT
     setBankAccount: (state, action) => {
       state.bankAccount = action.payload
     },
+
+    // TRANSACTION EDIT WINDOWS
     setIsTransactionEditWindowVisible: (state, action) => {
       state.isTransactionEditWindowVisible = action.payload
     },
+
+    // RECURRING TRANSACTION EDIT WINDOWS
     setIsRecurringEditWindowVisible: (state, action) => {
       state.isRecurringEditWindowVisible = action.payload
     },
+
+    // SELECTED TRANSACTIONS
     setSelectedTransactionIds(state, action) {
       state.selectedTransactionIds = action.payload
     },
@@ -37,11 +44,24 @@ const settingsSlice = createSlice({
     clearSelectedTransactionIds(state) {
       state.selectedTransactionIds = []
     },
-    selectRecurringTransactionId(state, action) {
-      state.selectedRecurringTransactionId = action.payload
+
+    // SELECTED RECURRING TRANSACTION
+    setSelectedRecurringTransactionIds(state, action) {
+      state.selectedRecurringTransactionIds = action.payload
     },
-    clearSelectedRecurringTransactionId(state) {
-      state.selectedRecurringTransactionId = null
+    addSelectedRecurringTransactionId(state, action) {
+      if (!state.selectedRecurringTransactionIds.includes(action.payload)) {
+        state.selectedRecurringTransactionIds.push(action.payload)
+      }
+    },
+    removeSelectedRecurringTransactionId(state, action) {
+      state.selectedRecurringTransactionIds =
+        state.selectedRecurringTransactionIds.filter(
+          (id) => id !== action.payload
+        )
+    },
+    clearSelectedRecurringTransactionIds(state) {
+      state.selectedRecurringTransactionIds = []
     },
   },
 })
@@ -54,8 +74,10 @@ export const {
   addSelectedTransactionId,
   removeSelectedTransactionId,
   clearSelectedTransactionIds,
-  selectRecurringTransactionId,
-  clearSelectedRecurringTransactionId,
+  setSelectedRecurringTransactionIds,
+  addSelectedRecurringTransactionId,
+  removeSelectedRecurringTransactionId,
+  clearSelectedRecurringTransactionIds,
 } = settingsSlice.actions
 
 export default settingsSlice.reducer

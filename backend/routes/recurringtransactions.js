@@ -11,5 +11,7 @@ router.get("/", recurringTransactionsCtrl.getAllRecurringTransactions)
 router.post("/",multer().none(), recurringTransactionsCtrl.createRecurringTransaction)
 router.put("/:id", multer().none(), recurringTransactionsCtrl.updateRecurringTransaction)
 router.delete("/:id", recurringTransactionsCtrl.deleteRecurringTransaction)
+router.post("/bulk-delete", recurringTransactionsCtrl.deleteRecurringTransactions);
+
 
 module.exports = router

@@ -2,13 +2,8 @@ import "./RecurringTransactions.scss"
 import { fetchAllRecurringTransactions } from "../../api/recurringTransactions"
 import { useQuery } from "@tanstack/react-query"
 import {
-  Box,
   createTheme,
-  FormControl,
-  InputLabel,
-  MenuItem,
   Paper,
-  Select,
   Table,
   TableBody,
   TableCell,
@@ -22,9 +17,12 @@ import {
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import RecurringTransactionEdit from "../../components/RecurringTransactionEdit/RecurringTransactionEdit"
-import { selectRecurringTransactionId } from "../../features/settingsSlice"
+import {
+  addSelectedRecurringTransactionId,
+  removeSelectedRecurringTransactionId,
+  setSelectedRecurringTransactionIds,
+} from "../../features/settingsSlice"
 import { fetchAllSettings } from "../../api/settings"
-import ToolBar from "../../components/TransactionsToolBar/TransactionsToolBar"
 import RecurringToolBar from "../../components/RecurringToolBar/RecurringToolBar"
 
 /**
@@ -49,8 +47,8 @@ const RecurringTransactions = () => {
     (state) => state.settings.isRecurringEditWindowVisible
   )
 
-  const selectedRecurringTransactionId = useSelector(
-    (state) => state.settings.selectedRecurringTransactionId
+  const selectedRecurringTransactionIds = useSelector(
+    (state) => state.settings.selectedRecurringTransactionIds
   )
 
   /**
@@ -93,6 +91,7 @@ const RecurringTransactions = () => {
 
   const [order, setOrder] = useState("desc")
   const [orderBy, setOrderBy] = useState("date")
+  const [lastSelectedIndex, setLastSelectedIndex] = useState(null)
 
   /**
    * Handle sorting logic when a column header is clicked.
@@ -129,8 +128,27 @@ const RecurringTransactions = () => {
     }
   )
 
-  const handleRowClick = (transaction) => {
-    dispatch(selectRecurringTransactionId(transaction.id))
+  const handleRowClick = (e, tx, index) => {
+    if (e.shiftKey && lastSelectedIndex !== null) {
+      const start = Math.min(index, lastSelectedIndex)
+      const end = Math.max(index, lastSelectedIndex)
+      const ids = sortedRecurringTransactions
+        .slice(start, end + 1)
+        .map((t) => t.id)
+      dispatch(
+        setSelectedRecurringTransactionIds([
+          ...new Set([...selectedRecurringTransactionIds, ...ids]),
+        ])
+      )
+    } else if (e.ctrlKey || e.metaKey) {
+      selectedRecurringTransactionIds.includes(tx.id)
+        ? dispatch(removeSelectedRecurringTransactionId(tx.id))
+        : dispatch(addSelectedRecurringTransactionId(tx.id))
+      setLastSelectedIndex(index)
+    } else {
+      dispatch(setSelectedRecurringTransactionIds([tx.id]))
+      setLastSelectedIndex(index)
+    }
   }
 
   if (isLoadingRecurringTransactions || isLoadingSettings)
@@ -231,17 +249,17 @@ const RecurringTransactions = () => {
               </TableHead>
               {/* Table body */}
               <TableBody>
-                {sortedRecurringTransactions.map((tx) => (
+                {sortedRecurringTransactions.map((tx,index) => (
                   <TableRow
                     key={tx.id}
+                    onClick={(e) => handleRowClick(e,tx,index)}
                     className={`transaction-row ${
-                      selectedRecurringTransactionId === tx.id
+                      selectedRecurringTransactionIds.includes(tx.id)
                         ? "rowSelected"
                         : ""
                     }
                     ${tx.date < new Date() ? "rowOutdated" : ""}
                     `}
-                    onClick={() => handleRowClick(tx)}
                   >
                     <TableCell align="center">
                       {new Date(tx.date).toLocaleDateString()}

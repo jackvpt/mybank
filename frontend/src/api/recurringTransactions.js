@@ -63,3 +63,19 @@ export const deleteRecurringTransaction = async (id) => {
     throw error;
   }
 };
+
+export const deleteRecurringTransactions = async (recurringTransactionsIds) => {
+  if (!Array.isArray(recurringTransactionsIds) || recurringTransactionsIds.length === 0) {
+    throw new Error("Aucune transaction à supprimer.")
+  }
+
+  try {
+    const response = await axios.post(`${BASE_URL}/bulk-delete`, {
+      ids: recurringTransactionsIds,
+    })
+    return response.data
+  } catch (error) {
+    console.error("Error deleting transaction :", error.message)
+    throw error
+  }
+}

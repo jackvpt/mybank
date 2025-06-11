@@ -23,6 +23,7 @@ import {
   DialogContentText,
   DialogActions,
   ListSubheader,
+  CircularProgress,
 } from "@mui/material"
 
 import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
@@ -69,7 +70,7 @@ const TransactionEdit = () => {
    * Mutation to post a new transaction.
    * It uses React Query's useMutation hook to handle the mutation.
    **/
-  const mutation = useMutation({
+  const addMutation = useMutation({
     mutationFn: postTransaction,
     onSuccess: () => {
       queryClient.invalidateQueries(["transactions", bankAccountName])
@@ -184,14 +185,6 @@ const TransactionEdit = () => {
   }
   const [formData, setFormData] = useState(initialFormData)
 
-  const periodicities = [
-    { monthly: "Mensuel" },
-    { quarterly: "Trimestriel" },
-    { semiAnnually: "Semestriel" },
-    { annually: "Annuel" },
-    { oneTime: "Unique" },
-  ]
-
   useEffect(() => {
     if (selectedTransactionIds.length === 1) {
       const selected = transactions.find(
@@ -236,7 +229,27 @@ const TransactionEdit = () => {
    */
   const handleAddTransaction = (e) => {
     e.preventDefault()
-    if (!formHasErrors()) mutation.mutate(formData)
+    if (!formHasErrors()) {
+      if (formData.type === "transfer") {
+        setFormData((prev) => ({
+          ...prev,
+          label: `Virement vers ${formData.destination}`,
+        }))
+        addMutation.mutate(formData)
+
+        const creditTransaction = {
+          ...formData,
+          account: formData.destination,
+          debit:0,
+          credit: formData.amount,
+          label: `Virement depuis ${formData.account}`,
+          destination:"",
+        }
+        addMutation.mutate(creditTransaction)
+      } else {
+        addMutation.mutate(formData)
+      }
+    }
   }
 
   /**
@@ -270,7 +283,7 @@ const TransactionEdit = () => {
       formData.amount === 0 ||
       formData.amount === "" ||
       isNaN(formData.amount) ||
-      formData.label === ""
+      (formData.type !== "transfer" && formData.label === "")
     )
   }
 
@@ -427,115 +440,88 @@ const TransactionEdit = () => {
           />
 
           {/* CATEGORIES SELECT */}
-          <FormControl
-            fullWidth
-            size="small"
-            sx={{ width: "auto", minWidth: 240 }}
-          >
-            <InputLabel>Catégorie</InputLabel>
-            <Select
-              labelId="category-label"
-              id="category"
-              name="category"
-              value={formData.category ?? ""}
-              onChange={(e) => {
-                setFormData((prev) => ({
-                  ...prev,
-                  category: e.target.value,
-                  subCategory: "",
-                }))
-              }}
-              label="Catégorie"
+          {formData.type !== "transfer" && (
+            <FormControl
+              fullWidth
+              size="small"
+              sx={{ width: "auto", minWidth: 240 }}
             >
-              {Object.entries(groupedTransactionsCategories).map(
-                ([type, categories]) => [
-                  <ListSubheader
-                    key={type}
-                    sx={{
-                      backgroundColor: "#ddd",
-                      color: "#1976d2",
-                      fontWeight: 900,
-                    }}
-                  >
-                    {type === "debit" ? "Débit" : "Crédit"}
-                  </ListSubheader>,
-                  ...categories.map((category) => (
-                    <MenuItem
-                      key={category.name}
-                      value={category.name}
-                      sx={{ fontSize: "0.85rem" }}
+              <InputLabel>Catégorie</InputLabel>
+              <Select
+                labelId="category-label"
+                id="category"
+                name="category"
+                value={formData.category ?? ""}
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    category: e.target.value,
+                    subCategory: "",
+                  }))
+                }}
+                label="Catégorie"
+              >
+                {Object.entries(groupedTransactionsCategories).map(
+                  ([type, categories]) => [
+                    <ListSubheader
+                      key={type}
+                      sx={{
+                        backgroundColor: "#ddd",
+                        color: "#1976d2",
+                        fontWeight: 900,
+                      }}
                     >
-                      {category.name}
-                    </MenuItem>
-                  )),
-                ]
-              )}
-            </Select>
-          </FormControl>
+                      {type === "debit" ? "Débit" : "Crédit"}
+                    </ListSubheader>,
+                    ...categories.map((category) => (
+                      <MenuItem
+                        key={category.name}
+                        value={category.name}
+                        sx={{ fontSize: "0.85rem" }}
+                      >
+                        {category.name}
+                      </MenuItem>
+                    )),
+                  ]
+                )}
+              </Select>
+            </FormControl>
+          )}
 
           {/* SUB-CATEGORIES SELECT */}
-          <FormControl
-            fullWidth
-            size="small"
-            sx={{ width: "auto", minWidth: 240 }}
-          >
-            <InputLabel>Sous catégorie</InputLabel>
-            <Select
-              labelId="subCategory-label"
-              id="subCategory"
-              name="subCategory"
-              value={formData.subCategory}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  subCategory: e.target.value,
-                }))
-              }
-              label="Sous catégorie"
-              disabled={!formData.category}
+          {formData.type !== "transfer" && (
+            <FormControl
+              fullWidth
+              size="small"
+              sx={{ width: "auto", minWidth: 240 }}
             >
-              {transactionsCategories
-                .filter((category) => category.name === formData.category)
-                .flatMap((category) =>
-                  category.subcategories?.map((sub) => (
-                    <MenuItem key={`${category.name}-${sub}`} value={sub}>
-                      {sub}
-                    </MenuItem>
-                  ))
-                )}
-            </Select>
-          </FormControl>
-
-          {/* PERIODICITY SELECT */}
-          <FormControl
-            fullWidth
-            size="small"
-            sx={{ width: "auto", minWidth: 240 }}
-          >
-            <InputLabel>Périodicité</InputLabel>
-            <Select
-              labelId="periodicity-label"
-              id="periodicity"
-              name="periodicity"
-              value={formData.periodicty ?? ""}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  periodicity: e.target.value,
-                }))
-              }
-              label="Périodicité"
-            >
-              {periodicities.map((periodicity) => {
-                const key = Object.keys(periodicity)[0]
-                return (
-                  <MenuItem key={key} value={key}>
-                    {periodicity[key]}
-                  </MenuItem>
-                )
-              })}
-            </Select>
-          </FormControl>
+              <InputLabel>Sous catégorie</InputLabel>
+              <Select
+                labelId="subCategory-label"
+                id="subCategory"
+                name="subCategory"
+                value={formData.subCategory}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    subCategory: e.target.value,
+                  }))
+                }
+                label="Sous catégorie"
+                disabled={!formData.category}
+              >
+                {transactionsCategories
+                  .filter((category) => category.name === formData.category)
+                  .flatMap((category) =>
+                    category.subcategories?.map((sub) => (
+                      <MenuItem key={`${category.name}-${sub}`} value={sub}>
+                        {sub}
+                      </MenuItem>
+                    ))
+                  )}
+              </Select>
+            </FormControl>
+          )}
 
           {/* NOTES */}
           <TextField
@@ -555,11 +541,11 @@ const TransactionEdit = () => {
           {/* DELETE TRANSACTION BUTTON */}
           <Button
             variant="contained"
-            startIcon={<Delete />}
-            disabled={selectedTransactionIds.length === 0 || mutation.isPending}
+            startIcon={!deleteMutation.isPending ? <Delete /> : ""}
+            disabled={selectedTransactionIds.length === 0}
             onClick={() => handleOpenConfirm(selectedTransactionIds)}
             sx={{
-              minWidth: 100,
+              minWidth: 140,
               backgroundColor: "red",
               color: "#fff",
               "&:hover": {
@@ -573,17 +559,21 @@ const TransactionEdit = () => {
               boxShadow: 3,
             }}
           >
-            {mutation.isPending ? "Supprime..." : "Supprimer"}
+            {deleteMutation.isPending ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Supprimer"
+            )}
           </Button>
 
           {/* MODIFY TRANSACTION BUTTON */}
           <Button
             variant="contained"
-            startIcon={<ChangeCircle />}
+            startIcon={!updateMutation.isPending ? <ChangeCircle /> : ""}
             disabled={formHasErrors() || selectedTransactionIds.length !== 1}
             onClick={handleModifyTransaction}
             sx={{
-              minWidth: 100,
+              minWidth: 140,
               backgroundColor: "#1976d2",
               color: "#fff",
               "&:hover": {
@@ -597,17 +587,21 @@ const TransactionEdit = () => {
               boxShadow: 3,
             }}
           >
-            {mutation.isPending ? "Modifie..." : "Modifier"}
+            {updateMutation.isPending ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Modifier"
+            )}
           </Button>
 
           {/* ADD TRANSACTION BUTTON */}
           <Button
             variant="contained"
-            startIcon={<AddCircle />}
-            disabled={formHasErrors() || selectedTransactionIds.length != 1}
+            startIcon={!addMutation.isPending ? <AddCircle /> : ""}
+            disabled={formHasErrors()}
             onClick={handleAddTransaction}
             sx={{
-              minWidth: 100,
+              minWidth: 140,
               backgroundColor: "green",
               color: "#fff",
               "&:hover": {
@@ -621,7 +615,11 @@ const TransactionEdit = () => {
               boxShadow: 3,
             }}
           >
-            {mutation.isPending ? "Ajout..." : "Ajouter"}
+            {addMutation.isPending ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Ajouter"
+            )}
           </Button>
         </form>
       </LocalizationProvider>

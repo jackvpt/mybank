@@ -17,7 +17,7 @@
     justify-content: flex-end;
     align-items: center;
     margin: 10px 0;
-    margin-left:auto;
+    margin-left: auto;
 
     .toggle-tools {
       display: flex;
@@ -42,6 +42,7 @@
   }
 
   .transaction-row {
+    user-select: none;
     cursor: pointer;
 
     &:nth-of-type(even) {
@@ -66,8 +67,8 @@
     }
   }
 
-  .rowOutdated{
-        .MuiTableCell-root {
+  .rowOutdated {
+    .MuiTableCell-root {
       color: $text-color-3 !important;
       font-weight: bold;
     }
