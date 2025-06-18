@@ -1,2 +1,81 @@
 @use "../../styles/utils/variables" as *;
 @use "../../styles/utils/mixins" as *;
+
+.MuiMenuItem-root {
+  font-size: 0.8rem;
+  height: 24px;
+
+  &:hover {
+    background-color: $secondary-color-1 !important;
+  }
+}
+
+.MuiBox-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.container-checkTransactions {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+
+  &__tools {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    margin: 10px 0;
+
+    .toggle-tools {
+      display: flex;
+      flex-direction: row;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .date-form-control {
+      width: 200px;
+      margin-bottom: 1rem;
+    }
+
+    .date-form-control .MuiInputLabel-root {
+      font-size: 0.75rem;
+    }
+
+    .date-form-control .MuiSelect-root {
+      font-size: 0.8rem;
+      height: 34px;
+    }
+  }
+
+  .transaction-row {
+    user-select: none;
+    cursor: pointer;
+
+    &:nth-of-type(even) {
+      background-color: $primary-color-4;
+    }
+
+    &:hover {
+      background-color: $secondary-color-1;
+    }
+  }
+
+  .transaction-row > .MuiTableCell-root {
+    font-size: 0.75rem;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+  }
+
+  .rowSelected {
+    background-color: $primary-color-2 !important;
+    .MuiTableCell-root {
+      color: white !important;
+    }
+  }
+}

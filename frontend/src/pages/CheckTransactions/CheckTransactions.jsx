@@ -1,6 +1,6 @@
 import "./CheckTransactions.scss"
 import { useState } from "react"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   Box,
@@ -21,6 +21,9 @@ import {
   fetchTransactionsByAccountName,
   updateTransaction,
 } from "../../api/transactions"
+import CheckTransactionsToolBar from "../../components/CheckTransactionsToolBar/CheckTransactionsToolBar"
+import CheckTransactionEdit from "../../components/CheckTransactionEdit/CheckTransactionEdit"
+import { setSelectedCheckTransactionIds } from "../../features/settingsSlice"
 
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
@@ -36,6 +39,7 @@ const visibleColumnsConfig = (isMobile) => [
 
 const CheckTransactions = () => {
   const queryClient = useQueryClient()
+  const dispatch = useDispatch()
 
   const updateMutation = useMutation({
     mutationFn: updateTransaction,
@@ -48,7 +52,9 @@ const CheckTransactions = () => {
   })
 
   const bankAccountName = useSelector((state) => state.settings.bankAccount)
-
+  const selectedCheckTransactionIds = useSelector(
+    (state) => state.settings.selectedCheckTransactionIds
+  )
   const isMobile = useMediaQuery(theme.breakpoints.down("tablet"))
   const visibleColumns = visibleColumnsConfig(isMobile)
 
@@ -67,6 +73,10 @@ const CheckTransactions = () => {
 
   const unvalidatedTransactions = transactions.filter(
     (tx) => tx.status !== "validated"
+  )
+
+  const isCheckTransactionsEditWindowVisible = useSelector(
+    (state) => state.settings.isCheckTransactionsEditWindowVisible
   )
 
   // Sort transactions
@@ -89,25 +99,33 @@ const CheckTransactions = () => {
     setOrderBy(property)
   }
 
+  const handleRowClick = (tx) => {
+    dispatch(setSelectedCheckTransactionIds([tx.id]))
+  }
+
   const handleCheckTransaction = (transaction) => {
     const newStatus = transaction.status === "pointed" ? "" : "pointed"
     transaction.status = newStatus
 
     updateMutation.mutate({
       id: transaction.id,
-      updatedData: transaction
+      updatedData: transaction,
     })
-    console.log('transaction :>> ', transaction);
   }
 
   if (isLoading) return <p>Chargement des transactions...</p>
   if (error) return <p>Erreur : {error.message}</p>
 
   return (
-    <section className="container-transactions">
-      <div className="container-transactions__tools">
+    <section className="container-checkTransactions">
+      <div className="container-checkTransactions__tools">
         <h1>{bankAccountName}</h1>
+        <div className="toggle-tools">
+          <CheckTransactionsToolBar />
+        </div>
       </div>
+
+      {isCheckTransactionsEditWindowVisible && <CheckTransactionEdit />}
 
       <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
         <TableContainer component={Paper} sx={{ flex: 1, overflow: "auto" }}>
@@ -150,7 +168,15 @@ const CheckTransactions = () => {
             <TableBody>
               {sortedTransactions.map((tx) => {
                 return (
-                  <TableRow key={tx.id} className="transaction-row">
+                  <TableRow
+                    onClick={() => handleRowClick(tx)}
+                    key={tx.id}
+                    className={
+                      selectedCheckTransactionIds[0] === tx.id
+                        ? "transaction-row rowSelected"
+                        : "transaction-row"
+                    }
+                  >
                     <TableCell align="center">
                       {new Date(tx.date).toLocaleDateString()}
                     </TableCell>

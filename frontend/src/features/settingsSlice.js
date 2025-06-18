@@ -4,8 +4,12 @@ const initialState = {
   bankAccount: null,
   isTransactionEditWindowVisible: true,
   isRecurringEditWindowVisible: true,
+  isCheckTransactionsEditWindowVisible: false,
   selectedTransactionIds: [],
   selectedRecurringTransactionIds: [],
+  selectedCheckTransactionIds: [],
+  transactionsTableScrollPosition:0,
+  transactionsTableHasScrolledToBottom: false,
 }
 
 const settingsSlice = createSlice({
@@ -25,6 +29,11 @@ const settingsSlice = createSlice({
     // RECURRING TRANSACTION EDIT WINDOWS
     setIsRecurringEditWindowVisible: (state, action) => {
       state.isRecurringEditWindowVisible = action.payload
+    },
+
+    // CHECK TRANSACTION EDIT WINDOWS
+    setIsCheckTransactionsEditWindowVisible: (state, action) => {
+      state.isCheckTransactionsEditWindowVisible = action.payload
     },
 
     // SELECTED TRANSACTIONS
@@ -63,6 +72,22 @@ const settingsSlice = createSlice({
     clearSelectedRecurringTransactionIds(state) {
       state.selectedRecurringTransactionIds = []
     },
+
+    // SELECT CHECK TRANSACTION
+    setSelectedCheckTransactionIds(state, action) {
+      state.selectedCheckTransactionIds = action.payload
+    },
+    clearSelectedCheckTransactionIds(state) {
+      state.selectedCheckTransactionIds = []
+    },
+
+    // TRANSACTION TABLE SCROLL STATUS
+    setTransactionsTableScrollPosition(state, action) {
+      state.transactionsTableScrollPosition = action.payload;
+    },
+    setTransactionsTableHasScrolledToBottom(state, action) {
+      state.transactionsTableHasScrolledToBottom = action.payload;
+    },
   },
 })
 
@@ -70,6 +95,7 @@ export const {
   setBankAccount,
   setIsTransactionEditWindowVisible,
   setIsRecurringEditWindowVisible,
+  setIsCheckTransactionsEditWindowVisible,
   setSelectedTransactionIds,
   addSelectedTransactionId,
   removeSelectedTransactionId,
@@ -78,6 +104,10 @@ export const {
   addSelectedRecurringTransactionId,
   removeSelectedRecurringTransactionId,
   clearSelectedRecurringTransactionIds,
+  setSelectedCheckTransactionIds,
+  clearSelectedCheckTransactionIds,
+  setTransactionsTableScrollPosition,
+  setTransactionsTableHasScrolledToBottom,
 } = settingsSlice.actions
 
 export default settingsSlice.reducer

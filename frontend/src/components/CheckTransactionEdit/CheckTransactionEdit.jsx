@@ -1,5 +1,5 @@
 // CSS
-import "./TransactionEdit.scss"
+import "./CheckTransactionEdit.scss"
 
 // React imports
 import { useEffect, useState } from "react"
@@ -40,7 +40,7 @@ import {
   deleteTransactions,
 } from "../../api/transactions"
 
-const TransactionEdit = () => {
+const CheckTransactionEdit = () => {
   const queryClient = useQueryClient()
 
   const [toastOpen, setToastOpen] = useState(false)
@@ -62,8 +62,8 @@ const TransactionEdit = () => {
   }
 
   const bankAccountName = useSelector((state) => state.settings.bankAccount)
-  const selectedTransactionIds = useSelector(
-    (state) => state.settings.selectedTransactionIds
+  const selectedCheckTransactionIds = useSelector(
+    (state) => state.settings.selectedCheckTransactionIds
   )
 
   /**
@@ -186,24 +186,20 @@ const TransactionEdit = () => {
   const [formData, setFormData] = useState(initialFormData)
 
   useEffect(() => {
-    if (selectedTransactionIds.length === 1) {
-      const selected = transactions.find(
-        (transaction) => transaction.id === selectedTransactionIds[0]
-      )
+    const selected = transactions.find(
+      (transaction) => transaction.id === selectedCheckTransactionIds[0]
+    )
 
-      if (selected) {
-        setFormData({
-          ...selected,
-          date: new Date(selected.date),
-          category: selected.category ?? "",
-          subCategory: selected.subCategory ?? "",
-          type: selected.type ?? "card",
-        })
-      }
-    } else {
-      setFormData(initialFormData)
+    if (selected) {
+      setFormData({
+        ...selected,
+        date: new Date(selected.date),
+        category: selected.category ?? "",
+        subCategory: selected.subCategory ?? "",
+        type: selected.type ?? "card",
+      })
     }
-  }, [selectedTransactionIds, transactions])
+  }, [selectedCheckTransactionIds, transactions])
 
   /**
    * Handles the modification of a transaction.
@@ -216,7 +212,7 @@ const TransactionEdit = () => {
     e.preventDefault()
     if (!formHasErrors()) {
       updateMutation.mutate({
-        id: selectedTransactionIds,
+        id: [selectedCheckTransactionIds],
         updatedData: formData,
       })
     }
@@ -304,8 +300,6 @@ const TransactionEdit = () => {
         Error loading data: {settingsError.message || bankAccountsError.message}
       </p>
     )
-
-  console.log("object :>> ", formData)
 
   return (
     <section className="container-transaction-edit">
@@ -543,8 +537,8 @@ const TransactionEdit = () => {
           <Button
             variant="contained"
             startIcon={!deleteMutation.isPending ? <Delete /> : ""}
-            disabled={selectedTransactionIds.length === 0}
-            onClick={() => handleOpenConfirm(selectedTransactionIds)}
+            disabled={selectedCheckTransactionIds.length === 0}
+            onClick={() => handleOpenConfirm(selectedCheckTransactionIds)}
             sx={{
               minWidth: 140,
               backgroundColor: "red",
@@ -571,7 +565,7 @@ const TransactionEdit = () => {
           <Button
             variant="contained"
             startIcon={!updateMutation.isPending ? <ChangeCircle /> : ""}
-            disabled={formHasErrors() || selectedTransactionIds.length !== 1}
+            disabled={formHasErrors() || selectedCheckTransactionIds.length === 0}
             onClick={handleModifyTransaction}
             sx={{
               minWidth: 140,
@@ -674,4 +668,4 @@ const TransactionEdit = () => {
   )
 }
 
-export default TransactionEdit
+export default CheckTransactionEdit

@@ -56,6 +56,9 @@ export default class TransactionModel {
     /** @type {number} */
     this.credit = data.credit ?? 0
 
+    /** @type {number} */
+    this.amount = this.debit > 0 ? this.debit : this.credit
+
     /** @type {string} */
     this.amountSummary =
       this.debit > 0

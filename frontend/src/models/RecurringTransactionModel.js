@@ -57,7 +57,6 @@ export default class RecurringTransactionModel {
 
     /** @type {number} */
     this.amount = data.debit > 0 ? data.debit : this.credit
-    this.amount = this.amount.toFixed(2)
 
     /** @type {string} */
     this.amountSummary =

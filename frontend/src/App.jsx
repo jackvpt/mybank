@@ -6,7 +6,7 @@ import { fetchAllSettings } from "./api/settings"
 import { fetchAllCategories } from "./api/categories"
 import { useDispatch } from "react-redux"
 import { useEffect } from "react"
-import { clearSelectedRecurringTransactionIds, clearSelectedTransactionIds } from "./features/settingsSlice"
+import { clearSelectedCheckTransactionIds, clearSelectedRecurringTransactionIds, clearSelectedTransactionIds } from "./features/settingsSlice"
 import { fetchAllRecurringTransactions } from "./api/recurringTransactions"
 
 function App() {
@@ -42,6 +42,7 @@ function App() {
       if (event.key === "Escape") {
         dispatch(clearSelectedTransactionIds())
         dispatch(clearSelectedRecurringTransactionIds())
+        dispatch(clearSelectedCheckTransactionIds())
       }
     }
 

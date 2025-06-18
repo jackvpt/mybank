@@ -5,12 +5,17 @@ footer {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  gap:1.5rem;
   background-color: $primary-color-2;
-  padding: 10px;
+  padding: 10px 5px;
 
   .navbar__icon {
+    padding: 0 10px;
     font-size: 1.75rem;
     color: $text-color-2;
+
+    &.active {
+      background-color: $text-color-2;
+      color: $text-color-1;
+    }
   }
 }

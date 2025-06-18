@@ -458,7 +458,7 @@ const RecurringTransactionEdit = () => {
           <TextField
             type="text"
             label="Montant"
-            value={formData.amount}
+            value={Number(formData.amount).toFixed(2)}
             onChange={(e) =>
               setFormData((prev) => ({
                 ...prev,
