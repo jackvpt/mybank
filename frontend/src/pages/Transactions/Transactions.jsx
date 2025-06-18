@@ -24,7 +24,6 @@ import {
   addSelectedTransactionId,
   removeSelectedTransactionId,
   setSelectedTransactionIds,
-  setTransactionsTableHasScrolledToBottom,
   setTransactionsTableScrollPosition,
 } from "../../features/settingsSlice"
 import { fetchTransactionsByAccountName } from "../../api/transactions"
@@ -58,10 +57,6 @@ const Transactions = () => {
 
   const transactionsTableScrollPosition = useSelector(
     (state) => state.settings.transactionsTableScrollPosition
-  )
-
-  const transactionsTableHasScrolledToBottom = useSelector(
-    (state) => state.settings.transactionsTableHasScrolledToBottom
   )
 
   const isMobile = useMediaQuery(theme.breakpoints.down("tablet"))
@@ -159,23 +154,20 @@ const Transactions = () => {
     }
   }
 
+  useEffect(() => {
+    const container = tableContainerRef.current
+    if (!container) return
+
+    if (transactionsTableScrollPosition !== null) {
+      container.scrollTop = transactionsTableScrollPosition
+    } 
+  }, [transactions, transactionsTableScrollPosition, dispatch])
 
 
 
-useEffect(() => {
-  const container = tableContainerRef.current
-  if (!container) return
-
-  // On scroll en bas *après* le rendu du DOM (via requestAnimationFrame)
-  const raf = requestAnimationFrame(() => {
-    container.scrollTop = container.scrollHeight
-  })
-
-  // Cleanup : annuler le RAF si le composant se démonte
-  return () => cancelAnimationFrame(raf)
-}, []) // [] = au premier rendu uniquement
-
-
+  const handleScroll = (e) => {
+    dispatch(setTransactionsTableScrollPosition(e.currentTarget.scrollTop))
+  }
 
   if (isLoading) return <p>Chargement des transactions...</p>
   if (error) return <p>Erreur : {error.message}</p>
@@ -213,6 +205,9 @@ useEffect(() => {
           component={Paper}
           ref={tableContainerRef}
           sx={{ flex: 1, overflow: "auto" }}
+          onScroll={(e) => {
+            handleScroll(e)
+          }}
         >
           <Table aria-label="transactions">
             <TableHead>

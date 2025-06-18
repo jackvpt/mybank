@@ -2,6 +2,7 @@ import React from "react"
 import "./Header.scss"
 import { Link, NavLink } from "react-router-dom"
 import logo from "../../assets/images/logo_mybank_white.png"
+import DevTools from "../devTools/DevTools"
 
 /**
  * Renders the main navigation header of the application.
@@ -27,6 +28,7 @@ const Header = () => {
           ></img>
         </Link>
       </div>
+      <DevTools />
       <h1 className="logo__title">myBank</h1>
     </header>
   )

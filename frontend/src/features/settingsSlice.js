@@ -8,7 +8,7 @@ const initialState = {
   selectedTransactionIds: [],
   selectedRecurringTransactionIds: [],
   selectedCheckTransactionIds: [],
-  transactionsTableScrollPosition:0,
+  transactionsTableScrollPosition: null,
   transactionsTableHasScrolledToBottom: false,
 }
 
@@ -83,10 +83,7 @@ const settingsSlice = createSlice({
 
     // TRANSACTION TABLE SCROLL STATUS
     setTransactionsTableScrollPosition(state, action) {
-      state.transactionsTableScrollPosition = action.payload;
-    },
-    setTransactionsTableHasScrolledToBottom(state, action) {
-      state.transactionsTableHasScrolledToBottom = action.payload;
+      state.transactionsTableScrollPosition = action.payload
     },
   },
 })
@@ -107,7 +104,6 @@ export const {
   setSelectedCheckTransactionIds,
   clearSelectedCheckTransactionIds,
   setTransactionsTableScrollPosition,
-  setTransactionsTableHasScrolledToBottom,
 } = settingsSlice.actions
 
 export default settingsSlice.reducer
