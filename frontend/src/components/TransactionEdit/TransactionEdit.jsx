@@ -427,7 +427,7 @@ const TransactionEdit = () => {
           <TextField
             type="text"
             label="Montant"
-            value={Number(formData.amount).toFixed(2)}
+            value={formData.amount}
             onChange={(e) =>
               setFormData((prev) => ({
                 ...prev,

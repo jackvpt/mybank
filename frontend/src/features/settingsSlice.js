@@ -9,7 +9,6 @@ const initialState = {
   selectedRecurringTransactionIds: [],
   selectedCheckTransactionIds: [],
   transactionsTableScrollPosition: null,
-  transactionsTableHasScrolledToBottom: false,
 }
 
 const settingsSlice = createSlice({

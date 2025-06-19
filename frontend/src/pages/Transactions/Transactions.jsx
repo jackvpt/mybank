@@ -160,7 +160,11 @@ const Transactions = () => {
 
     if (transactionsTableScrollPosition !== null) {
       container.scrollTop = transactionsTableScrollPosition
-    } 
+    } else
+    {
+      container.scrollTop = container.scrollHeight;
+      dispatch(setTransactionsTableScrollPosition(container.scrollTop))
+    }
   }, [transactions, transactionsTableScrollPosition, dispatch])
 
 
