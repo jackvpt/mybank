@@ -78,4 +78,12 @@
       color: white !important;
     }
   }
+
+  .check-transaction-pointed:hover {
+    border:1px solid $text-color-1;
+  }
+
+  .check-transaction-notpointed:hover {
+    border:1px solid $primary-color-2;
+  }
 }

@@ -3,11 +3,13 @@ import "./TransactionEdit.scss"
 
 // React imports
 import { useEffect, useState } from "react"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 
 // DEV imports
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
+import { fr } from 'date-fns/locale';
+
 import {
   Button,
   FormControl,
@@ -39,8 +41,10 @@ import {
   updateTransaction,
   deleteTransactions,
 } from "../../api/transactions"
+import { setNewTransactionId, setSelectedTransactionIds } from "../../features/settingsSlice"
 
 const TransactionEdit = () => {
+  const dispatch = useDispatch()
   const queryClient = useQueryClient()
 
   const [toastOpen, setToastOpen] = useState(false)
@@ -72,8 +76,10 @@ const TransactionEdit = () => {
    **/
   const addMutation = useMutation({
     mutationFn: postTransaction,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries(["transactions", bankAccountName])
+      dispatch(setNewTransactionId(data.id))
+      dispatch(setSelectedTransactionIds([data.id]))
       setToastMessage("Transaction ajoutée")
       setToastOpen(true)
     },
@@ -309,10 +315,9 @@ const TransactionEdit = () => {
 
   return (
     <section className="container-transaction-edit">
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
         <form>
           {/* DATE PICKER */}
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
               label="Date"
               value={formData.date}
@@ -327,7 +332,6 @@ const TransactionEdit = () => {
                 },
               }}
             />
-          </LocalizationProvider>
 
           {/* TYPE SELECT */}
           <FormControl

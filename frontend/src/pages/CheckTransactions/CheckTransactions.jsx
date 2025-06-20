@@ -193,9 +193,14 @@ const CheckTransactions = () => {
                     ) && (
                       <TableCell align="center">
                         <Box
+                          className={
+                            tx.status === "pointed"
+                              ? "check-transaction-pointed"
+                              : "check-transaction-notpointed"
+                          }
                           sx={{
-                            width: 12,
-                            height: 12,
+                            width: 14,
+                            height: 14,
                             borderRadius: "50%",
                             backgroundColor:
                               tx.status === "validated"
@@ -206,7 +211,8 @@ const CheckTransactions = () => {
                             border: "1px solid #ccc",
                             margin: "0 auto",
                           }}
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation()
                             handleCheckTransaction(tx)
                           }}
                         />

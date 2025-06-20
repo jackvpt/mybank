@@ -23,12 +23,14 @@ import {
 import {
   addSelectedTransactionId,
   removeSelectedTransactionId,
+  setNewTransactionId,
   setSelectedTransactionIds,
   setTransactionsTableScrollPosition,
 } from "../../features/settingsSlice"
 import { fetchTransactionsByAccountName } from "../../api/transactions"
 import TransactionsToolBar from "../../components/TransactionsToolBar/TransactionsToolBar"
 import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
+import { Block } from "@mui/icons-material"
 
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
@@ -58,6 +60,12 @@ const Transactions = () => {
   const transactionsTableScrollPosition = useSelector(
     (state) => state.settings.transactionsTableScrollPosition
   )
+
+  const newTransactionId = useSelector(
+    (state) => state.settings.newTransactionId
+  )
+
+  const transactionRefs = useRef({})
 
   const isMobile = useMediaQuery(theme.breakpoints.down("tablet"))
   const visibleColumns = visibleColumnsConfig(isMobile)
@@ -160,14 +168,22 @@ const Transactions = () => {
 
     if (transactionsTableScrollPosition !== null) {
       container.scrollTop = transactionsTableScrollPosition
-    } else
-    {
-      container.scrollTop = container.scrollHeight;
+    } else {
+      container.scrollTop = container.scrollHeight
       dispatch(setTransactionsTableScrollPosition(container.scrollTop))
     }
+
+    if (newTransactionId) {
+      const element = transactionRefs.current[newTransactionId]
+      if (element) {
+        container.scrollTo({
+          top: element.offsetTop - 100,
+          behavior: "auto",
+        })
+      }
+      dispatch(setNewTransactionId(null))
+    }
   }, [transactions, transactionsTableScrollPosition, dispatch])
-
-
 
   const handleScroll = (e) => {
     dispatch(setTransactionsTableScrollPosition(e.currentTarget.scrollTop))
@@ -258,6 +274,9 @@ const Transactions = () => {
                 return (
                   <TableRow
                     key={tx.id}
+                    ref={(el) => {
+                      if (el) transactionRefs.current[tx.id] = el
+                    }}
                     onClick={(e) => handleRowClick(e, tx, index)}
                     className={
                       selectedTransactionIds.includes(tx.id)

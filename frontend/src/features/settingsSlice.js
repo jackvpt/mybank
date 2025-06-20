@@ -9,6 +9,7 @@ const initialState = {
   selectedRecurringTransactionIds: [],
   selectedCheckTransactionIds: [],
   transactionsTableScrollPosition: null,
+  newTransactionId: null,
 }
 
 const settingsSlice = createSlice({
@@ -84,6 +85,11 @@ const settingsSlice = createSlice({
     setTransactionsTableScrollPosition(state, action) {
       state.transactionsTableScrollPosition = action.payload
     },
+
+    // NEW TRANSACTION ID
+    setNewTransactionId(state, action) {
+      state.newTransactionId = action.payload
+    }
   },
 })
 
@@ -103,6 +109,7 @@ export const {
   setSelectedCheckTransactionIds,
   clearSelectedCheckTransactionIds,
   setTransactionsTableScrollPosition,
+  setNewTransactionId
 } = settingsSlice.actions
 
 export default settingsSlice.reducer
