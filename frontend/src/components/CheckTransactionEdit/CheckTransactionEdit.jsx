@@ -8,6 +8,8 @@ import { useSelector } from "react-redux"
 // DEV imports
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
+import { fr } from "date-fns/locale"
+
 import {
   Button,
   FormControl,
@@ -306,7 +308,7 @@ const CheckTransactionEdit = () => {
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <form>
           {/* DATE PICKER */}
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
             <DatePicker
               label="Date"
               value={formData.date}
@@ -565,7 +567,9 @@ const CheckTransactionEdit = () => {
           <Button
             variant="contained"
             startIcon={!updateMutation.isPending ? <ChangeCircle /> : ""}
-            disabled={formHasErrors() || selectedCheckTransactionIds.length === 0}
+            disabled={
+              formHasErrors() || selectedCheckTransactionIds.length === 0
+            }
             onClick={handleModifyTransaction}
             sx={{
               minWidth: 140,

@@ -47,6 +47,9 @@
   height: 34px;
 }
 .container-transactions .transaction-row {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
   cursor: pointer;
 }
 .container-transactions .transaction-row:nth-of-type(even) {

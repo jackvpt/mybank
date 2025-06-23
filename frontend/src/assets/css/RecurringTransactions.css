@@ -34,6 +34,9 @@
   height: 34px;
 }
 .container-recurringTransactions .transaction-row {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
   cursor: pointer;
 }
 .container-recurringTransactions .transaction-row:nth-of-type(even) {

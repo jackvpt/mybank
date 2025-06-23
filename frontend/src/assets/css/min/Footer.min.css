@@ -1,1 +1,1 @@
-footer{display:flex;flex-direction:row;justify-content:center;gap:1.5rem;background-color:#3657c3;padding:10px}footer .navbar__icon{font-size:1.75rem;color:#fff}/*# sourceMappingURL=Footer.min.css.map */
+footer{display:flex;flex-direction:row;justify-content:center;background-color:#3657c3;padding:10px 5px}footer .navbar__icon{padding:0 10px;font-size:1.75rem;color:#fff}footer .navbar__icon.active{background-color:#fff;color:#000}/*# sourceMappingURL=Footer.min.css.map */

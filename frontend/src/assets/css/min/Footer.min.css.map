@@ -1,1 +1,1 @@
-{"version":3,"sources":["../../../components/Footer/Footer.scss","../../../styles/utils/_variables.scss"],"names":[],"mappings":"AAGA,OACE,YAAA,CACA,kBAAA,CACA,sBAAA,CACA,UAAA,CACA,wBCFgB,CDGhB,YAAA,CAEA,qBACE,iBAAA,CACA,UAAA","file":"Footer.min.css"}
+{"version":3,"sources":["../../../components/Footer/Footer.scss","../../../styles/utils/_variables.scss"],"names":[],"mappings":"AAGA,OACE,YAAA,CACA,kBAAA,CACA,sBAAA,CACA,wBCDgB,CDEhB,gBAAA,CAEA,qBACE,cAAA,CACA,iBAAA,CACA,UAAA,CAEA,4BACE,qBCHS,CDIT,UCLS","file":"Footer.min.css"}

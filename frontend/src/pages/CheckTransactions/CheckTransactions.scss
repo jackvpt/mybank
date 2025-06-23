@@ -80,10 +80,34 @@
   }
 
   .check-transaction-pointed:hover {
-    border:1px solid $text-color-1;
+    border: 1px solid $text-color-1;
   }
 
   .check-transaction-notpointed:hover {
-    border:1px solid $primary-color-2;
+    border: 1px solid $primary-color-2;
+  }
+
+  &__table {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+
+    &__summary {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 10px;
+    }
+
+    &__transactions {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      height: 100%;
+    }
   }
 }

@@ -2,6 +2,11 @@ import "./CheckTransactions.scss"
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+// DEV imports
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
+import { fr } from "date-fns/locale"
+
 import {
   Box,
   createTheme,
@@ -13,6 +18,7 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
+  TextField,
   Typography,
   useMediaQuery,
 } from "@mui/material"
@@ -113,6 +119,18 @@ const CheckTransactions = () => {
     })
   }
 
+  const [checkDate, setCheckDate] = useState(new Date())
+  const [initialAmount, setInitialAmount] = useState(0)
+  const [finalAmount, setFinalAmount] = useState(0)
+
+  const formatAmount = (amount, setter) => {
+    const value = amount.replace(",", ".")
+    if (value !== "" && !isNaN(Number(value))) {
+      const formatted = parseFloat(value).toFixed(2)
+      setter(formatted)
+    }
+  }
+
   if (isLoading) return <p>Chargement des transactions...</p>
   if (error) return <p>Erreur : {error.message}</p>
 
@@ -124,116 +142,163 @@ const CheckTransactions = () => {
           <CheckTransactionsToolBar />
         </div>
       </div>
+      <div className="container-checkTransactions__table">
+        <div className="container-checkTransactions__table__summary">
+          {/* DATE PICKER */}
+          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
+            <DatePicker
+              label="Date du relevé"
+              value={checkDate}
+              onChange={(newValue) => setCheckDate(newValue)}
+              format="dd/MM/yyyy"
+              sx={{ width: "auto", minWidth: 150, maxWidth: 180 }}
+              slotProps={{
+                textField: {
+                  size: "small",
+                },
+              }}
+            />
 
-      {isCheckTransactionsEditWindowVisible && <CheckTransactionEdit />}
+            {/* INITIAL AMOUNT */}
+            <TextField
+              type="text"
+              label="Solde initial"
+              value={initialAmount}
+              onChange={(e) => setInitialAmount(e.target.value)}
+              onBlur={() => formatAmount(initialAmount, setInitialAmount)}
+              placeholder="0.00"
+              size="small"
+              sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
+            />
 
-      <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
-        <TableContainer component={Paper} sx={{ flex: 1, overflow: "auto" }}>
-          <Table aria-label="transactions">
-            <TableHead>
-              <TableRow>
-                {visibleColumns
-                  .filter((col) => col.show)
-                  .map((col) => (
-                    <TableCell
-                      key={col.id}
-                      align="center"
-                      sx={{
-                        height: 14,
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                        position: "sticky",
-                        top: 0,
-                        backgroundColor: "#f5f5f5",
-                        zIndex: 1,
-                      }}
-                    >
-                      <TableSortLabel
-                        active={orderBy === col.id}
-                        direction={orderBy === col.id ? order : "asc"}
-                        onClick={() => handleSort(col.id)}
-                        sx={{
-                          fontSize: "0.9rem",
-                          fontWeight: "bold",
-                          color: "#333",
-                        }}
-                      >
-                        {col.label}
-                      </TableSortLabel>
-                    </TableCell>
-                  ))}
-              </TableRow>
-            </TableHead>
+            {/* FINAL AMOUNT */}
+            <TextField
+              type="text"
+              label="Solde final"
+              value={finalAmount}
+              onChange={(e) => setFinalAmount(e.target.value)}
+              onBlur={() => formatAmount(finalAmount, setFinalAmount)}
+              placeholder="0.00"
+              size="small"
+              sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
+            />
+          </LocalizationProvider>
+        </div>
+        <div className="container-checkTransactions__table__transactions">
+          {isCheckTransactionsEditWindowVisible && <CheckTransactionEdit />}
 
-            <TableBody>
-              {sortedTransactions.map((tx) => {
-                return (
-                  <TableRow
-                    onClick={() => handleRowClick(tx)}
-                    key={tx.id}
-                    className={
-                      selectedCheckTransactionIds[0] === tx.id
-                        ? "transaction-row rowSelected"
-                        : "transaction-row"
-                    }
-                  >
-                    <TableCell align="center">
-                      {new Date(tx.date).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>{tx.label}</TableCell>
-                    <TableCell align="right">
-                      {tx.debit ? tx.debit.toFixed(2) : ""}
-                    </TableCell>
-                    <TableCell align="right">
-                      {tx.credit ? tx.credit.toFixed(2) : ""}
-                    </TableCell>
-
-                    {visibleColumns.find(
-                      (col) => col.id === "status" && col.show
-                    ) && (
-                      <TableCell align="center">
-                        <Box
-                          className={
-                            tx.status === "pointed"
-                              ? "check-transaction-pointed"
-                              : "check-transaction-notpointed"
-                          }
-                          sx={{
-                            width: 14,
-                            height: 14,
-                            borderRadius: "50%",
-                            backgroundColor:
-                              tx.status === "validated"
-                                ? "green"
-                                : tx.status === "pointed"
-                                ? "blue"
-                                : "white",
-                            border: "1px solid #ccc",
-                            margin: "0 auto",
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleCheckTransaction(tx)
-                          }}
-                        />
-                      </TableCell>
-                    )}
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-
-          {sortedTransactions.length === 0 && (
-            <Typography
-              variant="body2"
-              sx={{ padding: 2, textAlign: "center" }}
+          <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
+            <TableContainer
+              component={Paper}
+              sx={{ flex: 1, overflow: "auto" }}
             >
-              Aucune transaction trouvée.
-            </Typography>
-          )}
-        </TableContainer>
-      </Box>
+              <Table aria-label="transactions">
+                <TableHead>
+                  <TableRow>
+                    {visibleColumns
+                      .filter((col) => col.show)
+                      .map((col) => (
+                        <TableCell
+                          key={col.id}
+                          align="center"
+                          sx={{
+                            height: 14,
+                            paddingTop: 1,
+                            paddingBottom: 1,
+                            position: "sticky",
+                            top: 0,
+                            backgroundColor: "#f5f5f5",
+                            zIndex: 1,
+                          }}
+                        >
+                          <TableSortLabel
+                            active={orderBy === col.id}
+                            direction={orderBy === col.id ? order : "asc"}
+                            onClick={() => handleSort(col.id)}
+                            sx={{
+                              fontSize: "0.9rem",
+                              fontWeight: "bold",
+                              color: "#333",
+                            }}
+                          >
+                            {col.label}
+                          </TableSortLabel>
+                        </TableCell>
+                      ))}
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {sortedTransactions.map((tx) => {
+                    return (
+                      <TableRow
+                        onClick={() => handleRowClick(tx)}
+                        key={tx.id}
+                        className={
+                          selectedCheckTransactionIds[0] === tx.id
+                            ? "transaction-row rowSelected"
+                            : "transaction-row"
+                        }
+                      >
+                        <TableCell align="center">
+                          {new Date(tx.date).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>{tx.label}</TableCell>
+                        <TableCell align="right">
+                          {tx.debit ? tx.debit.toFixed(2) : ""}
+                        </TableCell>
+                        <TableCell align="right">
+                          {tx.credit ? tx.credit.toFixed(2) : ""}
+                        </TableCell>
+
+                        {visibleColumns.find(
+                          (col) => col.id === "status" && col.show
+                        ) && (
+                          <TableCell align="center">
+                            <Box
+                              className={
+                                tx.status === "pointed"
+                                  ? "check-transaction-pointed"
+                                  : "check-transaction-notpointed"
+                              }
+                              sx={{
+                                width: 14,
+                                height: 14,
+                                borderRadius: "50%",
+                                backgroundColor:
+                                  tx.status === "validated"
+                                    ? "green"
+                                    : tx.status === "pointed"
+                                    ? "blue"
+                                    : "white",
+                                border: "1px solid #ccc",
+                                margin: "0 auto",
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleCheckTransaction(tx)
+                              }}
+                            />
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+
+              {sortedTransactions.length === 0 && (
+                <Typography
+                  variant="body2"
+                  sx={{ padding: 2, textAlign: "center" }}
+                >
+                  Aucune transaction trouvée.
+                </Typography>
+              )}
+            </TableContainer>
+          </Box>
+        </div>
+      </div>
     </section>
   )
 }

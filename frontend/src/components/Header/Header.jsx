@@ -28,7 +28,7 @@ const Header = () => {
           ></img>
         </Link>
       </div>
-      <DevTools />
+      {/* <DevTools /> */}
       <h1 className="logo__title">myBank</h1>
     </header>
   )
