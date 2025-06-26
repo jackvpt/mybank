@@ -21,7 +21,7 @@ import {
   addSelectedRecurringTransactionId,
   removeSelectedRecurringTransactionId,
   setSelectedRecurringTransactionIds,
-} from "../../features/settingsSlice"
+} from "../../features/parametersSlice"
 import { fetchAllSettings } from "../../api/settings"
 import RecurringToolBar from "../../components/RecurringToolBar/RecurringToolBar"
 
@@ -44,11 +44,11 @@ const RecurringTransactions = () => {
   })
 
   const isRecurringEditWindowVisible = useSelector(
-    (state) => state.settings.isRecurringEditWindowVisible
+    (state) => state.parameters.isRecurringEditWindowVisible
   )
 
   const selectedRecurringTransactionIds = useSelector(
-    (state) => state.settings.selectedRecurringTransactionIds
+    (state) => state.parameters.selectedRecurringTransactionIds
   )
 
   /**

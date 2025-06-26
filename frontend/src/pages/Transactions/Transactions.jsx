@@ -26,11 +26,10 @@ import {
   setNewTransactionId,
   setSelectedTransactionIds,
   setTransactionsTableScrollPosition,
-} from "../../features/settingsSlice"
+} from "../../features/parametersSlice"
 import { fetchTransactionsByAccountName } from "../../api/transactions"
 import TransactionsToolBar from "../../components/TransactionsToolBar/TransactionsToolBar"
 import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
-import { Block } from "@mui/icons-material"
 
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
@@ -49,20 +48,20 @@ const Transactions = () => {
   const dispatch = useDispatch()
   const tableContainerRef = useRef(null)
 
-  const bankAccountName = useSelector((state) => state.settings.bankAccount)
+  const bankAccountName = useSelector((state) => state.parameters.bankAccount)
   const selectedTransactionIds = useSelector(
-    (state) => state.settings.selectedTransactionIds
+    (state) => state.parameters.selectedTransactionIds
   )
   const isTransactionEditWindowVisible = useSelector(
-    (state) => state.settings.isTransactionEditWindowVisible
+    (state) => state.parameters.isTransactionEditWindowVisible
   )
 
   const transactionsTableScrollPosition = useSelector(
-    (state) => state.settings.transactionsTableScrollPosition
+    (state) => state.parameters.transactionsTableScrollPosition
   )
 
   const newTransactionId = useSelector(
-    (state) => state.settings.newTransactionId
+    (state) => state.parameters.newTransactionId
   )
 
   const transactionRefs = useRef({})

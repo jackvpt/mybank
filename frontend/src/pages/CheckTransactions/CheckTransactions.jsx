@@ -29,7 +29,7 @@ import {
 } from "../../api/transactions"
 import CheckTransactionsToolBar from "../../components/CheckTransactionsToolBar/CheckTransactionsToolBar"
 import CheckTransactionEdit from "../../components/CheckTransactionEdit/CheckTransactionEdit"
-import { setSelectedCheckTransactionIds } from "../../features/settingsSlice"
+import { setSelectedCheckTransactionIds } from "../../features/parametersSlice"
 
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
@@ -57,9 +57,9 @@ const CheckTransactions = () => {
     },
   })
 
-  const bankAccountName = useSelector((state) => state.settings.bankAccount)
+  const bankAccountName = useSelector((state) => state.parameters.bankAccount)
   const selectedCheckTransactionIds = useSelector(
-    (state) => state.settings.selectedCheckTransactionIds
+    (state) => state.parameters.selectedCheckTransactionIds
   )
   const isMobile = useMediaQuery(theme.breakpoints.down("tablet"))
   const visibleColumns = visibleColumnsConfig(isMobile)
@@ -82,7 +82,7 @@ const CheckTransactions = () => {
   )
 
   const isCheckTransactionsEditWindowVisible = useSelector(
-    (state) => state.settings.isCheckTransactionsEditWindowVisible
+    (state) => state.parameters.isCheckTransactionsEditWindowVisible
   )
 
   // Sort transactions

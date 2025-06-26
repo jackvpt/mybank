@@ -12,8 +12,8 @@ const initialState = {
   newTransactionId: null,
 }
 
-const settingsSlice = createSlice({
-  name: "settings",
+const parametersSlice = createSlice({
+  name: "parameters",
   initialState,
   reducers: {
     // BANK ACCOUNT
@@ -110,6 +110,6 @@ export const {
   clearSelectedCheckTransactionIds,
   setTransactionsTableScrollPosition,
   setNewTransactionId
-} = settingsSlice.actions
+} = parametersSlice.actions
 
-export default settingsSlice.reducer
+export default parametersSlice.reducer

@@ -6,7 +6,7 @@ import EditIcon from "@mui/icons-material/Edit"
 const CheckTransactionsToolBar = () => {
   const dispatch = useDispatch()
   const isCheckTransactionsEditWindowVisible = useSelector(
-    (state) => state.settings.isCheckTransactionsEditWindowVisible
+    (state) => state.parameters.isCheckTransactionsEditWindowVisible
   )
   return (
     <section className="container-toolbar">

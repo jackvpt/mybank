@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import "./BankAccountCard.scss"
 import { useDispatch } from "react-redux"
-import { setBankAccount } from "../../features/settingsSlice"
+import { setBankAccount } from "../../features/parametersSlice"
 
 const BankAccountCard = ({ account, lastTransaction }) => {
   const dispatch = useDispatch()

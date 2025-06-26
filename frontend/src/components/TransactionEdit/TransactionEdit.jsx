@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux"
 // DEV imports
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
-import { fr } from 'date-fns/locale';
+import { fr } from "date-fns/locale"
 
 import {
   Button,
@@ -41,7 +41,10 @@ import {
   updateTransaction,
   deleteTransactions,
 } from "../../api/transactions"
-import { setNewTransactionId, setSelectedTransactionIds } from "../../features/settingsSlice"
+import {
+  setNewTransactionId,
+  setSelectedTransactionIds,
+} from "../../features/parametersSlice"
 
 const TransactionEdit = () => {
   const dispatch = useDispatch()
@@ -65,9 +68,9 @@ const TransactionEdit = () => {
     }
   }
 
-  const bankAccountName = useSelector((state) => state.settings.bankAccount)
+  const bankAccountName = useSelector((state) => state.parameters.bankAccount)
   const selectedTransactionIds = useSelector(
-    (state) => state.settings.selectedTransactionIds
+    (state) => state.parameters.selectedTransactionIds
   )
 
   /**
@@ -311,27 +314,25 @@ const TransactionEdit = () => {
       </p>
     )
 
-  console.log("object :>> ", formData)
-
   return (
     <section className="container-transaction-edit">
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
         <form>
           {/* DATE PICKER */}
-            <DatePicker
-              label="Date"
-              value={formData.date}
-              onChange={(newValue) =>
-                setFormData((prev) => ({ ...prev, date: newValue }))
-              }
-              format="dd/MM/yyyy"
-              sx={{ width: "auto", minWidth: 150, maxWidth: 180 }}
-              slotProps={{
-                textField: {
-                  size: "small",
-                },
-              }}
-            />
+          <DatePicker
+            label="Date"
+            value={formData.date}
+            onChange={(newValue) =>
+              setFormData((prev) => ({ ...prev, date: newValue }))
+            }
+            format="dd/MM/yyyy"
+            sx={{ width: "auto", minWidth: 150, maxWidth: 180 }}
+            slotProps={{
+              textField: {
+                size: "small",
+              },
+            }}
+          />
 
           {/* TYPE SELECT */}
           <FormControl

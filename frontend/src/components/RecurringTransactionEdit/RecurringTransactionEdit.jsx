@@ -71,7 +71,7 @@ const RecurringTransactionEdit = () => {
   }
 
   const selectedRecurringTransactionIds = useSelector(
-    (state) => state.settings.selectedRecurringTransactionIds
+    (state) => state.parameters.selectedRecurringTransactionIds
   )
 
   /**

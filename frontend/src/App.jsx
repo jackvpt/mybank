@@ -6,7 +6,7 @@ import { fetchAllSettings } from "./api/settings"
 import { fetchAllCategories } from "./api/categories"
 import { useDispatch } from "react-redux"
 import { useEffect } from "react"
-import { clearSelectedCheckTransactionIds, clearSelectedRecurringTransactionIds, clearSelectedTransactionIds } from "./features/settingsSlice"
+import { clearSelectedCheckTransactionIds, clearSelectedRecurringTransactionIds, clearSelectedTransactionIds } from "./features/parametersSlice"
 import { fetchAllRecurringTransactions } from "./api/recurringTransactions"
 
 function App() {

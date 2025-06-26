@@ -6,7 +6,7 @@ import EditIcon from "@mui/icons-material/Edit"
 const RecurringToolBar = () => {
   const dispatch = useDispatch()
   const isTransactionEditWindowVisible = useSelector(
-    (state) => state.settings.isTransactionEditWindowVisible
+    (state) => state.parameters.isTransactionEditWindowVisible
   )
   return (
     <section className="container-toolbar">

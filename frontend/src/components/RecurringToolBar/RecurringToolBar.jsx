@@ -4,9 +4,6 @@ import {
   Alert,
   Button,
   FormControl,
-  IconButton,
-  InputAdornment,
-  InputLabel,
   MenuItem,
   Select,
   Snackbar,
@@ -37,7 +34,7 @@ const RecurringToolBar = () => {
 
   const dispatch = useDispatch()
   const isRecurringEditWindowVisible = useSelector(
-    (state) => state.settings.isRecurringEditWindowVisible
+    (state) => state.parameters.isRecurringEditWindowVisible
   )
 
   const queryClient = useQueryClient()
