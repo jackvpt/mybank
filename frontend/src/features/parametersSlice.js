@@ -10,6 +10,12 @@ const initialState = {
   selectedCheckTransactionIds: [],
   transactionsTableScrollPosition: null,
   newTransactionId: null,
+  checking: {
+    date: new Date(),
+    initialAmount: 10,
+    finalAmount: 0,
+    currentAmount: 0,
+  },
 }
 
 const parametersSlice = createSlice({
@@ -89,6 +95,20 @@ const parametersSlice = createSlice({
     // NEW TRANSACTION ID
     setNewTransactionId(state, action) {
       state.newTransactionId = action.payload
+    },
+
+    // CHECKING ACCOUNT PARAMETERS
+    setCheckingDate(state, action) {
+      state.checking.date = action.payload
+    },
+    setCheckingInitialAmount(state, action) {
+      state.checking.initialAmount = action.payload
+    },
+    setCheckingFinalAmount(state, action) {
+      state.checking.finalAmount = action.payload
+    },
+    setCheckingCurrentAmount(state, action) {
+      state.checking.currentAmount = action.payload
     }
   },
 })
@@ -109,7 +129,11 @@ export const {
   setSelectedCheckTransactionIds,
   clearSelectedCheckTransactionIds,
   setTransactionsTableScrollPosition,
-  setNewTransactionId
+  setNewTransactionId,
+  setCheckingDate,
+  setCheckingInitialAmount,
+  setCheckingFinalAmount,
+  setCheckingCurrentAmount,
 } = parametersSlice.actions
 
 export default parametersSlice.reducer

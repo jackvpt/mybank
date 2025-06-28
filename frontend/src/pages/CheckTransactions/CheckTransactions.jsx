@@ -29,7 +29,14 @@ import {
 } from "../../api/transactions"
 import CheckTransactionsToolBar from "../../components/CheckTransactionsToolBar/CheckTransactionsToolBar"
 import CheckTransactionEdit from "../../components/CheckTransactionEdit/CheckTransactionEdit"
-import { setSelectedCheckTransactionIds } from "../../features/parametersSlice"
+import {
+  setSelectedCheckTransactionIds,
+  setCheckingDate,
+  setCheckingInitialAmount,
+  setCheckingFinalAmount,
+  setCheckingCurrentAmount,
+} from "../../features/parametersSlice"
+import { stringToAmount } from "../../utils/formatNumber"
 
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
@@ -119,17 +126,15 @@ const CheckTransactions = () => {
     })
   }
 
-  const [checkDate, setCheckDate] = useState(new Date())
-  const [initialAmount, setInitialAmount] = useState(0)
-  const [finalAmount, setFinalAmount] = useState(0)
-
-  const formatAmount = (amount, setter) => {
-    const value = amount.replace(",", ".")
-    if (value !== "" && !isNaN(Number(value))) {
-      const formatted = parseFloat(value).toFixed(2)
-      setter(formatted)
-    }
-  }
+  const [checkDate, setCheckDate] = useState(
+    useSelector((state) => state.parameters.checking.date)
+  )
+  const [checkInitialAmount, setCheckInitialAmount] = useState(
+    useSelector((state) => state.parameters.checking.initialAmount).toFixed(2)
+  )
+  const [checkFinalAmount, setCheckFinalAmount] = useState(
+    useSelector((state) => state.parameters.checking.finalAmount).toFixed(2)
+  )
 
   if (isLoading) return <p>Chargement des transactions...</p>
   if (error) return <p>Erreur : {error.message}</p>
@@ -149,7 +154,10 @@ const CheckTransactions = () => {
             <DatePicker
               label="Date du relevé"
               value={checkDate}
-              onChange={(newValue) => setCheckDate(newValue)}
+              onChange={(newValue) => {
+                setCheckDate(newValue)
+                dispatch(setCheckingDate(newValue))
+              }}
               format="dd/MM/yyyy"
               sx={{ width: "auto", minWidth: 150, maxWidth: 180 }}
               slotProps={{
@@ -163,9 +171,14 @@ const CheckTransactions = () => {
             <TextField
               type="text"
               label="Solde initial"
-              value={initialAmount}
-              onChange={(e) => setInitialAmount(e.target.value)}
-              onBlur={() => formatAmount(initialAmount, setInitialAmount)}
+              value={checkInitialAmount}
+              onFocus={(e) => e.target.select()}
+              onChange={(e) => setCheckInitialAmount(e.target.value)}
+              onBlur={(e) => {
+                const formattedValue = stringToAmount(e.target.value)
+                setCheckInitialAmount(formattedValue.toFixed(2))
+                dispatch(setCheckingInitialAmount(formattedValue))
+              }}
               placeholder="0.00"
               size="small"
               sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
@@ -175,9 +188,14 @@ const CheckTransactions = () => {
             <TextField
               type="text"
               label="Solde final"
-              value={finalAmount}
-              onChange={(e) => setFinalAmount(e.target.value)}
-              onBlur={() => formatAmount(finalAmount, setFinalAmount)}
+              value={checkFinalAmount}
+              onFocus={(e) => e.target.select()}
+              onChange={(e) => setCheckFinalAmount(e.target.value)}
+              onBlur={(e) => {
+                const formattedValue = stringToAmount(e.target.value)
+                setCheckFinalAmount(formattedValue.toFixed(2))
+                dispatch(setCheckingFinalAmount(formattedValue))
+              }}
               placeholder="0.00"
               size="small"
               sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
