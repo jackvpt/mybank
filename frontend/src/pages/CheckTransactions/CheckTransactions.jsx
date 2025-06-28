@@ -5,7 +5,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 // DEV imports
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
-import { fr } from "date-fns/locale"
 
 import {
   Box,
@@ -30,13 +29,10 @@ import {
 import CheckTransactionsToolBar from "../../components/CheckTransactionsToolBar/CheckTransactionsToolBar"
 import CheckTransactionEdit from "../../components/CheckTransactionEdit/CheckTransactionEdit"
 import {
-  setSelectedCheckTransactionIds,
-  setCheckingDate,
-  setCheckingInitialAmount,
-  setCheckingFinalAmount,
   setCheckingCurrentAmount,
+  setSelectedCheckTransactionIds,
 } from "../../features/parametersSlice"
-import { stringToAmount } from "../../utils/formatNumber"
+import CheckTransactionsToolBox from "../../components/CheckTransactionsToolBox/CheckTransactionsToolBox"
 
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
@@ -53,6 +49,10 @@ const visibleColumnsConfig = (isMobile) => [
 const CheckTransactions = () => {
   const queryClient = useQueryClient()
   const dispatch = useDispatch()
+
+  const checkInitialAmount = useSelector(
+    (state) => state.parameters.checking.initialAmount
+  )
 
   const updateMutation = useMutation({
     mutationFn: updateTransaction,
@@ -124,17 +124,28 @@ const CheckTransactions = () => {
       id: transaction.id,
       updatedData: transaction,
     })
+
+    updateCheckCurrentAmount()
   }
 
-  const [checkDate, setCheckDate] = useState(
-    useSelector((state) => state.parameters.checking.date)
-  )
-  const [checkInitialAmount, setCheckInitialAmount] = useState(
-    useSelector((state) => state.parameters.checking.initialAmount).toFixed(2)
-  )
-  const [checkFinalAmount, setCheckFinalAmount] = useState(
-    useSelector((state) => state.parameters.checking.finalAmount).toFixed(2)
-  )
+  const updateCheckCurrentAmount = () => {
+    const pointedTransactions = unvalidatedTransactions.filter(
+      (tx) => tx.status === "pointed"
+    )
+
+    const totalDebit = pointedTransactions.reduce(
+      (sum, tx) => sum + (tx.debit || 0),
+      0
+    )
+    const totalCredit = pointedTransactions.reduce(
+      (sum, tx) => sum + (tx.credit || 0),
+      0
+    )
+    const currentAmount =
+      parseFloat(checkInitialAmount) + totalCredit - totalDebit
+
+    dispatch(setCheckingCurrentAmount(currentAmount))
+  }
 
   if (isLoading) return <p>Chargement des transactions...</p>
   if (error) return <p>Erreur : {error.message}</p>
@@ -148,60 +159,7 @@ const CheckTransactions = () => {
         </div>
       </div>
       <div className="container-checkTransactions__table">
-        <div className="container-checkTransactions__table__summary">
-          {/* DATE PICKER */}
-          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
-            <DatePicker
-              label="Date du relevé"
-              value={checkDate}
-              onChange={(newValue) => {
-                setCheckDate(newValue)
-                dispatch(setCheckingDate(newValue))
-              }}
-              format="dd/MM/yyyy"
-              sx={{ width: "auto", minWidth: 150, maxWidth: 180 }}
-              slotProps={{
-                textField: {
-                  size: "small",
-                },
-              }}
-            />
-
-            {/* INITIAL AMOUNT */}
-            <TextField
-              type="text"
-              label="Solde initial"
-              value={checkInitialAmount}
-              onFocus={(e) => e.target.select()}
-              onChange={(e) => setCheckInitialAmount(e.target.value)}
-              onBlur={(e) => {
-                const formattedValue = stringToAmount(e.target.value)
-                setCheckInitialAmount(formattedValue.toFixed(2))
-                dispatch(setCheckingInitialAmount(formattedValue))
-              }}
-              placeholder="0.00"
-              size="small"
-              sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
-            />
-
-            {/* FINAL AMOUNT */}
-            <TextField
-              type="text"
-              label="Solde final"
-              value={checkFinalAmount}
-              onFocus={(e) => e.target.select()}
-              onChange={(e) => setCheckFinalAmount(e.target.value)}
-              onBlur={(e) => {
-                const formattedValue = stringToAmount(e.target.value)
-                setCheckFinalAmount(formattedValue.toFixed(2))
-                dispatch(setCheckingFinalAmount(formattedValue))
-              }}
-              placeholder="0.00"
-              size="small"
-              sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
-            />
-          </LocalizationProvider>
-        </div>
+        <CheckTransactionsToolBox />
         <div className="container-checkTransactions__table__transactions">
           {isCheckTransactionsEditWindowVisible && <CheckTransactionEdit />}
 
