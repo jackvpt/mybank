@@ -10,14 +10,38 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import { fr } from "date-fns/locale"
 import {
+  setCheckingCurrentAmount,
   setCheckingFinalAmount,
   setCheckingInitialAmount,
 } from "../../features/parametersSlice"
 import { stringToAmount } from "../../utils/formatNumber"
-import { TextField } from "@mui/material"
+import { Alert, Button, CircularProgress, Snackbar, TextField } from "@mui/material"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { validateTransactions } from "../../api/transactions"
+import { ChangeCircle } from "@mui/icons-material"
 
 const CheckTransactionsToolBox = () => {
+  const queryClient = useQueryClient()
+
   const dispatch = useDispatch()
+
+  const [toastOpen, setToastOpen] = useState(false)
+  const [toastMessage, setToastMessage] = useState("")
+
+  const bankAccountName = useSelector((state) => state.parameters.bankAccount)
+
+  const validateMutation = useMutation({
+    mutationFn: validateTransactions,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(["transactions", bankAccountName])
+      console.log("data :>> ", data)
+      setToastMessage(`${data.modifiedCount} transaction(s) validée(s)`)
+      setToastOpen(true)
+    },
+    onError: (error) => {
+      console.error("Erreur lors de la suppression :", error.message)
+    },
+  })
 
   const [checkDate, setCheckDate] = useState(
     useSelector((state) => state.parameters.checking.date)
@@ -31,6 +55,17 @@ const CheckTransactionsToolBox = () => {
   const checkCurrentAmount = useSelector(
     (state) => state.parameters.checking.currentAmount
   ).toFixed(2)
+
+  const handleValidateCheck = (e) => {
+    e.preventDefault()
+    validateMutation.mutate()
+    setCheckingCurrentAmount(0)
+  }
+
+  const handleToastClose = (event, reason) => {
+    if (reason === "clickaway") return
+    setToastOpen(false)
+  }
 
   return (
     <div className="container-checkTransactions__table__summary">
@@ -95,7 +130,62 @@ const CheckTransactionsToolBox = () => {
           size="small"
           sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
         />
+
+        {/* DIFFERENCE AMOUNT */}
+        <TextField
+          type="text"
+          label="Différence"
+          disabled
+          value={(checkCurrentAmount - checkFinalAmount).toFixed(2)}
+          placeholder="0.00"
+          size="small"
+          sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
+        />
+
+        {/* VALIDATION BUTTON */}
+        <Button
+          variant="contained"
+          startIcon={!validateMutation.isPending ? <ChangeCircle /> : ""}
+          disabled={checkCurrentAmount !== checkFinalAmount}
+          onClick={handleValidateCheck}
+          sx={{
+            minWidth: 140,
+            backgroundColor: "#1976d2",
+            color: "#fff",
+            "&:hover": {
+              backgroundColor: "#1565c0",
+            },
+            textTransform: "none",
+            fontWeight: 600,
+            px: 3,
+            py: 1,
+            borderRadius: 1,
+            boxShadow: 3,
+          }}
+        >
+          {validateMutation.isPending ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            "Valider le relevé"
+          )}
+        </Button>
       </LocalizationProvider>
+
+      {/* Toast notification for success messages */}
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={3000}
+        onClose={handleToastClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleToastClose}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {toastMessage}
+        </Alert>
+      </Snackbar>
     </div>
   )
 }

@@ -150,6 +150,8 @@ const CheckTransactions = () => {
   if (isLoading) return <p>Chargement des transactions...</p>
   if (error) return <p>Erreur : {error.message}</p>
 
+  updateCheckCurrentAmount()
+
   return (
     <section className="container-checkTransactions">
       <div className="container-checkTransactions__tools">

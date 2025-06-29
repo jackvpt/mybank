@@ -98,3 +98,13 @@ export const deleteTransactions = async (transactionsIds) => {
     throw error
   }
 }
+
+export const validateTransactions = async () => {
+  try {
+    const response = await axios.patch(`${BASE_URL}/validate`)
+    return response.data
+  } catch (error) {
+    console.error("Error validating transactions:", error.message)
+    throw error
+  }
+}

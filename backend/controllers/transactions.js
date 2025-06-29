@@ -98,3 +98,25 @@ exports.deleteTransactions = async (req, res) => {
     })
   }
 }
+
+/** VALIDATE ALL "pointed" Transactions */
+exports.validateTransactions = async (req, res) => {
+  try {
+    const result = await Transaction.updateMany(
+      { status: "pointed" },
+      { $set: { status: "validated" } }
+    )
+
+    res.status(200).json({
+      message: "All pointed transactions have been validated.",
+      matchedCount: result.matchedCount,
+      modifiedCount: result.modifiedCount,
+    })
+
+    console.log(`Validated ${result.modifiedCount} pointed transactions.`)
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || "Error validating pointed transactions.",
+    })
+  }
+}
