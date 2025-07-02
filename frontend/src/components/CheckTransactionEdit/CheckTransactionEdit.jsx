@@ -63,9 +63,9 @@ const CheckTransactionEdit = () => {
     }
   }
 
-  const bankAccountName = useSelector((state) => state.settings.bankAccount)
+  const bankAccountName = useSelector((state) => state.parameters.bankAccount)
   const selectedCheckTransactionIds = useSelector(
-    (state) => state.settings.selectedCheckTransactionIds
+    (state) => state.parameters.selectedCheckTransactionIds
   )
 
   /**

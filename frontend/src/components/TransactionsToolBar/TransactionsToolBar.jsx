@@ -2,6 +2,7 @@ import "./TransactionsToolBar.scss"
 import { useSelector, useDispatch } from "react-redux"
 import { ToggleButton } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit"
+import { setIsTransactionEditWindowVisible } from "../../features/parametersSlice"
 
 const RecurringToolBar = () => {
   const dispatch = useDispatch()
@@ -14,12 +15,13 @@ const RecurringToolBar = () => {
         value="edit"
         selected={isTransactionEditWindowVisible}
         onChange={() =>
-          dispatch({
-            type: "settings/setIsTransactionEditWindowVisible",
-            payload: !isTransactionEditWindowVisible,
-          })
+          dispatch(
+            setIsTransactionEditWindowVisible(!isTransactionEditWindowVisible)
+          )
         }
-        className={`toggle-edit-btn ${isTransactionEditWindowVisible ? "active" : ""}`}
+        className={`toggle-edit-btn ${
+          isTransactionEditWindowVisible ? "active" : ""
+        }`}
         size="small"
       >
         <EditIcon fontSize="small" />

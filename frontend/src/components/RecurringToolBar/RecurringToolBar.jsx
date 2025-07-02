@@ -20,6 +20,7 @@ import {
   updateRecurringTransaction,
 } from "../../api/recurringTransactions"
 import { postTransaction } from "../../api/transactions"
+import { setIsRecurringEditWindowVisible } from "../../features/parametersSlice"
 
 const RecurringToolBar = () => {
   // Fetch recurring transactions using React Query
@@ -101,54 +102,55 @@ const RecurringToolBar = () => {
 
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
 
-const handleAddRecurring = () => {
-  const newTransactions = []
+  const handleAddRecurring = () => {
+    const newTransactions = []
 
-  recurringTransactions.forEach((transaction) => {
-    const transactionDate = new Date(transaction.date)
+    recurringTransactions.forEach((transaction) => {
+      const transactionDate = new Date(transaction.date)
 
-    if (
-      transactionDate.getMonth() === selectedMonth &&
-      transactionDate.getFullYear() === selectedYear
-    ) {
-      const originalTransaction = { ...transaction }
+      if (
+        transactionDate.getMonth() === selectedMonth &&
+        transactionDate.getFullYear() === selectedYear
+      ) {
+        const originalTransaction = { ...transaction }
 
-      if (transaction.type === "transfer") {
-        const creditTransaction = {
-          ...transaction,
-          type: "credit",
-          label: `Virement depuis ${transaction.account}`,
-          account: transaction.destination,
-          debit: 0,
-          credit: transaction.amount,
-          destination: ""
+        if (transaction.type === "transfer") {
+          const creditTransaction = {
+            ...transaction,
+            type: "credit",
+            label: `Virement depuis ${transaction.account}`,
+            account: transaction.destination,
+            debit: 0,
+            credit: transaction.amount,
+            destination: "",
+          }
+          newTransactions.push(creditTransaction)
         }
-        newTransactions.push(creditTransaction)
+
+        newTransactions.push(originalTransaction)
+
+        const updatedTransaction = {
+          ...transaction,
+          date: new Date(
+            transactionDate.setMonth(transactionDate.getMonth() + 1)
+          ),
+        }
+
+        updateRecurringMutation.mutate({
+          id: transaction.id,
+          updatedData: updatedTransaction,
+        })
       }
+    })
 
-      newTransactions.push(originalTransaction)
-
-      const updatedTransaction = {
-        ...transaction,
-        date: new Date(transactionDate.setMonth(transactionDate.getMonth() + 1))
-      }
-
-      updateRecurringMutation.mutate({
-        id: transaction.id,
-        updatedData: updatedTransaction,
-      })
+    if (newTransactions.length > 0) {
+      console.log("newTransactions :>> ", newTransactions)
+      addBatchMutation.mutate(newTransactions)
+    } else {
+      setToastMessage("Aucune transaction récurrente trouvée pour ce mois")
+      setToastOpen(true)
     }
-  })
-
-  if (newTransactions.length > 0) {
-    console.log('newTransactions :>> ', newTransactions);
-    addBatchMutation.mutate(newTransactions)
-  } else {
-    setToastMessage("Aucune transaction récurrente trouvée pour ce mois")
-    setToastOpen(true)
   }
-}
-
 
   if (isLoadingRecurringTransactions) {
     return <div>Loading...</div>
@@ -252,10 +254,9 @@ const handleAddRecurring = () => {
         value="edit"
         selected={isRecurringEditWindowVisible}
         onChange={() =>
-          dispatch({
-            type: "settings/setIsRecurringEditWindowVisible",
-            payload: !isRecurringEditWindowVisible,
-          })
+          dispatch(
+            setIsRecurringEditWindowVisible(!isRecurringEditWindowVisible)
+          )
         }
         className={`toggle-edit-btn ${
           isRecurringEditWindowVisible ? "active" : ""

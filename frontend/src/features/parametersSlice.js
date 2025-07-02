@@ -12,9 +12,10 @@ const initialState = {
   newTransactionId: null,
   checking: {
     date: new Date(),
-    initialAmount: 10,
+    initialAmount: 0,
     finalAmount: 0,
     currentAmount: 0,
+    noneTransactionChecked: true,
   },
 }
 
@@ -109,7 +110,10 @@ const parametersSlice = createSlice({
     },
     setCheckingCurrentAmount(state, action) {
       state.checking.currentAmount = action.payload
-    }
+    },
+    setNoneTransactionChecked(state, action) {
+      state.checking.noneTransactionChecked = action.payload
+    },
   },
 })
 
@@ -134,6 +138,7 @@ export const {
   setCheckingInitialAmount,
   setCheckingFinalAmount,
   setCheckingCurrentAmount,
+  setNoneTransactionChecked
 } = parametersSlice.actions
 
 export default parametersSlice.reducer

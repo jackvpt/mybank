@@ -17,5 +17,9 @@ footer {
       background-color: $text-color-2;
       color: $text-color-1;
     }
+
+    &:hover {
+      background-color: $primary-color-3;
+    }
   }
 }

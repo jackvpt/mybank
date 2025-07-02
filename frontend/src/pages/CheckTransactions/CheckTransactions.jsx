@@ -30,6 +30,7 @@ import CheckTransactionsToolBar from "../../components/CheckTransactionsToolBar/
 import CheckTransactionEdit from "../../components/CheckTransactionEdit/CheckTransactionEdit"
 import {
   setCheckingCurrentAmount,
+  setNoneTransactionChecked,
   setSelectedCheckTransactionIds,
 } from "../../features/parametersSlice"
 import CheckTransactionsToolBox from "../../components/CheckTransactionsToolBox/CheckTransactionsToolBox"
@@ -145,6 +146,8 @@ const CheckTransactions = () => {
       parseFloat(checkInitialAmount) + totalCredit - totalDebit
 
     dispatch(setCheckingCurrentAmount(currentAmount))
+
+    dispatch(setNoneTransactionChecked(pointedTransactions.length === 0))
   }
 
   if (isLoading) return <p>Chargement des transactions...</p>

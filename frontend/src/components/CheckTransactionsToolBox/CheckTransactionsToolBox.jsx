@@ -15,7 +15,13 @@ import {
   setCheckingInitialAmount,
 } from "../../features/parametersSlice"
 import { stringToAmount } from "../../utils/formatNumber"
-import { Alert, Button, CircularProgress, Snackbar, TextField } from "@mui/material"
+import {
+  Alert,
+  Button,
+  CircularProgress,
+  Snackbar,
+  TextField,
+} from "@mui/material"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { validateTransactions } from "../../api/transactions"
 import { ChangeCircle } from "@mui/icons-material"
@@ -29,12 +35,14 @@ const CheckTransactionsToolBox = () => {
   const [toastMessage, setToastMessage] = useState("")
 
   const bankAccountName = useSelector((state) => state.parameters.bankAccount)
+  const noneTransactionChecked = useSelector(
+    (state) => state.parameters.checking.noneTransactionChecked
+  )
 
   const validateMutation = useMutation({
     mutationFn: validateTransactions,
     onSuccess: (data) => {
       queryClient.invalidateQueries(["transactions", bankAccountName])
-      console.log("data :>> ", data)
       setToastMessage(`${data.modifiedCount} transaction(s) validée(s)`)
       setToastOpen(true)
     },
@@ -145,8 +153,7 @@ const CheckTransactionsToolBox = () => {
         {/* VALIDATION BUTTON */}
         <Button
           variant="contained"
-          startIcon={!validateMutation.isPending ? <ChangeCircle /> : ""}
-          disabled={checkCurrentAmount !== checkFinalAmount}
+          disabled={checkCurrentAmount !== checkFinalAmount || noneTransactionChecked}
           onClick={handleValidateCheck}
           sx={{
             minWidth: 140,
