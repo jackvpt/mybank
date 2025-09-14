@@ -43,20 +43,20 @@ app.use((req, res, next) => {
 })
 
 /** User routes */
-app.use("/api/auth",rateLimiter[1],userRoutes)
+app.use("/auth",rateLimiter[1],userRoutes)
 
 /** Accounts routes */
-app.use("/api/bankaccounts", rateLimiter[1], bankAccountsRoutes)
+app.use("/bankaccounts", rateLimiter[1], bankAccountsRoutes)
 
 /** Transactions routes */
-app.use("/api/transactions", rateLimiter[1], transactionsRoutes)
+app.use("/transactions", rateLimiter[1], transactionsRoutes)
 
-app.use("/api/recurringtransactions", rateLimiter[1], recurringTransactionsRoutes)
+app.use("/recurringtransactions", rateLimiter[1], recurringTransactionsRoutes)
 
 /** Settings routes */
-app.use("/api/settings", rateLimiter[1], settingsRoutes)
+app.use("/settings", rateLimiter[1], settingsRoutes)
 
 /** Categories routes */
-app.use("/api/categories", rateLimiter[1], categoriesRoutes)
+app.use("/categories", rateLimiter[1], categoriesRoutes)
 
 module.exports = app
