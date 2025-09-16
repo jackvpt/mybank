@@ -1,7 +1,10 @@
 import RecurringTransactionModel from "../models/RecurringTransactionModel"
 import axios from "axios"
 
-const BASE_URL = "http://localhost:3000/api/recurringtransactions"
+import { API_URL } from "./apiURL"
+
+// Base URL for authentication-related endpoints
+const BASE_URL = `${API_URL}/recurringtransactions`
 
 /**
  * Fetches all recurring transactions from the API.

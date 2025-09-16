@@ -1,7 +1,10 @@
 import TransactionModel from "../models/TransactionModel"
 import axios from "axios"
 
-const BASE_URL = "http://localhost:3000/api/transactions"
+import { API_URL } from "./apiURL"
+
+// Base URL for authentication-related endpoints
+const BASE_URL = `${API_URL}/transactions`
 
 /**
  * Fetches all transactions from the API.

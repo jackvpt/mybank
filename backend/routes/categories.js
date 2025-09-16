@@ -6,8 +6,6 @@ const multer = require("multer")
 const categoriesCtrl = require("../controllers/categories")
 
 /** Set routes */
-
 router.get("/", categoriesCtrl.getAllCategories)
-
 
 module.exports = router

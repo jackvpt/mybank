@@ -1,3 +1,8 @@
+import { API_URL } from "./apiURL"
+
+// Base URL for authentication-related endpoints
+const BASE_URL = `${API_URL}/categories`
+
 /**
  * Sorts categories by type and name.
  * @function sortCategories
@@ -25,7 +30,7 @@ const sortCategories = (categories) => {
  */
 export const fetchAllCategories = async () => {
   try {
-    const response = await fetch("http://localhost:3000/api/categories")
+    const response = await fetch(`${BASE_URL}`)
     if (!response.ok) throw new Error("Categories request failed")
     const data = await response.json()
     return sortCategories(data)

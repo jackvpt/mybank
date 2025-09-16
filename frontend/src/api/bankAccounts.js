@@ -1,3 +1,10 @@
+import { API_URL } from "./apiURL"
+
+// Base URL for authentication-related endpoints
+const BASE_URL = `${API_URL}/bankaccounts`
+
+console.log('API_URL :>> ', API_URL);
+
 /**
  * Fetches a bank account by its name from mock data.
  *
@@ -9,7 +16,7 @@
  */
 export const fetchBankAccounts = async ()=>{
   try {
-    const response = await fetch("http://localhost:3000/api/bankaccounts")
+    const response = await fetch(`${BASE_URL}`)
     if (!response.ok) throw new Error("Mock data request failed")
     const data = await response.json()
     return data
