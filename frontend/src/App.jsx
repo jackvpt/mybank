@@ -6,11 +6,20 @@ import { fetchAllSettings } from "./api/settings"
 import { fetchAllCategories } from "./api/categories"
 import { useDispatch } from "react-redux"
 import { useEffect } from "react"
-import { clearSelectedCheckTransactionIds, clearSelectedRecurringTransactionIds, clearSelectedTransactionIds } from "./features/parametersSlice"
+import {
+  clearSelectedCheckTransactionIds,
+  clearSelectedRecurringTransactionIds,
+  clearSelectedTransactionIds,
+} from "./features/parametersSlice"
 import { fetchAllRecurringTransactions } from "./api/recurringTransactions"
+import { useAuthToken } from "./hooks/useAuthToken"
+import Loader from "./components/Loader/Loader"
 
 function App() {
   const dispatch = useDispatch()
+
+  // Token validation
+  const { isAuthLoading } = useAuthToken()
 
   useQuery({
     queryKey: ["bankAccounts"],
@@ -49,6 +58,8 @@ function App() {
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [dispatch])
+
+  if (isAuthLoading) return <Loader />
 
   return (
     <>

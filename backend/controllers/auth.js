@@ -104,8 +104,11 @@ exports.login = async (req, res) => {
 
     await createLog(req.body.email, "Logged in")
 
+    user.lastConnection = new Date()
+    await user.save()
+
     res.status(200).json({
-      userId: user._id,
+      user,
       token: jwt.sign(
         {
           userId: user._id,
@@ -114,10 +117,6 @@ exports.login = async (req, res) => {
         process.env.SECRET_TOKEN,
         { expiresIn: process.env.TOKEN_EXPIRATION || "7d" }
       ),
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role,
     })
   } catch (error) {
     console.error("Access denied :>> ", error)
@@ -178,6 +177,7 @@ exports.validate = async (req, res) => {
       lastName: user.lastName,
       email: user.email,
       role: user.role,
+      lastConnection: user.lastConnection,
       expiry: decodeExp(decoded.exp),
     })
   } catch (error) {

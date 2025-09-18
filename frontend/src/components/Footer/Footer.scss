@@ -12,6 +12,7 @@ footer {
     padding: 0 10px;
     font-size: 1.75rem;
     color: $text-color-2;
+    cursor: pointer;
 
     &.active {
       background-color: $text-color-2;
@@ -21,5 +22,9 @@ footer {
     &:hover {
       background-color: $primary-color-3;
     }
+  }
+  .disabled {
+    pointer-events: none;
+    opacity: 0.5;
   }
 }

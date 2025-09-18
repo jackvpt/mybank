@@ -3,7 +3,9 @@ import { Link } from "react-router-dom"
 import "./Login.scss"
 import {
   Button,
+  Checkbox,
   FormControl,
+  FormControlLabel,
   FormHelperText,
   IconButton,
   InputAdornment,
@@ -11,34 +13,46 @@ import {
   OutlinedInput,
 } from "@mui/material"
 import { Visibility, VisibilityOff } from "@mui/icons-material"
+import { useLogin } from "../../hooks/useLogin"
 
 const Login = () => {
-  const [form, setForm] = useState({
+  const loginMutation = useLogin()
+
+  const [formData, setFormData] = useState({
     email: "",
     password: "",
+    rememberMe: true,
   })
   const [showPassword, setShowPassword] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [isFormValid, setIsFormValid] = useState(false)
 
   const handleToggleVisibility = () => {
     setShowPassword((prev) => !prev)
   }
 
-  const handleChange = (e) => {
+  const handleFormChange = (e) => {
     const { name, value } = e.target
-    setForm((prev) => ({ ...prev, [name]: value }))
+    setFormData((prev) => ({ ...prev, [name]: value }))
+
+    switch (name) {
+      case "email":
+        setIsFormValid(isValidEmail(value))
+        break
+    }
   }
 
   const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
-  const isValidPassword = (password) =>
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password)
-
   const handleSubmit = (e) => {
     e.preventDefault()
     setSubmitted(true)
-    if (!isValidEmail(form.email) || !isValidPassword(form.password)) return
-    // Auth logic here
+    if (!isValidEmail(formData.email)) return
+    loginMutation.mutate({
+      email: formData.email,
+      password: formData.password,
+      remember: formData.rememberMe,
+    })
   }
 
   return (
@@ -49,7 +63,7 @@ const Login = () => {
           fullWidth
           sx={{ mb: 2, maxWidth: 400 }}
           variant="outlined"
-          error={submitted && !isValidEmail(form.email)}
+          error={submitted && !isValidEmail(formData.email)}
         >
           <InputLabel htmlFor="email">Email</InputLabel>
           <OutlinedInput
@@ -57,10 +71,10 @@ const Login = () => {
             type="email"
             name="email"
             label="Email"
-            value={form.email}
-            onChange={handleChange}
+            value={formData.email}
+            onChange={handleFormChange}
           />
-          {submitted && !isValidEmail(form.email) && (
+          {submitted && !isValidEmail(formData.email) && (
             <FormHelperText>Adresse email invalide</FormHelperText>
           )}
         </FormControl>
@@ -70,15 +84,15 @@ const Login = () => {
           fullWidth
           sx={{ mb: 2, maxWidth: 300 }}
           variant="outlined"
-          error={submitted && !isValidPassword(form.password)}
+          error={submitted}
         >
           <InputLabel htmlFor="password">Mot de passe</InputLabel>
           <OutlinedInput
             id="password"
             type={showPassword ? "text" : "password"}
             name="password"
-            value={form.password}
-            onChange={handleChange}
+            value={formData.password}
+            onChange={handleFormChange}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
@@ -92,16 +106,26 @@ const Login = () => {
             }
             label="Mot de passe"
           />
-          {submitted && !isValidPassword(form.password) && (
-            <FormHelperText>
-              8 caractères min.
-              <br />
-              Avec majuscule, minuscule, chiffre et caractère spécial
-            </FormHelperText>
-          )}
         </FormControl>
 
-        <Button type="submit" variant="contained">
+        {/** Remember Me Checkbox */}
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={formData.rememberMe}
+              name="rememberMe"
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  rememberMe: e.target.checked,
+                }))
+              }
+            />
+          }
+          label="Se souvenir de moi"
+        />
+
+        <Button type="submit" variant="contained" disabled={!isFormValid}>
           Connexion
         </Button>
       </form>

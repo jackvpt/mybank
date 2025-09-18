@@ -3,8 +3,6 @@ import { API_URL } from "./apiURL"
 // Base URL for authentication-related endpoints
 const BASE_URL = `${API_URL}/bankaccounts`
 
-console.log('API_URL :>> ', API_URL);
-
 /**
  * Fetches a bank account by its name from mock data.
  *
