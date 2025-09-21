@@ -1,7 +1,6 @@
 import "./Transactions.scss"
 import { useState, useEffect, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { useQuery } from "@tanstack/react-query"
 import {
   Box,
   createTheme,
@@ -27,9 +26,9 @@ import {
   setSelectedTransactionIds,
   setTransactionsTableScrollPosition,
 } from "../../features/parametersSlice"
-import { fetchTransactionsByAccountName } from "../../api/transactions"
 import TransactionsToolBar from "../../components/TransactionsToolBar/TransactionsToolBar"
 import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
+import { useFetchTransactions } from "../../hooks/useFetchTransactions"
 
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
@@ -48,7 +47,10 @@ const Transactions = () => {
   const dispatch = useDispatch()
   const tableContainerRef = useRef(null)
 
-  const bankAccountName = useSelector((state) => state.parameters.bankAccount)
+  const bankAccountName = useSelector(
+    (state) => state.parameters.bankAccount.name
+  )
+  const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
   const selectedTransactionIds = useSelector(
     (state) => state.parameters.selectedTransactionIds
   )
@@ -75,14 +77,70 @@ const Transactions = () => {
   const [lastSelectedIndex, setLastSelectedIndex] = useState(null)
 
   const {
-    data: transactions = [],
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["transactions", bankAccountName],
-    queryFn: () => fetchTransactionsByAccountName(bankAccountName),
-    enabled: !!bankAccountName,
-  })
+    isLoading: isLoadingTransactions,
+    error: errorTransactions,
+    data: transactionsData,
+  } = useFetchTransactions()
+
+  const handleSort = (property) => {
+    setOrder(orderBy === property && order === "asc" ? "desc" : "asc")
+    setOrderBy(property)
+  }
+
+  const handleRowClick = (e, tx, index) => {
+    if (e.shiftKey && lastSelectedIndex !== null) {
+      const start = Math.min(index, lastSelectedIndex)
+      const end = Math.max(index, lastSelectedIndex)
+      const ids = sortedTransactions.slice(start, end + 1).map((t) => t.id)
+      dispatch(
+        setSelectedTransactionIds([
+          ...new Set([...selectedTransactionIds, ...ids]),
+        ])
+      )
+    } else if (e.ctrlKey || e.metaKey) {
+      selectedTransactionIds.includes(tx.id)
+        ? dispatch(removeSelectedTransactionId(tx.id))
+        : dispatch(addSelectedTransactionId(tx.id))
+      setLastSelectedIndex(index)
+    } else {
+      dispatch(setSelectedTransactionIds([tx.id]))
+      setLastSelectedIndex(index)
+    }
+  }
+
+  const handleScroll = (e) => {
+    dispatch(setTransactionsTableScrollPosition(e.currentTarget.scrollTop))
+  }
+
+  useEffect(() => {
+    const container = tableContainerRef.current
+    if (!container) return
+
+    if (transactionsTableScrollPosition !== null) {
+      container.scrollTop = transactionsTableScrollPosition
+    } else {
+      container.scrollTop = container.scrollHeight
+      dispatch(setTransactionsTableScrollPosition(container.scrollTop))
+    }
+
+    if (newTransactionId) {
+      const element = transactionRefs.current[newTransactionId]
+      if (element) {
+        container.scrollTo({
+          top: element.offsetTop - 100,
+          behavior: "auto",
+        })
+      }
+      dispatch(setNewTransactionId(null))
+    }
+  }, [transactions, transactionsTableScrollPosition, dispatch])
+
+  if (isLoadingTransactions) return <p>Chargement des transactions...</p>
+  if (errorTransactions) return <p>Erreur : {errorTransactions.message}</p>
+
+  const transactions = transactionsData.filter(
+    (transaction) => transaction.accountId === bankAccountId
+  )
 
   // Filter transactions by date
   const getFilteredTransactions = () => {
@@ -134,62 +192,6 @@ const Transactions = () => {
       ? String(aValue).localeCompare(String(bValue))
       : String(bValue).localeCompare(String(aValue))
   })
-
-  const handleSort = (property) => {
-    setOrder(orderBy === property && order === "asc" ? "desc" : "asc")
-    setOrderBy(property)
-  }
-
-  const handleRowClick = (e, tx, index) => {
-    if (e.shiftKey && lastSelectedIndex !== null) {
-      const start = Math.min(index, lastSelectedIndex)
-      const end = Math.max(index, lastSelectedIndex)
-      const ids = sortedTransactions.slice(start, end + 1).map((t) => t.id)
-      dispatch(
-        setSelectedTransactionIds([
-          ...new Set([...selectedTransactionIds, ...ids]),
-        ])
-      )
-    } else if (e.ctrlKey || e.metaKey) {
-      selectedTransactionIds.includes(tx.id)
-        ? dispatch(removeSelectedTransactionId(tx.id))
-        : dispatch(addSelectedTransactionId(tx.id))
-      setLastSelectedIndex(index)
-    } else {
-      dispatch(setSelectedTransactionIds([tx.id]))
-      setLastSelectedIndex(index)
-    }
-  }
-
-  useEffect(() => {
-    const container = tableContainerRef.current
-    if (!container) return
-
-    if (transactionsTableScrollPosition !== null) {
-      container.scrollTop = transactionsTableScrollPosition
-    } else {
-      container.scrollTop = container.scrollHeight
-      dispatch(setTransactionsTableScrollPosition(container.scrollTop))
-    }
-
-    if (newTransactionId) {
-      const element = transactionRefs.current[newTransactionId]
-      if (element) {
-        container.scrollTo({
-          top: element.offsetTop - 100,
-          behavior: "auto",
-        })
-      }
-      dispatch(setNewTransactionId(null))
-    }
-  }, [transactions, transactionsTableScrollPosition, dispatch])
-
-  const handleScroll = (e) => {
-    dispatch(setTransactionsTableScrollPosition(e.currentTarget.scrollTop))
-  }
-
-  if (isLoading) return <p>Chargement des transactions...</p>
-  if (error) return <p>Erreur : {error.message}</p>
 
   return (
     <section className="container-transactions">

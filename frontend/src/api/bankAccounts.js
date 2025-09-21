@@ -1,4 +1,5 @@
 import { API_URL } from "./apiURL"
+import axios from "axios"
 
 // Base URL for authentication-related endpoints
 const BASE_URL = `${API_URL}/bankaccounts`
@@ -14,13 +15,11 @@ const BASE_URL = `${API_URL}/bankaccounts`
  */
 export const fetchBankAccounts = async ()=>{
   try {
-    const response = await fetch(`${BASE_URL}`)
-    if (!response.ok) throw new Error("Mock data request failed")
-    const data = await response.json()
-    return data
+    const response = await axios.get(`${BASE_URL}`)
+    return response.data
   } catch (error) {
     console.error(
-      `Error fetching accounts data from mock data: ${error.message}`
+      `Error fetching accounts data: ${error.message}`
     )
     throw error
   }

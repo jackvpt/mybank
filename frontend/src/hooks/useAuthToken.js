@@ -30,23 +30,21 @@ export function useAuthToken() {
 
   return useQuery({
     queryKey: ["token", token],
-    queryFn: () =>
-      validateToken(token, {
-        onSuccess: (data) => {
-          console.log("✅ Token is valid", data)
-          dispatch(setUser(new UserModel(data)))
-        },
-        onError: (err) => {
-          console.log("❌ onError triggered :>> ", err.message)
-          localStorage.removeItem("token")
-          sessionStorage.removeItem("token")
-          dispatch(clearUser())
-          navigate("/login", { replace: true })
-        },
-      }),
+    queryFn: () => validateToken(token),
     enabled: !!token,
     retry: false,
     refetchInterval: 30000,
     staleTime: 0,
+    onSuccess: (data) => {
+      console.log("✅ Token is valid", data)
+      dispatch(setUser(new UserModel(data.user)))
+    },
+    onError: (err) => {
+      console.log("❌ Token validation failed:", err.message)
+      localStorage.removeItem("token")
+      sessionStorage.removeItem("token")
+      dispatch(clearUser())
+      navigate("/login", { replace: true })
+    },
   })
 }

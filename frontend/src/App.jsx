@@ -1,10 +1,8 @@
 import { useQuery } from "@tanstack/react-query"
 import Router from "./router/Router"
-import { fetchAllTransactions } from "./api/transactions"
-import { fetchBankAccounts } from "./api/bankAccounts"
 import { fetchAllSettings } from "./api/settings"
 import { fetchAllCategories } from "./api/categories"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { useEffect } from "react"
 import {
   clearSelectedCheckTransactionIds,
@@ -14,22 +12,20 @@ import {
 import { fetchAllRecurringTransactions } from "./api/recurringTransactions"
 import { useAuthToken } from "./hooks/useAuthToken"
 import Loader from "./components/Loader/Loader"
+import { useFetchBankAccounts } from "./hooks/useFetchBankAccounts"
+import { useFetchTransactions } from "./hooks/useFetchTransactions"
 
 function App() {
   const dispatch = useDispatch()
 
   // Token validation
-  const { isAuthLoading } = useAuthToken()
+  const { isAuthLoading, errorAuthToken } = useAuthToken()
 
-  useQuery({
-    queryKey: ["bankAccounts"],
-    queryFn: fetchBankAccounts,
-  })
+  const { isLoading: isLoadingBankAccounts, error: errorBankAccounts, data: bankAccounts } =
+    useFetchBankAccounts()
 
-  useQuery({
-    queryKey: ["transactions"],
-    queryFn: fetchAllTransactions,
-  })
+  const { isLoading: isLoadingTransactions, error: errorTransactions } =
+    useFetchTransactions()
 
   useQuery({
     queryKey: ["recurringTransactions"],
@@ -59,7 +55,8 @@ function App() {
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [dispatch])
 
-  if (isAuthLoading) return <Loader />
+  if (isAuthLoading || isLoadingBankAccounts || isLoadingTransactions)
+    return <Loader />
 
   return (
     <>

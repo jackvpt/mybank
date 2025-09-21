@@ -68,7 +68,8 @@ const TransactionEdit = () => {
     }
   }
 
-  const bankAccountName = useSelector((state) => state.parameters.bankAccount)
+  const bankAccountName = useSelector((state) => state.parameters.bankAccount.name)
+  const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
   const selectedTransactionIds = useSelector(
     (state) => state.parameters.selectedTransactionIds
   )
@@ -178,7 +179,8 @@ const TransactionEdit = () => {
 
   const initialFormData = {
     date: new Date(),
-    account: bankAccountName,
+    accountId: bankAccountId,
+    accountName: bankAccountName,
     type: "card",
     checkNumber: "",
     label: "",

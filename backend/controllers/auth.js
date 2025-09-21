@@ -172,12 +172,7 @@ exports.validate = async (req, res) => {
 
     // Return user data
     res.status(200).json({
-      userId: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role,
-      lastConnection: user.lastConnection,
+      user,
       expiry: decodeExp(decoded.exp),
     })
   } catch (error) {

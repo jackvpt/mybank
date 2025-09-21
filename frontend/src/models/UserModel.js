@@ -19,7 +19,7 @@ export default class UserModel {
 
   constructor(data) {
     /** @type {string} */
-    this.id = data._id
+    this.id = data._id 
 
     /** @type {string} */
     this.firstName = data.firstName
@@ -44,5 +44,7 @@ export default class UserModel {
 
     /** @type {Date} */
     this.updatedAt = new Date(data.updatedAt)
+
+    console.log("UserModel instance created:", this)
   }
 }

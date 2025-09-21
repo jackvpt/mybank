@@ -19,7 +19,7 @@ export default class BankAccountModel {
    */
   constructor(data) {
     /** @type {string} */
-    this.id = data.id
+    this.id = data._id
 
     /** @type {string} */
     this.name = data.name

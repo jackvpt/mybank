@@ -4,7 +4,7 @@ import { createSlice } from "@reduxjs/toolkit"
  * Initial state of the user slice
  */
 const initialState = {
-  userId: null,
+  id: null,
   firstName: null,
   lastName: null,
   fullName: null,
@@ -25,7 +25,7 @@ const userSlice = createSlice({
     /**
      * Set the user information
      * @param {object} action.payload - User data object
-     * @param {string|number} action.payload.userId - User ID
+     * @param {string|number} action.payload.id - User ID
      * @param {string} action.payload.firstName - First name
      * @param {string} action.payload.lastName - Last name
      * @param {string} action.payload.email - Email address
@@ -33,7 +33,7 @@ const userSlice = createSlice({
      * @param {string} action.payload.lastConnection - Last connection timestamp
      */
     setUser: (state, action) => {
-      state.userId = action.payload.userId
+      state.id = action.payload.id
       state.firstName = action.payload.firstName
       state.lastName = action.payload.lastName
       state.fullName = action.payload.fullName

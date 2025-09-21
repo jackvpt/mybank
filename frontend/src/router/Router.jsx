@@ -19,7 +19,7 @@ import { useSelector } from "react-redux"
  */
 export default function Router() {
   // Access Redux state to determine if a user is authenticated
-  const isAuthenticated = useSelector((state) => state.user.userId !== null)
+  const isAuthenticated = useSelector((state) => state.user.id !== null)
   return (
     <>
       <Header />

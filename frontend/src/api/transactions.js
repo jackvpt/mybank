@@ -40,12 +40,32 @@ export const fetchTransactionsByAccountName = async (accountName) => {
 }
 
 /**
+ * Fetches transactions by account name from the API.
+ * @param {String} accountName
+ * @returns {Promise<TransactionModel[]>}
+ */
+export const fetchTransactionsByAccountId = async (accountId) => {
+  try {
+    const { data } = await axios.get(BASE_URL)
+    const filtered = data
+      .filter((transaction) => transaction.accountId === accountId)
+      .map((transaction) => new TransactionModel(transaction))
+
+    return filtered
+  } catch (error) {
+    console.error("Error fetching transactions by account ID:", error.message)
+    throw error
+  }
+}
+
+/**
  * Posts a new transaction to the API.
  * @param {Object} transactionData
  * @returns {Promise<TransactionModel>}
  */
 export const postTransaction = async (transactionData) => {
   try {
+    console.log('transactionData :>> ', transactionData);
     const { data } = await axios.post(BASE_URL, transactionData)
     return new TransactionModel(data)
   } catch (error) {
