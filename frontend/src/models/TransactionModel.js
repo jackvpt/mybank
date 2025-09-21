@@ -6,7 +6,8 @@ export default class TransactionModel {
    * Creates an instance of TransactionModel.
    *
    * @param {Object} data - The transaction data.
-   * @param {string} data.account - The account involved in the transaction.
+   * @param {string} data.accountId - The account id involved in the transaction.
+   * @param {string} data.accountName - The account name involved in the transaction.
    * @param {string|Date} data.date - The date of the transaction (ISO string or Date object).
    * @param {string} data.type - The type of transaction (e.g. "card", "check", "transfer", "auto debit").
    * @param {string} [data.checkNumber] - The check serial number (if applicable).
@@ -23,7 +24,10 @@ export default class TransactionModel {
     this.id = data._id 
 
     /** @type {string} */
-    this.account = data.account
+    this.accountId = data.accountId
+
+    /** @type {string} */
+    this.accountName = data.accountName
 
     /** @type {Date} */
     this.date = new Date(data.date)

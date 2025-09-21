@@ -51,6 +51,7 @@ const Transactions = () => {
     (state) => state.parameters.bankAccount.name
   )
   const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
+
   const selectedTransactionIds = useSelector(
     (state) => state.parameters.selectedTransactionIds
   )
@@ -81,6 +82,10 @@ const Transactions = () => {
     error: errorTransactions,
     data: transactionsData,
   } = useFetchTransactions()
+
+  const transactions = transactionsData.filter(
+    (transaction) => transaction.accountId === bankAccountId
+  )
 
   const handleSort = (property) => {
     setOrder(orderBy === property && order === "asc" ? "desc" : "asc")
@@ -137,10 +142,6 @@ const Transactions = () => {
 
   if (isLoadingTransactions) return <p>Chargement des transactions...</p>
   if (errorTransactions) return <p>Erreur : {errorTransactions.message}</p>
-
-  const transactions = transactionsData.filter(
-    (transaction) => transaction.accountId === bankAccountId
-  )
 
   // Filter transactions by date
   const getFilteredTransactions = () => {
