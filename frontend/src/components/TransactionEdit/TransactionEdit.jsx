@@ -37,7 +37,6 @@ import { fetchBankAccounts } from "../../api/bankAccounts"
 import { fetchAllCategories } from "../../api/categories"
 import {
   fetchTransactionsByAccountName,
-  postTransaction,
   updateTransaction,
   deleteTransactions,
 } from "../../api/transactions"
@@ -45,6 +44,7 @@ import {
   setNewTransactionId,
   setSelectedTransactionIds,
 } from "../../features/parametersSlice"
+import { useAddTransaction } from "../../hooks/useAddTransaction"
 
 const TransactionEdit = () => {
   const dispatch = useDispatch()
@@ -76,6 +76,7 @@ const TransactionEdit = () => {
     (state) => state.parameters.selectedTransactionIds
   )
 
+<<<<<<< HEAD
   /**
    * Mutation to post a new transaction.
    * It uses React Query's useMutation hook to handle the mutation.
@@ -86,11 +87,19 @@ const TransactionEdit = () => {
       queryClient.invalidateQueries("transactions")
       dispatch(setNewTransactionId(data.id))
       dispatch(setSelectedTransactionIds([data.id]))
+=======
+    /**
+   * React Query: Add transaction mutation
+   */
+  const addTransactionMutation = useAddTransaction({
+    onSuccess: () => {
+>>>>>>> 049dccb32c4e55e6b3f02ed41f016af6c8d9d908
       setToastMessage("Transaction ajoutée")
       setToastOpen(true)
+
     },
     onError: (error) => {
-      console.error("Erreur lors de la soumission :", error)
+      console.error("Error adding occupancy:", error)
     },
   })
 
@@ -247,7 +256,7 @@ const TransactionEdit = () => {
           ...prev,
           label: `Virement vers ${formData.destination}`,
         }))
-        addMutation.mutate(formData)
+        addTransactionMutation.mutate(formData)
 
         const creditTransaction = {
           ...formData,
@@ -257,9 +266,9 @@ const TransactionEdit = () => {
           label: `Virement depuis ${formData.account}`,
           destination: "",
         }
-        addMutation.mutate(creditTransaction)
+        addTransactionMutation.mutate(creditTransaction)
       } else {
-        addMutation.mutate(formData)
+        addTransactionMutation.mutate(formData)
       }
     }
   }
@@ -607,7 +616,7 @@ const TransactionEdit = () => {
           {/* ADD TRANSACTION BUTTON */}
           <Button
             variant="contained"
-            startIcon={!addMutation.isPending ? <AddCircle /> : ""}
+            startIcon={!addTransactionMutation.isPending ? <AddCircle /> : ""}
             disabled={formHasErrors()}
             onClick={handleAddTransaction}
             sx={{
@@ -625,7 +634,7 @@ const TransactionEdit = () => {
               boxShadow: 3,
             }}
           >
-            {addMutation.isPending ? (
+            {addTransactionMutation.isPending ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
               "Ajouter"

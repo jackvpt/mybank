@@ -83,6 +83,10 @@ const Transactions = () => {
     data: transactionsData,
   } = useFetchTransactions()
 
+  const transactions = transactionsData.filter(
+    (transaction) => transaction.accountId === bankAccountId
+  )
+
   const handleSort = (property) => {
     setOrder(orderBy === property && order === "asc" ? "desc" : "asc")
     setOrderBy(property)
@@ -138,10 +142,6 @@ const Transactions = () => {
 
   if (isLoadingTransactions) return <p>Chargement des transactions...</p>
   if (errorTransactions) return <p>Erreur : {errorTransactions.message}</p>
-
-  const transactions = transactionsData.filter(
-    (transaction) => transaction.accountId === bankAccountId
-  )
 
   // Filter transactions by date
   const getFilteredTransactions = () => {
