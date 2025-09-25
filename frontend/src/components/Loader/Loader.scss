@@ -25,7 +25,7 @@
   }
 
   &__spinner {
-    // color: $secondary-color-6;
+    color: $primary-color-2;
     font-size: 100px; // spinner size
     width: 1em;
     height: 1em;
@@ -47,7 +47,12 @@
     gap: 1.5rem;
 
     font-size: 1.5rem;
-    // color: $text-color-1;
+    color: $text-color-1;
+  }
+
+  &__icon{
+    color:$primary-color-2;
+    font-size: 4rem;
   }
 
   // Spinner shadow animation

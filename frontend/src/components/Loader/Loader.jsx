@@ -1,6 +1,10 @@
 // 📁 CSS imports
 import "./Loader.scss"
 
+// 👉 FontAwesome
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faBuildingColumns } from "@fortawesome/free-solid-svg-icons"
+
 /**
  * Loader component displaying a loading animation.
  * Uses a modal overlay with a spinner and localized loading text.
@@ -9,7 +13,6 @@ import "./Loader.scss"
  * @returns {JSX.Element} Rendered Loader component
  */
 const Loader = () => {
-
   return (
     <section className="loader">
       {/* Modal overlay */}
@@ -20,14 +23,9 @@ const Loader = () => {
 
           {/* Loading text */}
           <div className="loader__text">
-            
             {/* Logo */}
-            <img
-              className="loader__image"
-              src="/logo-hh.png"
-              alt="App logo"
-              width={"48px"}
-            />
+          <FontAwesomeIcon className="loader__icon" icon={faBuildingColumns} />
+
           </div>
         </div>
       </div>

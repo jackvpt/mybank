@@ -11,7 +11,7 @@ header {
   justify-content: space-between;
   align-items: center;
   background-color: $primary-color-2;
-  
+
   @include responsive-tablet {
     box-shadow: 0px 4px 4px 0px #00000040;
   }
@@ -22,11 +22,9 @@ header {
     align-items: center;
     justify-content: space-between;
 
-    &__image {
-      @include responsive-tablet {
-        width: 36px;
-        height: 36px;
-      }
+    &__icon {
+      color: white;
+      font-size: 3rem;
     }
 
     &__title {

@@ -1,8 +1,10 @@
 import React from "react"
 import "./Header.scss"
-import { Link, NavLink } from "react-router-dom"
-import logo from "../../assets/images/logo_mybank_white.png"
-import DevTools from "../devTools/DevTools"
+import { Link } from "react-router-dom"
+
+// 👉 FontAwesome
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faBuildingColumns } from "@fortawesome/free-solid-svg-icons"
 
 /**
  * Renders the main navigation header of the application.
@@ -19,16 +21,9 @@ const Header = () => {
       {/* Logo of the application */}
       <div className="logo">
         <Link to="/">
-          <img
-            className="logo__image"
-            src={logo}
-            alt="Logo myBank"
-            width="24"
-            height="24"
-          ></img>
+          <FontAwesomeIcon className="logo__icon" icon={faBuildingColumns} />
         </Link>
       </div>
-      {/* <DevTools /> */}
       <h1 className="logo__title">myBank</h1>
     </header>
   )
