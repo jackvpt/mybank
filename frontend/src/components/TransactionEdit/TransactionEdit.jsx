@@ -47,11 +47,11 @@ import {
   setSelectedTransactionIds,
 } from "../../features/parametersSlice"
 import { useAddTransaction } from "../../hooks/useAddTransaction"
+import ResponsiveDatePicker from "../ResponsiveDatePicker/ResponsiveDatePicker"
 
 const TransactionEdit = () => {
   const queryClient = useQueryClient()
 
-  const isMobile = useMediaQuery("(max-width:600px)")
 
   const [toastOpen, setToastOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState("")
@@ -317,41 +317,12 @@ const TransactionEdit = () => {
     <section className="container-transaction-edit">
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
         <form>
-          {/* DATE PICKER */}
-          {isMobile ? (
-            // --- VERSION SMARTPHONE (natif iOS/Android) ---
-            <TextField
-              label="Date"
-              type="date"
-              size="small"
-              value={formData.date || ""}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, date: e.target.value }))
-              }
-              sx={{
-                width: "100%",
-              }}
-              InputLabelProps={{
-                shrink: true, // pour garder le label visible
-              }}
-            />
-          ) : (
-            // --- VERSION DESKTOP/TABLET (MUI) ---
-            <DatePicker
-              label="Date"
-              value={formData.date}
-              onChange={(newValue) =>
-                setFormData((prev) => ({ ...prev, date: newValue }))
-              }
-              format="dd/MM/yyyy"
-              slotProps={{
-                textField: {
-                  size: "small",
-                  sx: { width: "100%", maxWidth: { sm: "180px" } },
-                },
-              }}
-            />
-          )}
+          <ResponsiveDatePicker
+            value={formData.date}
+            onChange={(newValue) =>
+              setFormData((prev) => ({ ...prev, date: newValue }))
+            }
+          />
 
           {/* TYPE SELECT */}
           <FormControl
