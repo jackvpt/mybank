@@ -330,7 +330,6 @@ const TransactionEdit = () => {
               }
               sx={{
                 width: "100%",
-                maxWidth: { sm: "180px" },
               }}
               InputLabelProps={{
                 shrink: true, // pour garder le label visible
@@ -338,7 +337,7 @@ const TransactionEdit = () => {
             />
           ) : (
             // --- VERSION DESKTOP/TABLET (MUI) ---
-            <MobileDatePicker
+            <DatePicker
               label="Date"
               value={formData.date}
               onChange={(newValue) =>
@@ -348,10 +347,7 @@ const TransactionEdit = () => {
               slotProps={{
                 textField: {
                   size: "small",
-                  sx: {
-                    width: "100%",
-                    maxWidth: { sm: "180px" },
-                  },
+                  sx: { width: "100%", maxWidth: { sm: "180px" } },
                 },
               }}
             />
