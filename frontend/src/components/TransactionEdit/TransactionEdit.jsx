@@ -3,7 +3,7 @@ import "./TransactionEdit.scss"
 
 // React imports
 import { useEffect, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 
 // DEV imports
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
@@ -47,7 +47,6 @@ import {
 import { useAddTransaction } from "../../hooks/useAddTransaction"
 
 const TransactionEdit = () => {
-  const dispatch = useDispatch()
   const queryClient = useQueryClient()
 
   const [toastOpen, setToastOpen] = useState(false)
@@ -76,27 +75,10 @@ const TransactionEdit = () => {
     (state) => state.parameters.selectedTransactionIds
   )
 
-<<<<<<< HEAD
-  /**
-   * Mutation to post a new transaction.
-   * It uses React Query's useMutation hook to handle the mutation.
-   **/
-  const addMutation = useMutation({
-    mutationFn: postTransaction,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries("transactions")
-      dispatch(setNewTransactionId(data.id))
-      dispatch(setSelectedTransactionIds([data.id]))
-=======
-    /**
-   * React Query: Add transaction mutation
-   */
   const addTransactionMutation = useAddTransaction({
     onSuccess: () => {
->>>>>>> 049dccb32c4e55e6b3f02ed41f016af6c8d9d908
       setToastMessage("Transaction ajoutée")
       setToastOpen(true)
-
     },
     onError: (error) => {
       console.error("Error adding occupancy:", error)

@@ -51,7 +51,9 @@ const Transactions = () => {
     (state) => state.parameters.bankAccount.name
   )
   const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
-
+  const bankAccountInitialBalance = useSelector(
+    (state) => state.parameters.bankAccount.initialBalance
+  )
   const selectedTransactionIds = useSelector(
     (state) => state.parameters.selectedTransactionIds
   )
@@ -271,7 +273,10 @@ const Transactions = () => {
               {sortedTransactions.map((tx, index) => {
                 const balance = sortedTransactions
                   .slice(0, index + 1)
-                  .reduce((acc, t) => acc + (t.credit || 0) - (t.debit || 0), 0)
+                  .reduce(
+                    (acc, t) => acc + (t.credit || 0) - (t.debit || 0),
+                    bankAccountInitialBalance
+                  )
 
                 return (
                   <TableRow
@@ -299,7 +304,14 @@ const Transactions = () => {
                     {visibleColumns.find(
                       (col) => col.id === "balance" && col.show
                     ) && (
-                      <TableCell align="right" className={`cell__balance ${balance > 0 ? "" : "cell__balance-negative"}`}>{balance.toFixed(2)}</TableCell>
+                      <TableCell
+                        align="right"
+                        className={`cell__balance ${
+                          balance > 0 ? "" : "cell__balance-negative"
+                        }`}
+                      >
+                        {balance.toFixed(2)}
+                      </TableCell>
                     )}
                     {visibleColumns.find(
                       (col) => col.id === "status" && col.show

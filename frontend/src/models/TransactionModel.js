@@ -33,11 +33,7 @@ export default class TransactionModel {
     this.accountId = data.accountId
 
     /** @type {string} */
-<<<<<<< HEAD
     this.accountName = data.accountName === "" || data.accountName === null ? data.account : data.accountName
-=======
-    this.accountName = data.accountName
->>>>>>> 049dccb32c4e55e6b3f02ed41f016af6c8d9d908
 
     /** @type {Date} */
     this.date = new Date(data.date)
