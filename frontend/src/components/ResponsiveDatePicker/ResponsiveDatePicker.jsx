@@ -10,7 +10,6 @@ const ResponsiveDatePicker = ({ value, onChange }) => {
         <TextField
           label="Date"
           type="date"
-          size="small"
           value={value || ""}
           onChange={(e) => onChange(e.target.value)}
           sx={{ width: "100%" }}
