@@ -3,7 +3,8 @@ const mongoose = require("mongoose")
 
 /** Create a mongoose Schema */
 const recurringTransactionSchema = mongoose.Schema({
-  account: { type: String, required: true },
+  accountId: { type: String, required: true },
+  accountName: { type: String, required: true },
   date: { type: Date, required: true },
   type: { type: String, required: true },
   checkNumber: { type: String, required: false },

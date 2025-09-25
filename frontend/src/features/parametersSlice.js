@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit"
 
 const initialState = {
-  bankAccount: {  name: null, id: null },
+  bankAccount: { name: null, id: null, initialBalance: null },
   isTransactionEditWindowVisible: true,
   isRecurringEditWindowVisible: true,
   isCheckTransactionsEditWindowVisible: false,
@@ -25,9 +25,9 @@ const parametersSlice = createSlice({
   reducers: {
     // BANK ACCOUNT
     setBankAccount: (state, action) => {
-      console.log('payload :>> ', action.payload);
       state.bankAccount.name = action.payload.name
       state.bankAccount.id = action.payload.id
+      state.bankAccount.initialBalance = action.payload.initialBalance
     },
 
     // TRANSACTION EDIT WINDOWS
@@ -140,7 +140,7 @@ export const {
   setCheckingInitialAmount,
   setCheckingFinalAmount,
   setCheckingCurrentAmount,
-  setNoneTransactionChecked
+  setNoneTransactionChecked,
 } = parametersSlice.actions
 
 export default parametersSlice.reducer

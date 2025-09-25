@@ -1,18 +1,14 @@
 import "./Dashboard.scss"
 import { useQuery } from "@tanstack/react-query"
-import { fetchBankAccounts } from "../../api/bankAccounts"
 import BankAccountCard from "../../components/BankAccountCard/BankAccountCard"
 import { fetchAllTransactions } from "../../api/transactions"
+import { useFetchBankAccounts } from "../../hooks/useFetchBankAccounts"
 
 const Dashboard = () => {
-  const {
-    data: bankAccounts,
-    isLoading: isLoadingAccounts,
-    error: accountError,
-  } = useQuery({
-    queryKey: ["bankAccounts"],
-    queryFn: fetchBankAccounts,
-  })
+
+
+    const { isLoading: isLoadingBankAccounts ,error:bankAccountsError,data:bankAccounts} = useFetchBankAccounts()
+  
 
   const {
     data: transactions,
@@ -23,9 +19,9 @@ const Dashboard = () => {
     queryFn: fetchAllTransactions,
   })
 
-  if (isLoadingAccounts || isLoadingTransactions)
+  if (isLoadingBankAccounts || isLoadingTransactions)
     return <p>Chargement des données...</p>
-  if (accountError) return <p>Erreur comptes : {accountError.message}</p>
+  if (bankAccountsError) return <p>Erreur comptes : {bankAccountsError.message}</p>
   if (transactionsError)
     return <p>Erreur transactions : {transactions.message}</p>
 
@@ -40,7 +36,7 @@ const Dashboard = () => {
             .sort((a, b) => new Date(b.date) - new Date(a.date))[0] || null
         return (
           <BankAccountCard
-            key={account._id}
+            key={account.id}
             account={account}
             lastTransaction={lastTransaction}
           />

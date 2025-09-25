@@ -78,4 +78,12 @@
       color: white !important;
     }
   }
+
+  .cell__balance{
+    font-weight: bold;
+
+    &-negative {
+      color: red;
+    }
+  }
 }

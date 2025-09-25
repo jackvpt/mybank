@@ -42,8 +42,6 @@ exports.updateRecurringTransaction = async (req, res) => {
   const recurringTransactionObject = req.body
 
   try {
-    const recurringTransaction = await RecurringTransaction.findOne({ _id: req.params.id })
-
     const updatedRecurringTransaction = await RecurringTransaction.findByIdAndUpdate(
       req.params.id,
       { ...recurringTransactionObject, _id: req.params.id },

@@ -68,7 +68,9 @@ const TransactionEdit = () => {
     }
   }
 
-  const bankAccountName = useSelector((state) => state.parameters.bankAccount.name)
+  const bankAccountName = useSelector(
+    (state) => state.parameters.bankAccount.name
+  )
   const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
   const selectedTransactionIds = useSelector(
     (state) => state.parameters.selectedTransactionIds
@@ -81,7 +83,7 @@ const TransactionEdit = () => {
   const addMutation = useMutation({
     mutationFn: postTransaction,
     onSuccess: (data) => {
-      queryClient.invalidateQueries(["transactions", bankAccountName])
+      queryClient.invalidateQueries("transactions")
       dispatch(setNewTransactionId(data.id))
       dispatch(setSelectedTransactionIds([data.id]))
       setToastMessage("Transaction ajoutée")
@@ -95,7 +97,7 @@ const TransactionEdit = () => {
   const updateMutation = useMutation({
     mutationFn: updateTransaction,
     onSuccess: () => {
-      queryClient.invalidateQueries(["transactions", bankAccountName])
+      queryClient.invalidateQueries("transactions")
       setToastMessage("Transaction modifiée")
       setToastOpen(true)
     },
@@ -107,7 +109,7 @@ const TransactionEdit = () => {
   const deleteMutation = useMutation({
     mutationFn: deleteTransactions,
     onSuccess: (data) => {
-      queryClient.invalidateQueries(["transactions", bankAccountName])
+      queryClient.invalidateQueries("transactions")
       setToastMessage(`${data.deletedCount} transaction(s) supprimée(s)`)
       setToastOpen(true)
     },

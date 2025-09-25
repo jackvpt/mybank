@@ -51,6 +51,7 @@ const Transactions = () => {
     (state) => state.parameters.bankAccount.name
   )
   const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
+
   const selectedTransactionIds = useSelector(
     (state) => state.parameters.selectedTransactionIds
   )
@@ -133,7 +134,7 @@ const Transactions = () => {
       }
       dispatch(setNewTransactionId(null))
     }
-  }, [transactions, transactionsTableScrollPosition, dispatch])
+  }, [transactionsTableScrollPosition, dispatch])
 
   if (isLoadingTransactions) return <p>Chargement des transactions...</p>
   if (errorTransactions) return <p>Erreur : {errorTransactions.message}</p>
@@ -298,7 +299,7 @@ const Transactions = () => {
                     {visibleColumns.find(
                       (col) => col.id === "balance" && col.show
                     ) && (
-                      <TableCell align="right">{balance.toFixed(2)}</TableCell>
+                      <TableCell align="right" className={`cell__balance ${balance > 0 ? "" : "cell__balance-negative"}`}>{balance.toFixed(2)}</TableCell>
                     )}
                     {visibleColumns.find(
                       (col) => col.id === "status" && col.show

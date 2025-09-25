@@ -8,7 +8,6 @@ import storage from "redux-persist/lib/storage" // defaults to localStorage
 import parametersSlice from "../features/parametersSlice"
 import userSlice from "../features/userSlice"
 
-
 /**
  * Root reducer combining all slices of the Redux store.
  *
@@ -16,8 +15,8 @@ import userSlice from "../features/userSlice"
  * @constant
  */
 const rootReducer = combineReducers({
+  user: userSlice, // User state, will be persisted
   parameters: parametersSlice, // Volatile state, not persisted
-    user: userSlice, // User state, will be persisted
 })
 
 /**
@@ -33,7 +32,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user"], // Only 'user' slice is persisted
+  whitelist: ["user", "parameters"], // Only 'user' and 'parameters' slices are persisted
 }
 
 /**
@@ -65,4 +64,3 @@ export const store = configureStore({
  * @returns {import('redux-persist').Persistor} The persistor instance.
  */
 export const persistor = persistStore(store)
-

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import Router from "./router/Router"
 import { fetchAllSettings } from "./api/settings"
 import { fetchAllCategories } from "./api/categories"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import { useEffect } from "react"
 import {
   clearSelectedCheckTransactionIds,
@@ -19,13 +19,11 @@ function App() {
   const dispatch = useDispatch()
 
   // Token validation
-  const { isAuthLoading, errorAuthToken } = useAuthToken()
+  const { isAuthLoading } = useAuthToken()
 
-  const { isLoading: isLoadingBankAccounts, error: errorBankAccounts, data: bankAccounts } =
-    useFetchBankAccounts()
+  const { isLoading: isLoadingBankAccounts } = useFetchBankAccounts()
 
-  const { isLoading: isLoadingTransactions, error: errorTransactions } =
-    useFetchTransactions()
+  const { isLoading: isLoadingTransactions } = useFetchTransactions()
 
   useQuery({
     queryKey: ["recurringTransactions"],
