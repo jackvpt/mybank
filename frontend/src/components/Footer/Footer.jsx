@@ -4,7 +4,7 @@ import HomeIcon from "@mui/icons-material/Home"
 import ViewListIcon from "@mui/icons-material/ViewList"
 import RepeatIcon from "@mui/icons-material/Repeat"
 import CheckIcon from "@mui/icons-material/Checklist"
-import LogOutIcon from "@mui/icons-material/LogOut"
+import LogOutIcon from "@mui/icons-material/Logout"
 import { NavLink, useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 
