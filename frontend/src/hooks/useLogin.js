@@ -34,7 +34,6 @@ export function useLogin() {
       } else {
         sessionStorage.setItem("token", data.token)
       }
-
       return data
     },
     onSuccess: (data) => {

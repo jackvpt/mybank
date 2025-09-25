@@ -1,9 +1,9 @@
-import React, { useState } from "react"
-import { Link } from "react-router-dom"
+import { useState } from "react"
 import "./Login.scss"
 import {
   Button,
   Checkbox,
+  CircularProgress,
   FormControl,
   FormControlLabel,
   FormHelperText,
@@ -44,8 +44,7 @@ const Login = () => {
 
   const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const submitForm = () => {
     setSubmitted(true)
     if (!isValidEmail(formData.email)) return
     loginMutation.mutate({
@@ -57,78 +56,90 @@ const Login = () => {
 
   return (
     <section className="container-login">
-      <form onSubmit={handleSubmit} noValidate>
-        {/* Email Field */}
-        <FormControl
-          fullWidth
-          sx={{ mb: 2, maxWidth: 400 }}
-          variant="outlined"
-          error={submitted && !isValidEmail(formData.email)}
-        >
-          <InputLabel htmlFor="email">Email</InputLabel>
-          <OutlinedInput
-            id="email"
-            type="email"
-            name="email"
-            label="Email"
-            value={formData.email}
-            onChange={handleFormChange}
-          />
-          {submitted && !isValidEmail(formData.email) && (
-            <FormHelperText>Adresse email invalide</FormHelperText>
-          )}
-        </FormControl>
-
-        {/* Password Field */}
-        <FormControl
-          fullWidth
-          sx={{ mb: 2, maxWidth: 300 }}
-          variant="outlined"
-          error={submitted}
-        >
-          <InputLabel htmlFor="password">Mot de passe</InputLabel>
-          <OutlinedInput
-            id="password"
-            type={showPassword ? "text" : "password"}
-            name="password"
-            value={formData.password}
-            onChange={handleFormChange}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={handleToggleVisibility}
-                  edge="end"
-                  aria-label="toggle password visibility"
-                >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            }
-            label="Mot de passe"
-          />
-        </FormControl>
-
-        {/** Remember Me Checkbox */}
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={formData.rememberMe}
-              name="rememberMe"
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  rememberMe: e.target.checked,
-                }))
-              }
-            />
-          }
-          label="Se souvenir de moi"
+      <h1>Login</h1>
+      {/* Email Field */}
+      <FormControl
+        fullWidth
+        sx={{ mb: 2, maxWidth: 300 }}
+        variant="outlined"
+        error={submitted && !isValidEmail(formData.email)}
+      >
+        <InputLabel htmlFor="email">Email</InputLabel>
+        <OutlinedInput
+          id="email"
+          type="email"
+          name="email"
+          label="Email"
+          value={formData.email}
+          onChange={handleFormChange}
         />
+        {submitted && !isValidEmail(formData.email) && (
+          <FormHelperText>Adresse email invalide</FormHelperText>
+        )}
+      </FormControl>
 
-        <Button type="submit" variant="contained" disabled={!isFormValid}>
-          Connexion
-        </Button>
-      </form>
+      {/* Password Field */}
+      <FormControl
+        fullWidth
+        sx={{ mb: 2, maxWidth: 300 }}
+        variant="outlined"
+        error={submitted}
+      >
+        <InputLabel htmlFor="password">Mot de passe</InputLabel>
+        <OutlinedInput
+          id="password"
+          type={showPassword ? "text" : "password"}
+          name="password"
+          value={formData.password}
+          onChange={handleFormChange}
+          endAdornment={
+            <InputAdornment position="end">
+              <IconButton
+                onClick={handleToggleVisibility}
+                edge="end"
+                aria-label="toggle password visibility"
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          }
+          label="Mot de passe"
+        />
+      </FormControl>
+
+      {/** Remember Me Checkbox */}
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={formData.rememberMe}
+            name="rememberMe"
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                rememberMe: e.target.checked,
+              }))
+            }
+          />
+        }
+        label="Se souvenir de moi"
+      />
+
+      {/* LOGIN BUTTON */}
+      <Button
+        variant="contained"
+        color="primary"
+        fullWidth
+        sx={{ maxWidth: 300 }}
+        size="large"
+        onClick={submitForm}
+        disabled={!isFormValid || loginMutation.isPending}
+      >
+        {loginMutation.isPending ? (
+          <CircularProgress size={24} color="inherit" />
+        ) : (
+          "Log in"
+        )}
+      </Button>
     </section>
   )
 }

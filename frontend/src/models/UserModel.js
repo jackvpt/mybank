@@ -44,7 +44,5 @@ export default class UserModel {
 
     /** @type {Date} */
     this.updatedAt = new Date(data.updatedAt)
-
-    console.log("UserModel instance created:", this)
   }
 }
