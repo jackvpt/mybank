@@ -26,9 +26,10 @@
 
   &__tools {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: baseline;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 10px;
+    align-items: center;
     margin: 10px 0;
 
     .toggle-tools {
@@ -50,6 +51,12 @@
     .date-form-control .MuiSelect-root {
       font-size: 0.8rem;
       height: 34px;
+    }
+
+    @include responsive-tablet {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: baseline;
     }
   }
 
@@ -79,7 +86,7 @@
     }
   }
 
-  .cell__balance{
+  .cell__balance {
     font-weight: bold;
 
     &-negative {

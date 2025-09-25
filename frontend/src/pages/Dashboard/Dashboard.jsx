@@ -5,10 +5,11 @@ import { fetchAllTransactions } from "../../api/transactions"
 import { useFetchBankAccounts } from "../../hooks/useFetchBankAccounts"
 
 const Dashboard = () => {
-
-
-    const { isLoading: isLoadingBankAccounts ,error:bankAccountsError,data:bankAccounts} = useFetchBankAccounts()
-  
+  const {
+    isLoading: isLoadingBankAccounts,
+    error: bankAccountsError,
+    data: bankAccounts,
+  } = useFetchBankAccounts()
 
   const {
     data: transactions,
@@ -21,7 +22,8 @@ const Dashboard = () => {
 
   if (isLoadingBankAccounts || isLoadingTransactions)
     return <p>Chargement des données...</p>
-  if (bankAccountsError) return <p>Erreur comptes : {bankAccountsError.message}</p>
+  if (bankAccountsError)
+    return <p>Erreur comptes : {bankAccountsError.message}</p>
   if (transactionsError)
     return <p>Erreur transactions : {transactions.message}</p>
 

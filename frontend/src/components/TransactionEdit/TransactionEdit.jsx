@@ -321,10 +321,13 @@ const TransactionEdit = () => {
               setFormData((prev) => ({ ...prev, date: newValue }))
             }
             format="dd/MM/yyyy"
-            sx={{ width: "auto", minWidth: 150, maxWidth: 180 }}
             slotProps={{
               textField: {
                 size: "small",
+                sx: {
+                  width: "100%", // Full width for mobile
+                  maxWidth: { sm: "180px" }, // Maximum width for tablet and laptop
+                },
               },
             }}
           />
@@ -335,7 +338,7 @@ const TransactionEdit = () => {
             variant="outlined"
             required
             size="small"
-            sx={{ width: "auto", minWidth: 240 }}
+            sx={{ width: "100%", maxWidth: { sm: "240px" } }}
           >
             <InputLabel id="type-label">Type</InputLabel>
             <Select
@@ -369,7 +372,7 @@ const TransactionEdit = () => {
                 }))
               }
               size="small"
-              sx={{ width: 120 }}
+              sx={{ width: "100%", maxWidth: { sm: "240px" } }}
             />
           )}
 
@@ -380,7 +383,7 @@ const TransactionEdit = () => {
               variant="outlined"
               required
               size="small"
-              sx={{ width: "auto", minWidth: 240 }}
+              sx={{ width: "100%", maxWidth: { sm: "240px" } }}
             >
               <InputLabel id="type-label">Destination</InputLabel>
               <Select
@@ -419,7 +422,7 @@ const TransactionEdit = () => {
               fullWidth
               variant="outlined"
               size="small"
-              sx={{ width: "auto", minWidth: 350 }}
+              sx={{ width: "100%", maxWidth: { sm: "350px" } }}
             />
           )}
 
@@ -437,7 +440,7 @@ const TransactionEdit = () => {
             onBlur={() => handleAmountBlur()}
             placeholder="0.00"
             size="small"
-            sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
+            sx={{ width: "100%", maxWidth: { sm: "240px" } }}
           />
 
           {/* CATEGORIES SELECT */}
@@ -445,7 +448,11 @@ const TransactionEdit = () => {
             <FormControl
               fullWidth
               size="small"
-              sx={{ width: "auto", minWidth: 240 }}
+              sx={{
+                width: "100%", // Full width for mobile
+                maxWidth: { sm: "180px" }, // Maximum width for tablet and laptop
+                minWidth: 240, // Ensuring a minimum width for the component
+              }}
             >
               <InputLabel>Catégorie</InputLabel>
               <Select
@@ -494,7 +501,11 @@ const TransactionEdit = () => {
             <FormControl
               fullWidth
               size="small"
-              sx={{ width: "auto", minWidth: 240 }}
+              sx={{
+                width: "100%", // Full width for mobile
+                maxWidth: { sm: "180px" }, // Maximum width for tablet and laptop
+                minWidth: 240, // Ensuring a minimum width for the component
+              }}
             >
               <InputLabel>Sous catégorie</InputLabel>
               <Select
@@ -536,7 +547,11 @@ const TransactionEdit = () => {
               }))
             }
             size="small"
-            sx={{ minWidth: 200 }}
+            sx={{
+              width: "100%",
+              minWidth: { sm: "200px" },
+              maxWidth: { sm: "350px" },
+            }}
           />
 
           {/* DELETE TRANSACTION BUTTON */}
@@ -546,7 +561,8 @@ const TransactionEdit = () => {
             disabled={selectedTransactionIds.length === 0}
             onClick={() => handleOpenConfirm(selectedTransactionIds)}
             sx={{
-              minWidth: 140,
+              width: "100%",
+              maxWidth: { sm: "160px" },
               backgroundColor: "red",
               color: "#fff",
               "&:hover": {
@@ -574,7 +590,8 @@ const TransactionEdit = () => {
             disabled={formHasErrors() || selectedTransactionIds.length !== 1}
             onClick={handleModifyTransaction}
             sx={{
-              minWidth: 140,
+              width: "100%",
+              maxWidth: { sm: "160px" },
               backgroundColor: "#1976d2",
               color: "#fff",
               "&:hover": {
@@ -602,7 +619,8 @@ const TransactionEdit = () => {
             disabled={formHasErrors()}
             onClick={handleAddTransaction}
             sx={{
-              minWidth: 140,
+              width: "100%",
+              maxWidth: { sm: "160px" },
               backgroundColor: "green",
               color: "#fff",
               "&:hover": {
