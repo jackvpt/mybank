@@ -47,7 +47,7 @@ import {
   setSelectedTransactionIds,
 } from "../../features/parametersSlice"
 import { useAddTransaction } from "../../hooks/useAddTransaction"
-import ResponsiveDatePicker from "../ResponsiveDatePicker/ResponsiveDatePicker"
+import ResponsiveDatePicker from "../sub-components/ResponsiveDatePicker/ResponsiveDatePicker"
 import AmountTextField from "../AmountTextField/AmountTextField"
 
 const TransactionEdit = () => {

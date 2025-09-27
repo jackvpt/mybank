@@ -45,7 +45,7 @@ import {
   updateRecurringTransaction,
 } from "../../api/recurringTransactions"
 import { fr } from "date-fns/locale"
-import ResponsiveDatePicker from "../ResponsiveDatePicker/ResponsiveDatePicker"
+import ResponsiveDatePicker from "../sub-components/ResponsiveDatePicker/ResponsiveDatePicker"
 import AmountTextField from "../AmountTextField/AmountTextField"
 
 const RecurringTransactionEdit = () => {

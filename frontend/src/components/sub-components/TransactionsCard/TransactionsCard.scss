@@ -1,0 +1,19 @@
+@use "../../../styles/utils/variables" as *;
+@use "../../../styles/utils/mixins" as *;
+
+.transaction-card{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid black;
+    padding:5px;
+
+    &__label{
+        font-weight: bold;
+    }
+
+    .positive{
+        color: green;
+    }
+}

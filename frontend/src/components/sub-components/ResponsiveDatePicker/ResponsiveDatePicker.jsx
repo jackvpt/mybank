@@ -2,7 +2,7 @@ import { useMediaQuery, TextField } from "@mui/material"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 
 const ResponsiveDatePicker = ({ value, onChange }) => {
-  const isMobile = useMediaQuery("(max-width:600px)")
+  const isMobile = useMediaQuery("(max-width:768px)")
 
   return (
     <>
@@ -12,10 +12,15 @@ const ResponsiveDatePicker = ({ value, onChange }) => {
           type="date"
           value={value || ""}
           onChange={(e) => onChange(e.target.value)}
-          sx={{ width: "100%" }}
+          sx={{
+            width: "100%",
+            "& .MuiInputBase-input": {
+              height: "1.5em", 
+              padding: "12px", 
+            },
+          }}
           slotProps={{
-            inputLabel: { shrink: true }, // replace InputLabelProps
-            input: { readOnly: false }, // replace InputProps
+            inputLabel: { shrink: true },
           }}
         />
       ) : (
