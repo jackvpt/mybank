@@ -48,6 +48,7 @@ import {
 } from "../../features/parametersSlice"
 import { useAddTransaction } from "../../hooks/useAddTransaction"
 import ResponsiveDatePicker from "../ResponsiveDatePicker/ResponsiveDatePicker"
+import AmountTextField from "../AmountTextField/AmountTextField"
 
 const TransactionEdit = () => {
   const queryClient = useQueryClient()
@@ -419,7 +420,7 @@ const TransactionEdit = () => {
           )}
 
           {/* AMOUNT */}
-          <TextField
+          {/* <TextField
             type="text"
             label="Montant"
             value={formData.amount}
@@ -433,6 +434,16 @@ const TransactionEdit = () => {
             placeholder="0.00"
             size="small"
             sx={{ width: "100%", maxWidth: { sm: "240px" } }}
+          /> */}
+          <AmountTextField
+            value={formData.amount}
+            onChange={(value) =>
+              setFormData((prev) => ({
+                ...prev,
+                amount: value,
+              }))
+            }
+            onBlur={() => handleAmountBlur()}
           />
 
           {/* CATEGORIES SELECT */}

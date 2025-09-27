@@ -26,7 +26,6 @@ const Dashboard = () => {
     return <p>Erreur comptes : {bankAccountsError.message}</p>
   if (transactionsError)
     return <p>Erreur transactions : {transactions.message}</p>
-
   return (
     <section className="container-dashboard">
       {bankAccounts.map((account) => {

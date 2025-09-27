@@ -45,6 +45,8 @@ import {
   updateRecurringTransaction,
 } from "../../api/recurringTransactions"
 import { fr } from "date-fns/locale"
+import ResponsiveDatePicker from "../ResponsiveDatePicker/ResponsiveDatePicker"
+import AmountTextField from "../AmountTextField/AmountTextField"
 
 const RecurringTransactionEdit = () => {
   const queryClient = useQueryClient()
@@ -244,7 +246,7 @@ const RecurringTransactionEdit = () => {
           label: `Virement vers ${formData.destination}`,
         }))
       }
-      console.log('formData :>> ', formData);
+      console.log("formData :>> ", formData)
       addMutation.mutate(formData)
     }
   }
@@ -313,19 +315,11 @@ const RecurringTransactionEdit = () => {
               dateAdapter={AdapterDateFns}
               adapterLocale={fr}
             >
-              <DatePicker
-                label="Date"
+              <ResponsiveDatePicker
                 value={formData.date}
                 onChange={(newValue) =>
                   setFormData((prev) => ({ ...prev, date: newValue }))
                 }
-                format="dd/MM/yyyy"
-                sx={{ width: "auto", minWidth: 150, maxWidth: 180 }}
-                slotProps={{
-                  textField: {
-                    size: "small",
-                  },
-                }}
               />
             </LocalizationProvider>
           </ThemeProvider>
@@ -455,20 +449,15 @@ const RecurringTransactionEdit = () => {
           )}
 
           {/* AMOUNT */}
-          <TextField
-            type="text"
-            label="Montant"
-            value={Number(formData.amount).toFixed(2)}
-            onChange={(e) =>
+          <AmountTextField
+            value={formData.amount}
+            onChange={(value) =>
               setFormData((prev) => ({
                 ...prev,
-                amount: e.target.value,
+                amount: value,
               }))
             }
             onBlur={() => handleAmountBlur()}
-            placeholder="0.00"
-            size="small"
-            sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
           />
 
           {/* CATEGORIES SELECT */}

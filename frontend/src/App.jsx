@@ -19,7 +19,7 @@ function App() {
   const dispatch = useDispatch()
 
   // Token validation
-  const { isAuthLoading } = useAuthToken()
+  const { isLoading: isAuthLoading } = useAuthToken()
 
   const { isLoading: isLoadingBankAccounts } = useFetchBankAccounts()
 
@@ -52,6 +52,7 @@ function App() {
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [dispatch])
+
 
   if (isAuthLoading || isLoadingBankAccounts || isLoadingTransactions)
     return <Loader />
