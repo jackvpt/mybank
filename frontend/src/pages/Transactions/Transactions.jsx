@@ -17,6 +17,8 @@ import { useFetchTransactions } from "../../hooks/useFetchTransactions"
 import TransactionsTable from "../../components/sub-components/TransactionsTable/TransactionsTable"
 import TransactionsCard from "../../components/sub-components/TransactionsCard/TransactionsCard.jsx"
 
+import { format } from "date-fns"
+
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
 })
@@ -83,6 +85,17 @@ const Transactions = () => {
 
   const filteredTransactions = getFilteredTransactions()
 
+  const groupedTransactions = filteredTransactions
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .reduce((groups, tx) => {
+      const dateKey = format(new Date(tx.date), "yyyy-MM-dd")
+      if (!groups[dateKey]) {
+        groups[dateKey] = []
+      }
+      groups[dateKey].push(tx)
+      return groups
+    }, {})
+
   return (
     <section className="container-transactions">
       <div className="container-transactions__tools">
@@ -110,16 +123,15 @@ const Transactions = () => {
       </div>
 
       {isTransactionEditWindowVisible && <TransactionEdit />}
-      {isMobile ? 
-      filteredTransactions.map((tx) => (
-          <TransactionsCard key={tx.id} transaction={tx} />
-      )) 
-      
-      
-      
-      
-      
-      : (
+      {isMobile ? (
+        Object.entries(groupedTransactions).map(([date, transactions]) => (
+          <TransactionsCard
+            key={date}
+            date={date}
+            transactions={transactions}
+          />
+        ))
+      ) : (
         <TransactionsTable filteredTransactions={filteredTransactions} />
       )}
     </section>

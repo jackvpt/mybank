@@ -1,19 +1,38 @@
 @use "../../../styles/utils/variables" as *;
 @use "../../../styles/utils/mixins" as *;
 
-.transaction-card{
+.transaction-card {
+  margin-bottom: 15px;
+
+  &__date{
+    margin-bottom: 5px;;
+  }
+  &__transactions {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+    background-color: $primary-color-4;
+    border-radius: 3px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
+  }
+  &__content {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid black;
-    padding:5px;
+    padding: 5px;
+    cursor: pointer;
 
-    &__label{
-        font-weight: bold;
+    &:hover{
+      background-color: lighten($primary-color-4, 10%);
     }
 
-    .positive{
-        color: green;
+    &__label {
+      font-weight: bold;
     }
+
+    .positive {
+      color: green;
+    }
+  }
 }
