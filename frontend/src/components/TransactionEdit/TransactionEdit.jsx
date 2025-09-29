@@ -27,8 +27,6 @@ import {
   ListSubheader,
   CircularProgress,
 } from "@mui/material"
-import { useMediaQuery } from "@mui/material"
-import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker"
 
 import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
 
@@ -42,17 +40,13 @@ import {
   updateTransaction,
   deleteTransactions,
 } from "../../api/transactions"
-import {
-  setNewTransactionId,
-  setSelectedTransactionIds,
-} from "../../features/parametersSlice"
+
 import { useAddTransaction } from "../../hooks/useAddTransaction"
 import ResponsiveDatePicker from "../sub-components/ResponsiveDatePicker/ResponsiveDatePicker"
 import AmountTextField from "../AmountTextField/AmountTextField"
 
 const TransactionEdit = () => {
   const queryClient = useQueryClient()
-
 
   const [toastOpen, setToastOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState("")
@@ -238,24 +232,34 @@ const TransactionEdit = () => {
   const handleAddTransaction = (e) => {
     e.preventDefault()
     if (!formHasErrors()) {
-      if (formData.type === "transfer") {
-        setFormData((prev) => ({
-          ...prev,
-          label: `Virement vers ${formData.destination}`,
-        }))
-        addTransactionMutation.mutate(formData)
+      const debitTransaction = {
+        ...formData,
+        label: `Virement vers ${formData.destination}`,
+      }
 
-        const creditTransaction = {
-          ...formData,
-          account: formData.destination,
-          debit: 0,
-          credit: formData.amount,
-          label: `Virement depuis ${formData.account}`,
-          destination: "",
-        }
-        addTransactionMutation.mutate(creditTransaction)
-      } else {
-        addTransactionMutation.mutate(formData)
+      const creditTransaction = {
+        ...formData,
+        account: formData.destination,
+        debit: 0,
+        credit: formData.amount,
+        label: `Virement depuis ${formData.account}`,
+        destination: "",
+      }
+
+      switch (formData.type) {
+        case "transfer":
+          setFormData((prev) => ({
+            ...prev,
+            label: `Virement vers ${formData.destination}`,
+          }))
+          addTransactionMutation.mutate(debitTransaction)
+
+          addTransactionMutation.mutate(creditTransaction)
+          break
+
+        default:
+          addTransactionMutation.mutate(formData)
+          break
       }
     }
   }
@@ -272,10 +276,16 @@ const TransactionEdit = () => {
     if (value !== "" && !isNaN(Number(value))) {
       const formatted = parseFloat(value).toFixed(2)
       formData.amount = formatted
-      if (formData.type === "deposit") {
-        setFormData((prev) => ({ ...prev, credit: formatted }))
-      } else {
-        setFormData((prev) => ({ ...prev, debit: formatted }))
+      switch (formData.type) {
+        case "transfer":
+          formData.label = `Virement vers ${formData.destination}`
+          break
+        case "directdeposit":
+          setFormData((prev) => ({ ...prev, credit: formatted }))
+          break
+        default:
+          setFormData((prev) => ({ ...prev, debit: formatted }))
+          break
       }
     }
   }

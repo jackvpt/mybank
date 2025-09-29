@@ -8,6 +8,7 @@
   &__date {
     margin-bottom: 5px;
   }
+
   &__transactions {
     display: flex;
     flex-direction: column;
@@ -21,7 +22,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 5px;
+    padding: 5px 10px;
     cursor: pointer;
 
     &:hover {

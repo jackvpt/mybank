@@ -2,25 +2,27 @@
 
 html,
 body {
-  height: 100%;
   margin: 0;
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  scrollbar-gutter: stable; // To manage the space for the vertical scrollbar
 }
 
 #root {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  height: 100%;
+  height: 100vh;
+  height: 100dvh; // For smartphone devices
 }
 
 main {
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 0;
+  overflow-y: auto;
+
   padding: 10px;
 
   @include responsive-desktop {

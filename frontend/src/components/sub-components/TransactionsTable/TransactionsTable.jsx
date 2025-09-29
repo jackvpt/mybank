@@ -20,8 +20,6 @@ import {
   setTransactionsTableScrollPosition,
 } from "../../../features/parametersSlice"
 
-
-
 const visibleColumnsConfig = (isMobile) => [
   { id: "date", label: "Date", show: true },
   { id: "label", label: "Libellé", show: true },
@@ -35,7 +33,6 @@ const TransactionsTable = ({ filteredTransactions }) => {
   const dispatch = useDispatch()
   const tableContainerRef = useRef(null)
   const transactionRefs = useRef({})
-
 
   const handleScroll = (e) => {
     dispatch(setTransactionsTableScrollPosition(e.currentTarget.scrollTop))
