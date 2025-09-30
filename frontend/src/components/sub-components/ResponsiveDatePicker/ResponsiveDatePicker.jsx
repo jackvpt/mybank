@@ -19,9 +19,9 @@ const ResponsiveDatePicker = ({ value, onChange }) => {
             //   padding: "12px", 
             // },
           }}
-          slotProps={{
-            inputLabel: { shrink: true },
-          }}
+          // slotProps={{
+          //   inputLabel: { shrink: true },
+          // }}
         />
       ) : (
         <DatePicker
