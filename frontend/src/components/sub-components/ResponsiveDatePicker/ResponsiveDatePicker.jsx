@@ -16,7 +16,7 @@ const ResponsiveDatePicker = ({ value, onChange }) => {
             width: "100%",
             "& .MuiInputBase-input": {
               height: "auto",
-              padding: "16px 12px",
+              padding: "36px 12px",
               fontSize: "1rem",
             },
           }}
