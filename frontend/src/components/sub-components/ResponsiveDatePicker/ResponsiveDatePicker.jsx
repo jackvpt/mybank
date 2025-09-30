@@ -12,16 +12,6 @@ const ResponsiveDatePicker = ({ value, onChange }) => {
           type="date"
           value={value || ""}
           onChange={(e) => onChange(e.target.value)}
-          sx={{
-            width: "100%",
-            // "& .MuiInputBase-input": {
-            //   height: "1.5em", 
-            //   padding: "12px", 
-            // },
-          }}
-          // slotProps={{
-          //   inputLabel: { shrink: true },
-          // }}
         />
       ) : (
         <DatePicker
