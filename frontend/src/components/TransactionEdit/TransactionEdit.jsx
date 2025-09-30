@@ -44,6 +44,7 @@ import {
 import { useAddTransaction } from "../../hooks/useAddTransaction"
 import ResponsiveDatePicker from "../sub-components/ResponsiveDatePicker/ResponsiveDatePicker"
 import AmountTextField from "../AmountTextField/AmountTextField"
+import ResponsiveSelect from "../sub-components/ResponsiveSelect/ResponsiveSelect"
 
 const TransactionEdit = () => {
   const queryClient = useQueryClient()
@@ -335,13 +336,21 @@ const TransactionEdit = () => {
             }
           />
 
-          {/* TYPE SELECT */}
+          <ResponsiveSelect
+            label="Type"
+            name="type"
+            value={formData.type}
+            onChange={(val) => setFormData((prev) => ({ ...prev, type: val }))}
+            options={transactionTypes}
+          />
+
+          {/* TYPE SELECT
           <FormControl
             fullWidth
             variant="outlined"
             required
             size="small"
-            sx={{ width: "100%", maxWidth: { sm: "240px" } }}
+            sx={{ width: "100%", maxWidth: { md: "240px" } }}
           >
             <InputLabel id="type-label">Type</InputLabel>
             <Select
@@ -360,7 +369,7 @@ const TransactionEdit = () => {
                 </MenuItem>
               ))}
             </Select>
-          </FormControl>
+          </FormControl> */}
 
           {/* CHECK NUMBER */}
           {formData.type === "check" && (
