@@ -12,12 +12,22 @@ const ResponsiveDatePicker = ({ value, onChange }) => {
           type="date"
           value={value || ""}
           onChange={(e) => onChange(e.target.value)}
+          InputLabelProps={{
+            shrink: true, // évite que le label chevauche
+          }}
           sx={{
             width: "100%",
+            "& .MuiInputBase-root": {
+              height: "56px", // même hauteur qu'un TextField standard
+            },
             "& .MuiInputBase-input": {
-              height: "auto",
-              padding: "36px 12px",
+              padding: "16.5px 14px", // padding interne identique aux autres champs
               fontSize: "1rem",
+              boxSizing: "border-box",
+            },
+            "& input[type='date']::-webkit-calendar-picker-indicator": {
+              cursor: "pointer",
+              marginRight: 2,
             },
           }}
         />
