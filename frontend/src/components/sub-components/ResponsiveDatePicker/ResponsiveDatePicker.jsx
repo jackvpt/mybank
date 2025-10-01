@@ -10,8 +10,8 @@ const ResponsiveDatePicker = ({ value, onChange }) => {
         <TextField
           label="Date"
           type="date"
-          value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
+          value={value}
+          onChange={onChange}
           InputLabelProps={{
             shrink: true, // évite que le label chevauche
           }}
