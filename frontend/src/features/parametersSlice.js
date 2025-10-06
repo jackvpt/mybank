@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit"
 
-const initialState = {
+export const initialState = {
   bankAccount: { name: null, id: null, initialBalance: null },
   isTransactionEditWindowVisible: true,
   isRecurringEditWindowVisible: true,

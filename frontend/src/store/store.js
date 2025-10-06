@@ -1,66 +1,77 @@
-// 📦 React imports
+// 📦 Redux Toolkit imports
 import { configureStore, combineReducers } from "@reduxjs/toolkit"
-import { persistStore, persistReducer } from "redux-persist"
+import { persistStore, persistReducer, createTransform } from "redux-persist"
+import storage from "redux-persist/lib/storage"
 
-import storage from "redux-persist/lib/storage" // defaults to localStorage
-
-// 🗃️ State & Data fetching
-import parametersSlice from "../features/parametersSlice"
+// 🗃️ Feature slices
 import userSlice from "../features/userSlice"
+import parametersSlice, { initialState as parametersInitialState } from "../features/parametersSlice"
 
 /**
- * Root reducer combining all slices of the Redux store.
+ * 🎯 Transform for the 'parameters' slice.
  *
- * @category Redux
- * @constant
+ * Only selected keys will be persisted.
+ * Non-persisted fields (like temporary UI state) will be reset
+ * to their initialState after a refresh.
+ */
+const parametersTransform = createTransform(
+  // ➡️ Transform before saving to storage
+  (inboundState) => ({
+    bankAccount: inboundState.bankAccount,
+    isTransactionEditWindowVisible: inboundState.isTransactionEditWindowVisible,
+    isRecurringEditWindowVisible: inboundState.isRecurringEditWindowVisible,
+    isCheckTransactionsEditWindowVisible: inboundState.isCheckTransactionsEditWindowVisible,
+    transactionsTableScrollPosition: inboundState.transactionsTableScrollPosition,
+  }),
+
+  // ⬅️ Transform after rehydration
+  (outboundState) => ({
+    ...parametersInitialState, // restore all non-persisted fields
+    ...outboundState,           // overwrite persisted fields
+  }),
+
+  // Apply this transform only to the 'parameters' slice
+  { whitelist: ["parameters"] }
+)
+
+/**
+ * 🧱 Root reducer combining all slices.
  */
 const rootReducer = combineReducers({
-  user: userSlice, // User state, will be persisted
-  parameters: parametersSlice, // Volatile state, not persisted
+  user: userSlice,          // fully persisted slice
+  parameters: parametersSlice, // partial persistence controlled via transform
+  // add other slices here if needed
 })
 
 /**
- * Configuration object for redux-persist.
+ * ⚙️ Root persist configuration.
  *
- * @category Redux
- * @constant
- * @type {object}
- * @property {string} key - Key for storage.
- * @property {object} storage - Storage engine (localStorage).
- * @property {string[]} whitelist - Slices of state to persist.
+ * Controls which top-level slices are persisted.
  */
-const persistConfig = {
+const rootPersistConfig = {
   key: "root",
   storage,
-  whitelist: ["user", "parameters"], // Only 'user' and 'parameters' slices are persisted
+  whitelist: ["user", "parameters"], // only these slices are persisted
+  transforms: [parametersTransform], // apply selective transform
 }
 
 /**
- * Creates a persisted reducer with the configuration and root reducer.
- *
- * @category Redux
- * @constant
+ * 🧠 Create the global persisted reducer.
  */
-const persistedReducer = persistReducer(persistConfig, rootReducer)
+const persistedReducer = persistReducer(rootPersistConfig, rootReducer)
 
 /**
- * Configures the Redux store with Redux Toolkit.
- *
- * @category Redux
- * @returns {import('@reduxjs/toolkit').EnhancedStore} The configured Redux store.
+ * 🏗️ Configure Redux store using Redux Toolkit.
  */
 export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // Disable warnings from redux-persist
+      serializableCheck: false, // ignore redux-persist warnings
     }),
 })
 
 /**
- * Creates the persistor to enable persisting the store.
- *
- * @category Redux
- * @returns {import('redux-persist').Persistor} The persistor instance.
+ * 💾 Create persistor instance to enable store persistence.
  */
 export const persistor = persistStore(store)
