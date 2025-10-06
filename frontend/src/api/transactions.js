@@ -106,6 +106,12 @@ export const deleteTransaction = async (id) => {
   }
 }
 
+/**
+ * Deletes multiple transactions by their IDs.
+ * @param {string[]} transactionsIds - The IDs of the transactions to delete.
+ * @returns {Promise<Object>} - The response data from the API.
+ * @throws {Error} - Throws an error if the request fails.
+ */
 export const deleteTransactions = async (transactionsIds) => {
   if (!Array.isArray(transactionsIds) || transactionsIds.length === 0) {
     throw new Error("Aucune transaction à supprimer.")

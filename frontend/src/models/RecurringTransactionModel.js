@@ -22,7 +22,10 @@ export default class RecurringTransactionModel {
     this.id = data._id
 
     /** @type {string} */
-    this.account = data.account
+    this.accountID = data.accountID
+
+    /** @type {string} */
+    this.accountName = data.accountName
 
     /** @type {Date} */
     this.date = new Date(data.date)

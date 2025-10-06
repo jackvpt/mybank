@@ -6,14 +6,12 @@ export default class TransactionModel {
    * Creates an instance of TransactionModel.
    *
    * @param {Object} data - The transaction data.
-<<<<<<< HEAD
+
    * @param {string} data.id - Unique identifier for the transaction.
    * @param {string} data.accountId - The ID of the account involved in the transaction.
    * @param {string} [data.accountName] - The name of the account (if available).
-=======
    * @param {string} data.accountId - The account id involved in the transaction.
    * @param {string} data.accountName - The account name involved in the transaction.
->>>>>>> 049dccb32c4e55e6b3f02ed41f016af6c8d9d908
    * @param {string|Date} data.date - The date of the transaction (ISO string or Date object).
    * @param {string} data.type - The type of transaction (e.g. "card", "check", "transfer", "auto debit").
    * @param {string} [data.checkNumber] - The check serial number (if applicable).
@@ -27,13 +25,16 @@ export default class TransactionModel {
    */
   constructor(data) {
     /** @type {string} */
-    this.id = data._id 
+    this.id = data._id
 
     /** @type {string} */
     this.accountId = data.accountId
 
     /** @type {string} */
-    this.accountName = data.accountName === "" || data.accountName === null ? data.account : data.accountName
+    this.accountName =
+      data.accountName === "" || data.accountName === null
+        ? data.account
+        : data.accountName
 
     /** @type {Date} */
     this.date = new Date(data.date)
@@ -55,27 +56,22 @@ export default class TransactionModel {
     this.label = data.label
 
     /** @type {string} */
-    this.category =convertCategory(data.category)
+    this.category = convertCategory(data.category)
 
     /** @type {string | undefined} */
     this.subCategory = data.subCategory
 
     /** @type {number} */
-    this.debit = data.debit ?? 0
+    this.amount = data.amount
 
     /** @type {number} */
-    this.credit = data.credit ?? 0
+    this.debit = data.amount < 0 ? -data.amount : 0
 
     /** @type {number} */
-    this.amount = this.debit > 0 ? this.debit : this.credit
+    this.credit = data.amount > 0 ? data.amount : 0
 
     /** @type {string} */
-    this.amountSummary =
-      this.debit > 0
-        ? `-${this.debit.toFixed(2)}€`
-        : this.credit > 0
-        ? `+${this.credit.toFixed(2)}€`
-        : "0.00€"
+    this.amountSummary = `${this.amount.toFixed(2)}€`
 
     /** @type {string} */
     this.status = data.status ?? null

@@ -1,7 +1,9 @@
 /** Imports */
+const mongoose = require('mongoose');
 const Transaction = require("../models/Transaction")
 
 const fs = require("fs")
+const recalcBalance = require("../utils/recalcBalance")
 
 /** GET All Transactions */
 exports.getAllTransactions = async (req, res) => {
@@ -26,6 +28,10 @@ exports.createTransaction = async (req, res) => {
     })
 
     await transaction.save()
+
+    // Recalculate account balance
+    await recalcBalance(transaction.accountId)
+
     res.status(201).json(transaction)
     console.log(
       `Transaction created: ${transaction._id} - ${transaction.label}`
@@ -49,6 +55,10 @@ exports.updateTransaction = async (req, res) => {
       { ...transactionObject, _id: req.params.id },
       { new: true }
     )
+
+    // Recalculate account balance
+    if (updatedTransaction) await recalcBalance(transaction.accountId)
+
     res.status(200).json(updatedTransaction)
     console.log(
       `Transaction updated: ${updatedTransaction._id} - ${updatedTransaction.label}`
@@ -62,6 +72,10 @@ exports.updateTransaction = async (req, res) => {
 exports.deleteTransaction = async (req, res) => {
   try {
     await Transaction.deleteOne({ _id: req.params.id })
+
+    // Recalculate account balance
+    await recalcBalance(transaction.accountId)
+
     res.status(200).json({ message: "Transaction deleted successfully!" })
     console.log(`Transaction deleted: ${req.params.id}`)
   } catch (error) {
@@ -82,7 +96,18 @@ exports.deleteTransactions = async (req, res) => {
   }
 
   try {
+    // Retrieve a transaction to get the accountId
+    const sampleTransaction = await Transaction.findOne({
+      _id: ids[0],
+    })
+    if (!sampleTransaction) {
+      return res.status(404).json({ error: "Transaction not found." })
+    }
+    const accountId = sampleTransaction.accountId
+
     const result = await Transaction.deleteMany({ _id: { $in: ids } })
+    // Recalculate account balance
+    await recalcBalance(accountId)
 
     res.status(200).json({
       message: "Transactions deleted successfully!",

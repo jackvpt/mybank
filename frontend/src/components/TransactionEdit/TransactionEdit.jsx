@@ -179,6 +179,7 @@ const TransactionEdit = () => {
     label: "",
     category: null,
     subCategory: "",
+    rawAmount: "",
     amount: 0,
     debit: 0,
     credit: 0,
@@ -273,21 +274,41 @@ const TransactionEdit = () => {
    * @param {string} field
    */
   const handleAmountBlur = () => {
-    const value = formData.amount.replace(",", ".")
-    if (value !== "" && !isNaN(Number(value))) {
-      const formatted = parseFloat(value).toFixed(2)
-      formData.amount = formatted
-      switch (formData.type) {
-        case "transfer":
-          formData.label = `Virement vers ${formData.destination}`
-          break
-        case "directdeposit":
-          setFormData((prev) => ({ ...prev, credit: formatted }))
-          break
-        default:
-          setFormData((prev) => ({ ...prev, debit: formatted }))
-          break
-      }
+    const amountStr = String(formData.rawAmount).replace(",", ".")
+    if (amountStr !== "" && !isNaN(Number(amountStr))) {
+      const numericAmount = parseFloat(amountStr)
+
+      setFormData((prev) => {
+        let newAmount = numericAmount
+        let newLabel = prev.label
+
+        switch (prev.type) {
+          case "card":
+          case "check":
+            newAmount = -Math.abs(numericAmount)
+            break
+
+          case "transfer":
+            newAmount = -Math.abs(numericAmount)
+            newLabel = `Virement vers ${prev.destination}`
+            break
+
+          case "directdeposit":
+            newAmount = Math.abs(numericAmount)
+            break
+
+          default:
+            newAmount = -Math.abs(numericAmount)
+            break
+        }
+
+        return {
+          ...prev,
+          amount: parseFloat(newAmount.toFixed(2)),
+          rawAmount: numericAmount.toFixed(2),
+          label: newLabel,
+        }
+      })
     }
   }
 
@@ -336,6 +357,7 @@ const TransactionEdit = () => {
             }
           />
 
+          {/* TYPE SELECT */}
           <ResponsiveSelect
             label="Type"
             name="type"
@@ -343,33 +365,6 @@ const TransactionEdit = () => {
             onChange={(val) => setFormData((prev) => ({ ...prev, type: val }))}
             options={transactionTypes}
           />
-
-          {/* TYPE SELECT
-          <FormControl
-            fullWidth
-            variant="outlined"
-            required
-            size="small"
-            sx={{ width: "100%", maxWidth: { md: "240px" } }}
-          >
-            <InputLabel id="type-label">Type</InputLabel>
-            <Select
-              labelId="type-label"
-              id="type"
-              name="type"
-              value={formData.type}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, type: e.target.value }))
-              }
-              label="Type"
-            >
-              {transactionTypes.map((type) => (
-                <MenuItem key={type.name} value={type.name}>
-                  {type.text}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl> */}
 
           {/* CHECK NUMBER */}
           {formData.type === "check" && (
@@ -439,30 +434,15 @@ const TransactionEdit = () => {
           )}
 
           {/* AMOUNT */}
-          {/* <TextField
-            type="text"
-            label="Montant"
-            value={formData.amount}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                amount: e.target.value,
-              }))
-            }
-            onBlur={() => handleAmountBlur()}
-            placeholder="0.00"
-            size="small"
-            sx={{ width: "100%", maxWidth: { sm: "240px" } }}
-          /> */}
           <AmountTextField
-            value={formData.amount}
+            value={formData.rawAmount}
             onChange={(value) =>
               setFormData((prev) => ({
                 ...prev,
-                amount: value,
+                rawAmount: value,
               }))
             }
-            onBlur={() => handleAmountBlur()}
+            onBlur={handleAmountBlur}
           />
 
           {/* CATEGORIES SELECT */}

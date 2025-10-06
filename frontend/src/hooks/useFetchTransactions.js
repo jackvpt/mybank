@@ -2,14 +2,15 @@
 import { useQuery } from "@tanstack/react-query"
 
 // 🧰 API functions
-
-import TransactionModel from "../models/TransactionModel"
 import { fetchAllTransactions } from "../api/transactions"
 
+// 🧰 Models
+import TransactionModel from "../models/TransactionModel"
+
 /**
- * Custom React hook to fetch all guest houses.
+ * Custom React hook to fetch all transactions
  *
- * Uses React Query to fetch and cache the list of guest houses from the API.
+ * Uses React Query to fetch and cache the list of transactions from the API.
  *
  * @returns {object} React Query object containing data, status, and methods
  */

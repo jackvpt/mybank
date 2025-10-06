@@ -8,9 +8,16 @@ const BankAccountCard = ({ account, lastTransaction }) => {
   const navigate = useNavigate()
 
   const handleClick = () => {
-    dispatch(setBankAccount({ name: account.name, id: account.id , initialBalance: account.initialBalance }))
+    dispatch(
+      setBankAccount({
+        name: account.name,
+        id: account.id,
+        initialBalance: account.initialBalance,
+      })
+    )
     navigate(`/transactions`)
   }
+
   return (
     <article className="container-bankAccountCard" onClick={handleClick}>
       <h2 className="bankAccountName">{account.name}</h2>

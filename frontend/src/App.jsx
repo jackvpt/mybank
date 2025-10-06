@@ -9,11 +9,11 @@ import {
   clearSelectedRecurringTransactionIds,
   clearSelectedTransactionIds,
 } from "./features/parametersSlice"
-import { fetchAllRecurringTransactions } from "./api/recurringTransactions"
 import { useAuthToken } from "./hooks/useAuthToken"
 import Loader from "./components/Loader/Loader"
 import { useFetchBankAccounts } from "./hooks/useFetchBankAccounts"
 import { useFetchTransactions } from "./hooks/useFetchTransactions"
+import { useFetchRecurringTransactions } from "./hooks/useFetchRecurringTransactions"
 
 function App() {
   const dispatch = useDispatch()
@@ -25,10 +25,8 @@ function App() {
 
   const { isLoading: isLoadingTransactions } = useFetchTransactions()
 
-  useQuery({
-    queryKey: ["recurringTransactions"],
-    queryFn: fetchAllRecurringTransactions,
-  })
+  const { isLoading: isLoadingRecurringTransactions } =
+    useFetchRecurringTransactions()
 
   useQuery({
     queryKey: ["settings"],
@@ -53,8 +51,12 @@ function App() {
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [dispatch])
 
-
-  if (isAuthLoading || isLoadingBankAccounts || isLoadingTransactions)
+  if (
+    isAuthLoading ||
+    isLoadingBankAccounts ||
+    isLoadingTransactions ||
+    isLoadingRecurringTransactions
+  )
     return <Loader />
 
   return (
