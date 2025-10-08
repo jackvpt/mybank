@@ -194,9 +194,11 @@ const TransactionEdit = () => {
           ...prev,
           date: new Date(selected.date),
           rawAmount: Math.abs(selected.amount).toFixed(2),
+          label: selected.label ?? "",
           category: selected.category ?? "",
           subCategory: selected.subCategory ?? "",
           type: selected.type ?? "card",
+          notes: selected.notes ?? "",
           // keep other fields unchanged if needed
         }))
       }

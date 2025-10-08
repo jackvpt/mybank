@@ -21,6 +21,7 @@ import {
 } from "../../api/recurringTransactions"
 import { setIsRecurringEditWindowVisible } from "../../features/parametersSlice"
 import { useAddRecurringTransactions } from "../../hooks/useAddRecurringTransactions"
+import TransactionModel from "../../models/TransactionModel"
 
 const RecurringToolBar = () => {
   // Fetch recurring transactions using React Query
@@ -109,22 +110,15 @@ const RecurringToolBar = () => {
         transactionDate.getMonth() === selectedMonth &&
         transactionDate.getFullYear() === selectedYear
       ) {
-        const originalTransaction = { ...transaction }
+        const originalTransaction = new TransactionModel({ ...transaction })
 
         switch (transaction.type) {
           case "transfer":
             {
-              const creditTransaction = {
-                ...transaction,
-                type: "credit",
-                label: `Virement depuis ${transaction.account}`,
-                account: transaction.destination,
-                debit: 0,
-                credit: transaction.amount,
-                destination: "",
+              originalTransaction.label=`Virement depuis ${transaction.accountName}`
+                // account: transaction.destination,
               }
-              newTransactions.push(creditTransaction)
-            }
+            
             break
           case "autodebit":
             break
@@ -134,23 +128,22 @@ const RecurringToolBar = () => {
 
         newTransactions.push(originalTransaction)
 
-        // const updatedTransaction = {
-        //   ...transaction,
-        //   date: new Date(
-        //     transactionDate.setMonth(transactionDate.getMonth() + 1)
-        //   ),
-        // }
+        const updatedTransaction = {
+          ...transaction,
+          date: new Date(
+            transactionDate.setMonth(transactionDate.getMonth() + 1)
+          ),
+        }
 
-        // updateRecurringMutation.mutate({
-        //   id: transaction.id,
-        //   updatedData: updatedTransaction,
-        // })
+        updateRecurringMutation.mutate({
+          id: transaction.id,
+          updatedData: updatedTransaction,
+        })
       }
     })
 
     if (newTransactions.length > 0) {
-      console.log("newTransactions :>> ", newTransactions)
-      // addTransactionsMutation.mutate(newTransactions)
+      addTransactionsMutation.mutate(newTransactions)
     } else {
       setToastMessage("Aucune transaction récurrente trouvée pour ce mois")
       setToastOpen(true)
