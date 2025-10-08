@@ -47,8 +47,20 @@ const parametersSlice = createSlice({
 
     // SELECTED TRANSACTIONS
     setSelectedTransactionIds(state, action) {
-      state.selectedTransactionIds = action.payload
+      const payload = action.payload
+
+      if (payload.length > 1) {
+        state.selectedTransactionIds = payload
+      } else {
+        const id = payload[0]
+        if (state.selectedTransactionIds.includes(id)) {
+          state.selectedTransactionIds = []
+        } else {
+          state.selectedTransactionIds = [id]
+        }
+      }
     },
+
     addSelectedTransactionId(state, action) {
       if (!state.selectedTransactionIds.includes(action.payload)) {
         state.selectedTransactionIds.push(action.payload)
