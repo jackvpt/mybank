@@ -33,18 +33,15 @@ import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
 /** API imports */
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { fetchAllSettings } from "../../api/settings"
-import { fetchBankAccounts } from "../../api/bankAccounts"
-import { fetchAllCategories } from "../../api/categories"
-import {
-  fetchTransactionsByAccountName,
-  updateTransaction,
-  deleteTransactions,
-} from "../../api/transactions"
+import { updateTransaction, deleteTransactions } from "../../api/transactions"
 
 import { useAddTransaction } from "../../hooks/useAddTransaction"
 import ResponsiveDatePicker from "../sub-components/ResponsiveDatePicker/ResponsiveDatePicker"
 import AmountTextField from "../AmountTextField/AmountTextField"
 import ResponsiveSelect from "../sub-components/ResponsiveSelect/ResponsiveSelect"
+import { useFetchBankAccounts } from "../../hooks/useFetchBankAccounts"
+import { useFetchTransactions } from "../../hooks/useFetchTransactions"
+import { useFetchCategories } from "../../hooks/useFetchCategories"
 
 const TransactionEdit = () => {
   const queryClient = useQueryClient()
@@ -129,15 +126,15 @@ const TransactionEdit = () => {
     queryFn: () => fetchAllSettings(),
   })
 
-  // Fetch categories using React Query
+  /**
+   * Fetch categories using React Query
+   */
   const {
     data: transactionsCategories,
     isLoading: isLoadingCategories,
     error: categoriesError,
-  } = useQuery({
-    queryKey: ["categories"],
-    queryFn: () => fetchAllCategories(),
-  })
+  } = useFetchCategories()
+
   const groupedTransactionsCategories = transactionsCategories.reduce(
     (acc, category) => {
       if (!acc[category.type]) acc[category.type] = []
@@ -149,24 +146,21 @@ const TransactionEdit = () => {
 
   // Fetch bank accounts using React Query
   const {
-    data: bankAccounts,
     isLoading: isLoadingBankAccounts,
     error: bankAccountsError,
-  } = useQuery({
-    queryKey: ["bankAccounts"],
-    queryFn: fetchBankAccounts,
-  })
+    data: bankAccounts,
+  } = useFetchBankAccounts()
 
   // Fetch transactions using React Query
   const {
-    data: transactions = [],
     isLoading: isLoadingTransactions,
     error: transactionsError,
-  } = useQuery({
-    queryKey: ["transactions", bankAccountName],
-    queryFn: () => fetchTransactionsByAccountName(bankAccountName),
-    enabled: !!bankAccountName,
-  })
+    data: transactions = [],
+  } = useFetchTransactions()
+
+  const transactionsByAccountId = transactions.filter(
+    (transaction) => transaction.accountId === bankAccountId
+  )
 
   const transactionTypes = settings ? settings[0].types : []
 
@@ -190,25 +184,26 @@ const TransactionEdit = () => {
   }
   const [formData, setFormData] = useState(initialFormData)
 
-  useEffect(() => {
-    if (selectedTransactionIds.length === 1) {
-      const selected = transactions.find(
-        (transaction) => transaction.id === selectedTransactionIds[0]
-      )
-
-      if (selected) {
-        setFormData({
-          ...selected,
-          date: new Date(selected.date),
-          category: selected.category ?? "",
-          subCategory: selected.subCategory ?? "",
-          type: selected.type ?? "card",
-        })
-      }
-    } else {
-      setFormData(initialFormData)
+useEffect(() => {
+  if (selectedTransactionIds.length === 1) {
+    const selected = transactionsByAccountId.find(
+      (transaction) => transaction.id === selectedTransactionIds[0]
+    )
+    if (selected) {
+      setFormData((prev) => ({
+        ...prev,
+        date: new Date(selected.date),
+        category: selected.category ?? "",
+        subCategory: selected.subCategory ?? "",
+        type: selected.type ?? "card",
+        // keep other fields unchanged if needed
+      }))
     }
-  }, [selectedTransactionIds, transactions])
+  } else if (selectedTransactionIds.length === 0) {
+    setFormData(initialFormData)
+  }
+}, [selectedTransactionIds])
+
 
   /**
    * Handles the modification of a transaction.
@@ -485,7 +480,7 @@ const TransactionEdit = () => {
                     </ListSubheader>,
                     ...categories.map((category) => (
                       <MenuItem
-                        key={category.name}
+                        key={category.id}
                         value={category.name}
                         sx={{ fontSize: "0.85rem" }}
                       >

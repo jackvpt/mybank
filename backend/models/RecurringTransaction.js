@@ -8,6 +8,7 @@ const recurringTransactionSchema = mongoose.Schema({
   date: { type: Date, required: true },
   type: { type: String, required: true },
   checkNumber: { type: String, required: false },
+  amount: { type: Number, required: true },
   debit: { type: Number, required: false },
   credit: { type: Number, required: false },
   label: { type: String, required: true },

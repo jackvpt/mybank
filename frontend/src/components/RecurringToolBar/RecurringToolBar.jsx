@@ -19,8 +19,8 @@ import {
   fetchAllRecurringTransactions,
   updateRecurringTransaction,
 } from "../../api/recurringTransactions"
-import { postTransaction } from "../../api/transactions"
 import { setIsRecurringEditWindowVisible } from "../../features/parametersSlice"
+import { useAddRecurringTransactions } from "../../hooks/useAddRecurringTransactions"
 
 const RecurringToolBar = () => {
   // Fetch recurring transactions using React Query
@@ -53,10 +53,7 @@ const RecurringToolBar = () => {
     setToastOpen(false)
   }
 
-  const addBatchMutation = useMutation({
-    mutationFn: async (transactions) => {
-      return await Promise.all(transactions.map(postTransaction))
-    },
+  const addTransactionsMutation = useAddRecurringTransactions({
     onSuccess: (results) => {
       queryClient.invalidateQueries("recurringTransactions")
       setToastMessage(
@@ -67,7 +64,7 @@ const RecurringToolBar = () => {
       setToastOpen(true)
     },
     onError: (error) => {
-      console.error("Error with batch posts :", error)
+      console.error("Error with recurring transactions:", error)
     },
   })
 
@@ -114,38 +111,46 @@ const RecurringToolBar = () => {
       ) {
         const originalTransaction = { ...transaction }
 
-        if (transaction.type === "transfer") {
-          const creditTransaction = {
-            ...transaction,
-            type: "credit",
-            label: `Virement depuis ${transaction.account}`,
-            account: transaction.destination,
-            debit: 0,
-            credit: transaction.amount,
-            destination: "",
-          }
-          newTransactions.push(creditTransaction)
+        switch (transaction.type) {
+          case "transfer":
+            {
+              const creditTransaction = {
+                ...transaction,
+                type: "credit",
+                label: `Virement depuis ${transaction.account}`,
+                account: transaction.destination,
+                debit: 0,
+                credit: transaction.amount,
+                destination: "",
+              }
+              newTransactions.push(creditTransaction)
+            }
+            break
+          case "autodebit":
+            break
+          case "directdeposit":
+            break
         }
 
         newTransactions.push(originalTransaction)
 
-        const updatedTransaction = {
-          ...transaction,
-          date: new Date(
-            transactionDate.setMonth(transactionDate.getMonth() + 1)
-          ),
-        }
+        // const updatedTransaction = {
+        //   ...transaction,
+        //   date: new Date(
+        //     transactionDate.setMonth(transactionDate.getMonth() + 1)
+        //   ),
+        // }
 
-        updateRecurringMutation.mutate({
-          id: transaction.id,
-          updatedData: updatedTransaction,
-        })
+        // updateRecurringMutation.mutate({
+        //   id: transaction.id,
+        //   updatedData: updatedTransaction,
+        // })
       }
     })
 
     if (newTransactions.length > 0) {
       console.log("newTransactions :>> ", newTransactions)
-      addBatchMutation.mutate(newTransactions)
+      // addTransactionsMutation.mutate(newTransactions)
     } else {
       setToastMessage("Aucune transaction récurrente trouvée pour ce mois")
       setToastOpen(true)

@@ -3,8 +3,9 @@ const mongoose = require("mongoose")
 
 /** Create a mongoose Schema */
 const categorySchema = mongoose.Schema({
-  category: { type: String, required: true },
+  name: { type: String, required: true },
   subcategories: [{ type: String }],
+  type: { type: String, required: true }, // debit, credit
 })
 
 /** Model methods converts Schema in usable model */

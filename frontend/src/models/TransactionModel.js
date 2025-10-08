@@ -10,14 +10,14 @@ export default class TransactionModel {
    * @param {string} data.id - Unique identifier for the transaction.
    * @param {string} data.accountId - The ID of the account involved in the transaction.
    * @param {string} [data.accountName] - The name of the account (if available).
-   * @param {string} data.accountId - The account id involved in the transaction.
-   * @param {string} data.accountName - The account name involved in the transaction.
-   * @param {string|Date} data.date - The date of the transaction (ISO string or Date object).
+   * @param {Date} data.date - The date of the transaction.
+   * @param {String} data.shortDate - The short date of the transaction.
    * @param {string} data.type - The type of transaction (e.g. "card", "check", "transfer", "auto debit").
    * @param {string} [data.checkNumber] - The check serial number (if applicable).
    * @param {string} data.label - The transaction label or description.
    * @param {string} data.category - The main category of the transaction.
    * @param {string} [data.subCategory] - A more specific sub-category (optional).
+   * @param {number} [data.amount] - The transaction amount (positive for credit, negative for debit).
    * @param {number} [data.debit=0] - The debit amount (money going out).
    * @param {number} [data.credit=0] - The credit amount (money coming in).
    * @param {string} [data.status] - Status of the transaction (null, "pointed","validated").

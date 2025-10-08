@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import Router from "./router/Router"
 import { fetchAllSettings } from "./api/settings"
-import { fetchAllCategories } from "./api/categories"
 import { useDispatch } from "react-redux"
 import { useEffect } from "react"
 import {
@@ -14,6 +13,7 @@ import Loader from "./components/Loader/Loader"
 import { useFetchBankAccounts } from "./hooks/useFetchBankAccounts"
 import { useFetchTransactions } from "./hooks/useFetchTransactions"
 import { useFetchRecurringTransactions } from "./hooks/useFetchRecurringTransactions"
+import { useFetchCategories } from "./hooks/useFetchCategories"
 
 function App() {
   const dispatch = useDispatch()
@@ -33,10 +33,7 @@ function App() {
     queryFn: fetchAllSettings,
   })
 
-  useQuery({
-    queryKey: ["categories"],
-    queryFn: fetchAllCategories,
-  })
+  const { isLoading: isLoadingCategories } = useFetchCategories()
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -55,7 +52,8 @@ function App() {
     isAuthLoading ||
     isLoadingBankAccounts ||
     isLoadingTransactions ||
-    isLoadingRecurringTransactions
+    isLoadingRecurringTransactions ||
+    isLoadingCategories
   )
     return <Loader />
 

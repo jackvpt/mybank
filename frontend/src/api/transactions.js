@@ -65,7 +65,6 @@ export const fetchTransactionsByAccountId = async (accountId) => {
  */
 export const postTransaction = async (transactionData) => {
   try {
-    console.log('transactionData :>> ', transactionData);
     const { data } = await axios.post(BASE_URL, transactionData)
     return new TransactionModel(data)
   } catch (error) {
