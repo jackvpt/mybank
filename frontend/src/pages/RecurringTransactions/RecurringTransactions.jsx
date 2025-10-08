@@ -249,10 +249,10 @@ const RecurringTransactions = () => {
               </TableHead>
               {/* Table body */}
               <TableBody>
-                {sortedRecurringTransactions.map((tx,index) => (
+                {sortedRecurringTransactions.map((tx, index) => (
                   <TableRow
                     key={tx.id}
-                    onClick={(e) => handleRowClick(e,tx,index)}
+                    onClick={(e) => handleRowClick(e, tx, index)}
                     className={`transaction-row ${
                       selectedRecurringTransactionIds.includes(tx.id)
                         ? "rowSelected"

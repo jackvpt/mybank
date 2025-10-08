@@ -56,7 +56,7 @@ export default class TransactionModel {
     this.label = data.label
 
     /** @type {string} */
-    this.category = convertCategory(data.category)
+    this.category = data.category
 
     /** @type {string | undefined} */
     this.subCategory = data.subCategory
@@ -84,8 +84,4 @@ export default class TransactionModel {
   }
 }
 
-const convertCategory = (category) => {
-  if (category === "Traitements et salaires") {
-    return "Revenus"
-  }
-}
+

@@ -72,6 +72,11 @@ const RecurringTransactionEdit = () => {
     }
   }
 
+  const bankAccountName = useSelector(
+    (state) => state.parameters.bankAccount.name
+  )
+  const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
+
   const selectedRecurringTransactionIds = useSelector(
     (state) => state.parameters.selectedRecurringTransactionIds
   )
@@ -177,13 +182,14 @@ const RecurringTransactionEdit = () => {
       d.setDate(1)
       return d
     })(),
-    account: "",
+    accountId: bankAccountId,
+    accountName: bankAccountName,
     type: "autodebit",
     checkNumber: "",
     label: "",
     category: "",
     subCategory: "",
-    amount: 0,
+    rawAmount: "",
     debit: 0,
     credit: 0,
     status: "",
@@ -206,6 +212,7 @@ const RecurringTransactionEdit = () => {
         setFormData({
           ...selected,
           date: new Date(selected.date),
+          rawAmount: Math.abs(selected.amount).toFixed(2),
           category: selected.category ?? "",
           subCategory: selected.subCategory ?? "",
           type: selected.type ?? "card",
@@ -259,15 +266,41 @@ const RecurringTransactionEdit = () => {
    * @param {string} field
    */
   const handleAmountBlur = () => {
-    const value = formData.amount.replace(",", ".")
-    if (value !== "" && !isNaN(Number(value))) {
-      const formatted = parseFloat(value).toFixed(2)
-      formData.amount = formatted
-      if (formData.type === "directdeposit") {
-        setFormData((prev) => ({ ...prev, debit: "", credit: formatted }))
-      } else {
-        setFormData((prev) => ({ ...prev, debit: formatted, credit: "" }))
-      }
+    const amountStr = String(formData.rawAmount).replace(",", ".")
+    if (amountStr !== "" && !isNaN(Number(amountStr))) {
+      const numericAmount = parseFloat(amountStr)
+
+      setFormData((prev) => {
+        let newAmount = numericAmount
+        let newLabel = prev.label
+
+        switch (prev.type) {
+          case "card":
+          case "check":
+            newAmount = -Math.abs(numericAmount)
+            break
+
+          case "transfer":
+            newAmount = -Math.abs(numericAmount)
+            newLabel = `Virement vers ${prev.destination}`
+            break
+
+          case "directdeposit":
+            newAmount = Math.abs(numericAmount)
+            break
+
+          default:
+            newAmount = -Math.abs(numericAmount)
+            break
+        }
+
+        return {
+          ...prev,
+          amount: parseFloat(newAmount.toFixed(2)),
+          rawAmount: numericAmount.toFixed(2),
+          label: newLabel,
+        }
+      })
     }
   }
 
@@ -450,14 +483,14 @@ const RecurringTransactionEdit = () => {
 
           {/* AMOUNT */}
           <AmountTextField
-            value={formData.amount}
+            value={formData.rawAmount}
             onChange={(value) =>
               setFormData((prev) => ({
                 ...prev,
-                amount: value,
+                rawAmount: value,
               }))
             }
-            onBlur={() => handleAmountBlur()}
+            onBlur={handleAmountBlur}
           />
 
           {/* CATEGORIES SELECT */}

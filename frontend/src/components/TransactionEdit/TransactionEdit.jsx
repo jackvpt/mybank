@@ -184,26 +184,26 @@ const TransactionEdit = () => {
   }
   const [formData, setFormData] = useState(initialFormData)
 
-useEffect(() => {
-  if (selectedTransactionIds.length === 1) {
-    const selected = transactionsByAccountId.find(
-      (transaction) => transaction.id === selectedTransactionIds[0]
-    )
-    if (selected) {
-      setFormData((prev) => ({
-        ...prev,
-        date: new Date(selected.date),
-        category: selected.category ?? "",
-        subCategory: selected.subCategory ?? "",
-        type: selected.type ?? "card",
-        // keep other fields unchanged if needed
-      }))
+  useEffect(() => {
+    if (selectedTransactionIds.length === 1) {
+      const selected = transactionsByAccountId.find(
+        (transaction) => transaction.id === selectedTransactionIds[0]
+      )
+      if (selected) {
+        setFormData((prev) => ({
+          ...prev,
+          date: new Date(selected.date),
+          rawAmount: Math.abs(selected.amount).toFixed(2),
+          category: selected.category ?? "",
+          subCategory: selected.subCategory ?? "",
+          type: selected.type ?? "card",
+          // keep other fields unchanged if needed
+        }))
+      }
+    } else if (selectedTransactionIds.length === 0) {
+      setFormData(initialFormData)
     }
-  } else if (selectedTransactionIds.length === 0) {
-    setFormData(initialFormData)
-  }
-}, [selectedTransactionIds])
-
+  }, [selectedTransactionIds])
 
   /**
    * Handles the modification of a transaction.
