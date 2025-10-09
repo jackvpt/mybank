@@ -9,10 +9,13 @@ footer {
   padding: 10px 5px;
 
   .navbar__icon {
-    padding: 0 10px;
-    font-size: 1.75rem;
+    padding: 10px;
     color: $text-color-2;
     cursor: pointer;
+
+    &-image{
+      font-size: 1.5rem;
+    }
 
     &.active {
       background-color: $text-color-2;

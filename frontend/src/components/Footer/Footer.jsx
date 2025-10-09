@@ -1,12 +1,17 @@
 import "./Footer.scss"
 
-import HomeIcon from "@mui/icons-material/Home"
-import ViewListIcon from "@mui/icons-material/ViewList"
-import RepeatIcon from "@mui/icons-material/Repeat"
-import CheckIcon from "@mui/icons-material/Checklist"
-import LogOutIcon from "@mui/icons-material/Logout"
 import { NavLink, useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
+
+// 👉 FontAwesome
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import {
+  faHouse,
+  faList,
+  faListCheck,
+  faRepeat,
+  faRightFromBracket,
+} from "@fortawesome/free-solid-svg-icons"
 
 const Footer = () => {
   const dispatch = useDispatch()
@@ -28,38 +33,52 @@ const Footer = () => {
       <NavLink
         to="/dashboard"
         className={({ isActive }) =>
-          isActive ? "navbar__icon active" : `navbar__icon ${!isAuthenticated ? "disabled" : ""}`
+          isActive
+            ? "navbar__icon active"
+            : `navbar__icon ${!isAuthenticated ? "disabled" : ""}`
         }
       >
-        <HomeIcon />
+        <FontAwesomeIcon className="navbar__icon-image" icon={faHouse} />
       </NavLink>
       <NavLink
         to="/transactions"
         className={({ isActive }) =>
-          isActive ? "navbar__icon active" : `navbar__icon ${!isAuthenticated ? "disabled" : ""}`
+          isActive
+            ? "navbar__icon active"
+            : `navbar__icon ${!isAuthenticated ? "disabled" : ""}`
         }
       >
-        <ViewListIcon />
+        <FontAwesomeIcon className="navbar__icon-image" icon={faList} />
       </NavLink>
       <NavLink
         to="/recurringtransactions"
         className={({ isActive }) =>
-          isActive ? "navbar__icon active" : `navbar__icon ${!isAuthenticated ? "disabled" : ""}`
+          isActive
+            ? "navbar__icon active"
+            : `navbar__icon ${!isAuthenticated ? "disabled" : ""}`
         }
       >
-        <RepeatIcon />
+        <FontAwesomeIcon className="navbar__icon-image" icon={faRepeat} />
       </NavLink>
       <NavLink
         disabled
         to="/checktransactions"
         className={({ isActive }) =>
-          isActive ? "navbar__icon active" : `navbar__icon ${!isAuthenticated ? "disabled" : ""}`
+          isActive
+            ? "navbar__icon active"
+            : `navbar__icon ${!isAuthenticated ? "disabled" : ""}`
         }
       >
-        <CheckIcon />
+        <FontAwesomeIcon className="navbar__icon-image" icon={faListCheck} />
       </NavLink>
-      <div onClick={handleLogOut} className={`navbar__icon ${!isAuthenticated ? "disabled" : ""}`}>
-        <LogOutIcon />
+      <div
+        onClick={handleLogOut}
+        className={`navbar__icon ${!isAuthenticated ? "disabled" : ""}`}
+      >
+        <FontAwesomeIcon
+          className="navbar__icon-image"
+          icon={faRightFromBracket}
+        />
       </div>
     </footer>
   )
