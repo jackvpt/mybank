@@ -24,6 +24,11 @@ export const stringToAmount = (str) => {
  *
  * @param {Date} value - The date to format.
  * @returns {string|null} The formatted date string or null if invalid.
+ * @example
+ * dateToCustom(new Date("2023-10-05T14:30:00")) // returns "05/10/2023 14:30"
+ * dateToCustom("2023-10-05T14:30:00") // returns "05/10/2023 14:30"
+ * dateToCustom(null) // returns null
+ * dateToCustom("invalid date") // returns null
  */
 export const dateToCustom = (value) => {
   if (!value) return null
@@ -38,4 +43,15 @@ export const dateToCustom = (value) => {
   const minutes = String(date.getMinutes()).padStart(2, "0")
 
   return `${day}/${month}/${year} ${hours}:${minutes}`
+}
+
+/**
+ * 
+ * @param {Date} date 
+ * @returns {Date} New date with one month added
+ */
+export const addOneMonth = (date) => {
+  const newDate = new Date(date)
+  newDate.setMonth(newDate.getMonth() + 1)
+  return newDate
 }

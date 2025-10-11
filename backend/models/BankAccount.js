@@ -10,6 +10,8 @@ const bankAccountSchema = mongoose.Schema({
   bic: { type: String, required: false },
   initialBalance: { type: Number, required: true },
   currentBalance: { type: Number, required: true },
+  lastCheckDate: { type: Date, required: false },
+  lastCheckBalance: { type: Number, required: false },
   createdAt: { type: Date, required: false },
   updatedAt: { type: Date, required: false },
 })

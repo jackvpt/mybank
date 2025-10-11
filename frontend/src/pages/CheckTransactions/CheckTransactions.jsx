@@ -1,10 +1,7 @@
 import "./CheckTransactions.scss"
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-// DEV imports
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import {
   Box,
@@ -22,10 +19,7 @@ import {
   useMediaQuery,
 } from "@mui/material"
 
-import {
-  fetchTransactionsByAccountName,
-  updateTransaction,
-} from "../../api/transactions"
+import { updateTransaction } from "../../api/transactions"
 import CheckTransactionsToolBar from "../../components/CheckTransactionsToolBar/CheckTransactionsToolBar"
 import CheckTransactionEdit from "../../components/CheckTransactionEdit/CheckTransactionEdit"
 import {
@@ -34,6 +28,7 @@ import {
   setSelectedCheckTransactionIds,
 } from "../../features/parametersSlice"
 import CheckTransactionsToolBox from "../../components/CheckTransactionsToolBox/CheckTransactionsToolBox"
+import { useGetTransactionsByAccountId } from "../../hooks/useGetTransactionsByAccountId"
 
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
@@ -58,14 +53,17 @@ const CheckTransactions = () => {
   const updateMutation = useMutation({
     mutationFn: updateTransaction,
     onSuccess: () => {
-      queryClient.invalidateQueries(["transactions", bankAccountName])
+      queryClient.invalidateQueries("transactions")
     },
     onError: (error) => {
       console.error("Erreur lors de la modification :", error)
     },
   })
 
-  const bankAccountName = useSelector((state) => state.parameters.bankAccount)
+  const bankAccountName = useSelector(
+    (state) => state.parameters.bankAccount.name
+  )
+
   const selectedCheckTransactionIds = useSelector(
     (state) => state.parameters.selectedCheckTransactionIds
   )
@@ -79,11 +77,7 @@ const CheckTransactions = () => {
     data: transactions = [],
     isLoading,
     error,
-  } = useQuery({
-    queryKey: ["transactions", bankAccountName],
-    queryFn: () => fetchTransactionsByAccountName(bankAccountName),
-    enabled: !!bankAccountName,
-  })
+  } = useGetTransactionsByAccountId()
 
   const unvalidatedTransactions = transactions.filter(
     (tx) => tx.status !== "validated"
@@ -125,8 +119,6 @@ const CheckTransactions = () => {
       id: transaction.id,
       updatedData: transaction,
     })
-
-    updateCheckCurrentAmount()
   }
 
   const updateCheckCurrentAmount = () => {

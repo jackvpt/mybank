@@ -11,6 +11,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import { fr } from "date-fns/locale"
 import {
   setCheckingCurrentAmount,
+  setCheckingDate,
   setCheckingFinalAmount,
   setCheckingInitialAmount,
 } from "../../features/parametersSlice"
@@ -25,6 +26,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { validateTransactions } from "../../api/transactions"
 import { ChangeCircle } from "@mui/icons-material"
+import ResponsiveDatePicker from "../sub-components/ResponsiveDatePicker/ResponsiveDatePicker"
 
 const CheckTransactionsToolBox = () => {
   const queryClient = useQueryClient()
@@ -34,7 +36,9 @@ const CheckTransactionsToolBox = () => {
   const [toastOpen, setToastOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState("")
 
-  const bankAccountName = useSelector((state) => state.parameters.bankAccount)
+  const bankAccountName = useSelector((state) => state.parameters.bankAccount.name)
+  const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
+  
   const noneTransactionChecked = useSelector(
     (state) => state.parameters.checking.noneTransactionChecked
   )
@@ -43,16 +47,17 @@ const CheckTransactionsToolBox = () => {
     mutationFn: validateTransactions,
     onSuccess: (data) => {
       queryClient.invalidateQueries(["transactions", bankAccountName])
+
       setToastMessage(`${data.modifiedCount} transaction(s) validée(s)`)
       setToastOpen(true)
     },
     onError: (error) => {
-      console.error("Erreur lors de la suppression :", error.message)
+      console.error("Erreur lors de la validation :", error.message)
     },
   })
 
   const [checkDate, setCheckDate] = useState(
-    useSelector((state) => state.parameters.checking.date)
+    new Date(useSelector((state) => state.parameters.checking.date))
   )
   const [checkInitialAmount, setCheckInitialAmount] = useState(
     useSelector((state) => state.parameters.checking.initialAmount).toFixed(2)
@@ -79,19 +84,11 @@ const CheckTransactionsToolBox = () => {
     <div className="container-checkTransactions__table__summary">
       {/* DATE PICKER */}
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
-        <DatePicker
-          label="Date du relevé"
+        <ResponsiveDatePicker
           value={checkDate}
           onChange={(newValue) => {
             setCheckDate(newValue)
-            dispatch(setCheckDate(newValue))
-          }}
-          format="dd/MM/yyyy"
-          sx={{ width: "auto", minWidth: 150, maxWidth: 180 }}
-          slotProps={{
-            textField: {
-              size: "small",
-            },
+            dispatch(setCheckingDate(newValue))
           }}
         />
 
@@ -153,7 +150,9 @@ const CheckTransactionsToolBox = () => {
         {/* VALIDATION BUTTON */}
         <Button
           variant="contained"
-          disabled={checkCurrentAmount !== checkFinalAmount || noneTransactionChecked}
+          disabled={
+            checkCurrentAmount !== checkFinalAmount || noneTransactionChecked
+          }
           onClick={handleValidateCheck}
           sx={{
             minWidth: 140,

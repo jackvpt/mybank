@@ -46,6 +46,12 @@ export default class BankAccountModel {
     this.currentBalance = data.currentBalance
 
     /** @type {Date} */
+    this.lastCheckDate = data.lastCheckDate
+
+    /** @type {number} */
+    this.lastCheckBalance = data.lastCheckBalance
+
+    /** @type {Date} */
     this.updatedAt = new Date(data.updatedAt)
   }
 }

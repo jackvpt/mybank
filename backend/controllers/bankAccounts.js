@@ -20,8 +20,6 @@ exports.updateBankAccount = async (req, res) => {
   const bankAccountObject = req.body
 
   try {
-    const bankAccount = await BankAccount.findOne({ _id: req.params.id })
-
     const updatedBankAccount = await BankAccount.findByIdAndUpdate(
       req.params.id,
       { ...bankAccountObject, _id: req.params.id },

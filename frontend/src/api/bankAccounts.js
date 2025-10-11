@@ -1,3 +1,4 @@
+import BankAccountModel from "../models/BankAccountModel"
 import { API_URL } from "./apiURL"
 import axios from "axios"
 
@@ -39,6 +40,16 @@ export const fetchBankAccountByName = async (name) => {
     console.error(
       `Error fetching accounts data from mock data: ${error.message}`
     )
+    throw error
+  }
+}
+
+export const updateBankAccount = async ({ id, updatedData }) => {
+  try {
+    const { data } = await axios.put(`${BASE_URL}/${id}`, updatedData)
+    return new BankAccountModel(data)
+  } catch (error) {
+    console.error("Error updating bank account:", error.message)
     throw error
   }
 }
