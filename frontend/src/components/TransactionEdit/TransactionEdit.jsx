@@ -2,13 +2,15 @@
 import "./TransactionEdit.scss"
 
 // React imports
-import { use, useEffect, useState } from "react"
+import {  useEffect, useState } from "react"
 import { useSelector } from "react-redux"
+import { useLocation } from "react-router-dom"
+
 
 // DEV imports
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
-import { fr, se } from "date-fns/locale"
+import { fr } from "date-fns/locale"
 
 import {
   Button,
@@ -72,6 +74,12 @@ const TransactionEdit = () => {
   const selectedTransactionsIds = useSelector(
     (state) => state.parameters.selectedTransactionsIds
   )
+
+  const selectedCheckingTransactionsIds = useSelector(
+    (state) => state.parameters.selectedCheckTransactionsIds
+  )
+
+  const location = useLocation().pathname
 
   const addTransactionMutation = useAddTransaction({
     onSuccess: () => {
@@ -159,10 +167,6 @@ const TransactionEdit = () => {
     data: transactions = [],
   } = useFetchTransactions()
 
-  const transactionsByAccountId = transactions.filter(
-    (transaction) => transaction.accountId === bankAccountId
-  )
-
   const transactionTypes = settings ? settings[0].types : []
 
   const initialFormData = {
@@ -187,6 +191,7 @@ const TransactionEdit = () => {
 
   useEffect(() => {
     if (selectedTransactionsIds.length === 1) {
+      
       const selectedTransaction = transactions.find(
         (tx) => tx.id === selectedTransactionsIds[0]
       )
@@ -209,7 +214,7 @@ const TransactionEdit = () => {
     } else {
       setFormData(initialFormData)
     }
-  }, [selectedTransactionsIds])
+  }, [selectedTransactionsIds, selectedCheckingTransactionsIds])
 
   /**
    * Handles the modification of a transaction.

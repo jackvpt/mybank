@@ -138,11 +138,11 @@ const RecurringTransactions = () => {
         .map((t) => t.id)
       dispatch(
         setSelectedRecurringTransactionsIds([
-          ...new Set([...selectedRecurringTransactionIds, ...ids]),
+          ...new Set([...selectedRecurringTransactionsIds, ...ids]),
         ])
       )
     } else if (e.ctrlKey || e.metaKey) {
-      selectedRecurringTransactionIds.includes(tx.id)
+      selectedRecurringTransactionsIds.includes(tx.id)
         ? dispatch(removeSelectedRecurringTransactionsIds(tx.id))
         : dispatch(addSelectedRecurringTransactionsIds(tx.id))
       setLastSelectedIndex(index)
