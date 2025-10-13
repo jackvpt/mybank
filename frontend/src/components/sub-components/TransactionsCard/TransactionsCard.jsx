@@ -2,7 +2,7 @@ import { useDispatch } from "react-redux"
 import "./TransactionsCard.scss"
 import {
   setIsTransactionEditWindowVisible,
-  setSelectedTransactionIds,
+  setSelectedTransactionsIds,
 } from "../../../features/parametersSlice"
 
 const TransactionsCard = ({ date, transactions }) => {
@@ -15,7 +15,7 @@ const TransactionsCard = ({ date, transactions }) => {
     })
 
   const handleTransactionClick = (transactionId) => () => {
-    dispatch(setSelectedTransactionIds([transactionId]))
+    dispatch(setSelectedTransactionsIds([transactionId]))
     dispatch(setIsTransactionEditWindowVisible(true))
   }
 

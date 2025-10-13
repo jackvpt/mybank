@@ -24,7 +24,7 @@ import {
   setCheckingCurrentAmount,
   setCheckingSorting,
   setNoneTransactionChecked,
-  setSelectedCheckTransactionIds,
+  setSelectedCheckTransactionsIds,
 } from "../../features/parametersSlice"
 import CheckTransactionsToolBox from "../../components/CheckTransactionsToolBox/CheckTransactionsToolBox"
 import { useGetTransactionsByAccountId } from "../../hooks/useGetTransactionsByAccountId"
@@ -64,8 +64,8 @@ const CheckTransactions = () => {
     (state) => state.parameters.bankAccount.name
   )
 
-  const selectedCheckTransactionIds = useSelector(
-    (state) => state.parameters.selectedCheckTransactionIds
+  const selectedCheckTransactionsIds = useSelector(
+    (state) => state.parameters.selectedCheckTransactionsIds
   )
   const isMobile = useMediaQuery(theme.breakpoints.down("tablet"))
   const visibleColumns = visibleColumnsConfig(isMobile)
@@ -113,7 +113,7 @@ const CheckTransactions = () => {
   }
 
   const handleRowClick = (tx) => {
-    dispatch(setSelectedCheckTransactionIds([tx.id]))
+    dispatch(setSelectedCheckTransactionsIds([tx.id]))
   }
 
   const handleCheckTransaction = (transaction) => {
@@ -213,7 +213,7 @@ const CheckTransactions = () => {
                         onClick={() => handleRowClick(tx)}
                         key={tx.id}
                         className={
-                          selectedCheckTransactionIds[0] === tx.id
+                          selectedCheckTransactionsIds[0] === tx.id
                             ? "transaction-row rowSelected"
                             : "transaction-row"
                         }

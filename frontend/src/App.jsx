@@ -4,9 +4,9 @@ import { fetchAllSettings } from "./api/settings"
 import { useDispatch } from "react-redux"
 import { useEffect } from "react"
 import {
-  clearSelectedCheckTransactionIds,
-  clearSelectedRecurringTransactionIds,
-  clearSelectedTransactionIds,
+  clearSelectedCheckTransactionsIds,
+  clearSelectedRecurringTransactionsIds,
+  clearSelectedTransactionsIds,
 } from "./features/parametersSlice"
 import { useAuthToken } from "./hooks/useAuthToken"
 import Loader from "./components/Loader/Loader"
@@ -38,9 +38,9 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
-        dispatch(clearSelectedTransactionIds())
-        dispatch(clearSelectedRecurringTransactionIds())
-        dispatch(clearSelectedCheckTransactionIds())
+        dispatch(clearSelectedTransactionsIds())
+        dispatch(clearSelectedRecurringTransactionsIds())
+        dispatch(clearSelectedCheckTransactionsIds())
       }
     }
 

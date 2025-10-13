@@ -77,8 +77,8 @@ const RecurringTransactionEdit = () => {
   )
   const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
 
-  const selectedRecurringTransactionIds = useSelector(
-    (state) => state.parameters.selectedRecurringTransactionIds
+  const selectedRecurringTransactionsIds = useSelector(
+    (state) => state.parameters.selectedRecurringTransactionsIds
   )
 
   /**
@@ -202,10 +202,10 @@ const RecurringTransactionEdit = () => {
   const periodicities = settings[0]?.periodicities
 
   useEffect(() => {
-    if (selectedRecurringTransactionIds.length === 1) {
+    if (selectedRecurringTransactionsIds.length === 1) {
       const selected = recurringTransactions.find(
         (recurringTransaction) =>
-          recurringTransaction.id === selectedRecurringTransactionIds[0]
+          recurringTransaction.id === selectedRecurringTransactionsIds[0]
       )
 
       if (selected) {
@@ -221,7 +221,7 @@ const RecurringTransactionEdit = () => {
     } else {
       setFormData(initialFormData)
     }
-  }, [selectedRecurringTransactionIds])
+  }, [selectedRecurringTransactionsIds])
 
   /**
    * Handles the modification of a transaction.
@@ -234,7 +234,7 @@ const RecurringTransactionEdit = () => {
     e.preventDefault()
     if (!formHasErrors()) {
       updateMutation.mutate({
-        id: selectedRecurringTransactionIds,
+        id: selectedRecurringTransactionsIds,
         updatedData: formData,
       })
     }
@@ -614,8 +614,8 @@ const RecurringTransactionEdit = () => {
           <Button
             variant="contained"
             startIcon={!deleteRecurringTransaction.isPending ? <Delete /> : ""}
-            disabled={selectedRecurringTransactionIds.length === 0}
-            onClick={() => handleOpenConfirm(selectedRecurringTransactionIds)}
+            disabled={selectedRecurringTransactionsIds.length === 0}
+            onClick={() => handleOpenConfirm(selectedRecurringTransactionsIds)}
             sx={{
               minWidth: 100,
               backgroundColor: "red",

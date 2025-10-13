@@ -19,9 +19,9 @@ import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import RecurringTransactionEdit from "../../components/RecurringTransactionEdit/RecurringTransactionEdit"
 import {
-  addSelectedRecurringTransactionId,
-  removeSelectedRecurringTransactionId,
-  setSelectedRecurringTransactionIds,
+  addSelectedRecurringTransactionsIds,
+  removeSelectedRecurringTransactionsIds,
+  setSelectedRecurringTransactionsIds,
 } from "../../features/parametersSlice"
 import { fetchAllSettings } from "../../api/settings"
 import RecurringToolBar from "../../components/RecurringToolBar/RecurringToolBar"
@@ -48,8 +48,8 @@ const RecurringTransactions = () => {
     (state) => state.parameters.isRecurringEditWindowVisible
   )
 
-  const selectedRecurringTransactionIds = useSelector(
-    (state) => state.parameters.selectedRecurringTransactionIds
+  const selectedRecurringTransactionsIds = useSelector(
+    (state) => state.parameters.selectedRecurringTransactionsIds
   )
 
   /**
@@ -137,17 +137,17 @@ const RecurringTransactions = () => {
         .slice(start, end + 1)
         .map((t) => t.id)
       dispatch(
-        setSelectedRecurringTransactionIds([
+        setSelectedRecurringTransactionsIds([
           ...new Set([...selectedRecurringTransactionIds, ...ids]),
         ])
       )
     } else if (e.ctrlKey || e.metaKey) {
       selectedRecurringTransactionIds.includes(tx.id)
-        ? dispatch(removeSelectedRecurringTransactionId(tx.id))
-        : dispatch(addSelectedRecurringTransactionId(tx.id))
+        ? dispatch(removeSelectedRecurringTransactionsIds(tx.id))
+        : dispatch(addSelectedRecurringTransactionsIds(tx.id))
       setLastSelectedIndex(index)
     } else {
-      dispatch(setSelectedRecurringTransactionIds([tx.id]))
+      dispatch(setSelectedRecurringTransactionsIds([tx.id]))
       setLastSelectedIndex(index)
     }
   }
@@ -255,7 +255,7 @@ const RecurringTransactions = () => {
                     key={tx.id}
                     onClick={(e) => handleRowClick(e, tx, index)}
                     className={`transaction-row ${
-                      selectedRecurringTransactionIds.includes(tx.id)
+                      selectedRecurringTransactionsIds.includes(tx.id)
                         ? "rowSelected"
                         : ""
                     }

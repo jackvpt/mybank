@@ -6,13 +6,8 @@ export const initialState = {
   isRecurringEditWindowVisible: true,
   isCheckTransactionsEditWindowVisible: false,
   selectedTransactionsIds: [],
-  selectedCheckTransactions: {
-    ids: [],
-    transaction: null,
-  },
-  // selectedTransactionIds: [],
-  selectedRecurringTransactionIds: [],
-  // selectedCheckTransactionIds: [],
+  selectedRecurringTransactionsIds: [],
+  selectedCheckTransactionsIds: [],
   transactionsTableScrollPosition: null,
   newTransactionId: null,
   checking: {
@@ -51,7 +46,7 @@ const parametersSlice = createSlice({
       state.isCheckTransactionsEditWindowVisible = action.payload
     },
 
-    setSelectedTransactionIds(state, action) {
+    setSelectedTransactionsIds(state, action) {
       const ids = action.payload
 
       if (ids.length > 1) {
@@ -66,45 +61,45 @@ const parametersSlice = createSlice({
       }
     },
 
-    addSelectedTransactionId(state, action) {
+    addSelectedTransactionsIds(state, action) {
       if (!state.selectedTransactionsIds.includes(action.payload)) {
         state.selectedTransactionsIds.push(action.payload)
       }
     },
-    removeSelectedTransactionId(state, action) {
+    removeSelectedTransactionsIds(state, action) {
       state.selectedTransactionsIds = state.selectedTransactionsIds.filter(
         (id) => id !== action.payload
       )
     },
-    clearSelectedTransactionIds(state) {
+    clearSelectedTransactionsIds(state) {
       state.selectedTransactionsIds = []
     },
 
     // SELECTED RECURRING TRANSACTION
-    setSelectedRecurringTransactionIds(state, action) {
-      state.selectedRecurringTransactionIds = action.payload
+    setSelectedRecurringTransactionsIds(state, action) {
+      state.selectedRecurringTransactionsIds = action.payload
     },
-    addSelectedRecurringTransactionId(state, action) {
-      if (!state.selectedRecurringTransactionIds.includes(action.payload)) {
-        state.selectedRecurringTransactionIds.push(action.payload)
+    addSelectedRecurringTransactionsIds(state, action) {
+      if (!state.selectedRecurringTransactionsIds.includes(action.payload)) {
+        state.selectedRecurringTransactionsIds.push(action.payload)
       }
     },
-    removeSelectedRecurringTransactionId(state, action) {
-      state.selectedRecurringTransactionIds =
-        state.selectedRecurringTransactionIds.filter(
+    removeSelectedRecurringTransactionsIds(state, action) {
+      state.selectedRecurringTransactionsIds =
+        state.selectedRecurringTransactionsIds.filter(
           (id) => id !== action.payload
         )
     },
-    clearSelectedRecurringTransactionIds(state) {
-      state.selectedRecurringTransactionIds = []
+    clearSelectedRecurringTransactionsIds(state) {
+      state.selectedRecurringTransactionsIds = []
     },
 
     // SELECT CHECK TRANSACTION
-    setSelectedCheckTransactionIds(state, action) {
-      state.selectedCheckTransactionIds = action.payload
+    setSelectedCheckTransactionsIds(state, action) {
+      state.selectedCheckTransactionsIds = action.payload
     },
-    clearSelectedCheckTransactionIds(state) {
-      state.selectedCheckTransactionIds = []
+    clearSelectedCheckTransactionsIds(state) {
+      state.selectedCheckTransactionsIds = []
     },
 
     // TRANSACTION TABLE SCROLL STATUS
@@ -144,16 +139,16 @@ export const {
   setIsTransactionEditWindowVisible,
   setIsRecurringEditWindowVisible,
   setIsCheckTransactionsEditWindowVisible,
-  setSelectedTransactionIds,
-  addSelectedTransactionId,
-  removeSelectedTransactionId,
-  clearSelectedTransactionIds,
-  setSelectedRecurringTransactionIds,
-  addSelectedRecurringTransactionId,
-  removeSelectedRecurringTransactionId,
-  clearSelectedRecurringTransactionIds,
-  setSelectedCheckTransactionIds,
-  clearSelectedCheckTransactionIds,
+  setSelectedTransactionsIds,
+  addSelectedTransactionsIds,
+  removeSelectedTransactionsIds,
+  clearSelectedTransactionsIds,
+  setSelectedRecurringTransactionsIds,
+  addSelectedRecurringTransactionsIds,
+  removeSelectedRecurringTransactionsIds,
+  clearSelectedRecurringTransactionsIds,
+  setSelectedCheckTransactionsIds,
+  clearSelectedCheckTransactionsIds,
   setTransactionsTableScrollPosition,
   setNewTransactionId,
   setCheckingSorting,

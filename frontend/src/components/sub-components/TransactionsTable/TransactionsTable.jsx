@@ -13,10 +13,10 @@ import {
 import { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
-  addSelectedTransactionId,
-  removeSelectedTransactionId,
+  addSelectedTransactionsIds,
+  removeSelectedTransactionsIds,
   setNewTransactionId,
-  setSelectedTransactionIds,
+  setSelectedTransactionsIds,
   setTransactionsTableScrollPosition,
 } from "../../../features/parametersSlice"
 
@@ -84,18 +84,18 @@ const TransactionsTable = ({ filteredTransactions }) => {
       const end = Math.max(index, lastSelectedIndex)
       const ids = sortedTransactions.slice(start, end + 1).map((t) => t.id)
       dispatch(
-        setSelectedTransactionIds([
+        setSelectedTransactionsIds([
           ...new Set([...selectedTransactionIds, ...ids]),
         ])
       )
     } else if (e.ctrlKey || e.metaKey) {
       selectedTransactionIds.includes(tx.id)
-        ? dispatch(removeSelectedTransactionId(tx.id))
-        : dispatch(addSelectedTransactionId(tx.id))
+        ? dispatch(removeSelectedTransactionsIds(tx.id))
+        : dispatch(addSelectedTransactionsIds(tx.id))
 
       setLastSelectedIndex(index)
     } else {
-      dispatch(setSelectedTransactionIds([tx.id]))
+      dispatch(setSelectedTransactionsIds([tx.id]))
       setLastSelectedIndex(index)
     }
   }
