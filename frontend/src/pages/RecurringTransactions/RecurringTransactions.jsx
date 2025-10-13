@@ -285,8 +285,8 @@ const RecurringTransactions = () => {
               </TableBody>
 
               {sortedRecurringTransactions.length > 0 && (
-                <TableFooter>
-                  <TableRow>
+                <TableFooter >
+                  <TableRow sx={{ '& td': { py: 0.5 } }}>
                     <TableCell
                       align="center"
                       colSpan={4}
@@ -304,6 +304,34 @@ const RecurringTransactions = () => {
                       {sortedRecurringTransactions
                         .reduce((sum, tx) => sum + (tx.credit || 0), 0)
                         .toFixed(2)}{" "}
+                      €
+                    </TableCell>
+                    <TableCell colSpan={2}></TableCell>
+                  </TableRow>
+
+                  <TableRow sx={{ '& td': { py: 0.5 } }}>
+                    <TableCell
+                      align="center"
+                      colSpan={4}
+                      sx={{ fontWeight: "bold" }}
+                    >
+                      Bilan
+                    </TableCell>
+                    <TableCell
+                      colSpan={2}
+                      align="center"
+                      sx={{ fontWeight: "bold" }}
+                    >
+                      {(
+                        sortedRecurringTransactions.reduce(
+                          (sum, tx) => sum + (tx.credit || 0),
+                          0
+                        ) -
+                        sortedRecurringTransactions.reduce(
+                          (sum, tx) => sum + (tx.debit || 0),
+                          0
+                        )
+                      ).toFixed(2)}{" "}
                       €
                     </TableCell>
                     <TableCell colSpan={2}></TableCell>
