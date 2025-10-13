@@ -5,10 +5,7 @@ export const initialState = {
   isTransactionEditWindowVisible: true,
   isRecurringEditWindowVisible: true,
   isCheckTransactionsEditWindowVisible: false,
-  selectedTransactions: {
-    ids: [],
-    transaction: null,
-  },
+  selectedTransactionsIds: [],
   selectedCheckTransactions: {
     ids: [],
     transaction: null,
@@ -55,45 +52,32 @@ const parametersSlice = createSlice({
     },
 
     setSelectedTransactionIds(state, action) {
-      const { ids, transaction } = action.payload
+      const ids = action.payload
 
       if (ids.length > 1) {
-        state.selectedTransactions.ids = ids
-        state.selectedTransactions.transaction = null
+        state.selectedTransactionsIds = ids
       } else {
         const id = ids[0]
-        if (state.selectedTransactions.ids.includes(id)) {
-          state.selectedTransactions.ids = []
-          state.selectedTransactions.transaction = null
+        if (state.selectedTransactionsIds.includes(id)) {
+          state.selectedTransactionsIds = []
         } else {
-          state.selectedTransactions.ids = [id]
-          state.selectedTransactions.transaction = transaction
+          state.selectedTransactionsIds = [id]
         }
       }
     },
 
     addSelectedTransactionId(state, action) {
-      if (!state.selectedTransactions.ids.includes(action.payload)) {
-        state.selectedTransactions.ids.push(action.payload)
-      }
-      if (state.selectedTransactions.ids.length !== 1) {
-        state.selectedTransactions.transaction = null
+      if (!state.selectedTransactionsIds.includes(action.payload)) {
+        state.selectedTransactionsIds.push(action.payload)
       }
     },
     removeSelectedTransactionId(state, action) {
-      state.selectedTransactions.ids = state.selectedTransactions.ids.filter(
+      state.selectedTransactionsIds = state.selectedTransactionsIds.filter(
         (id) => id !== action.payload
       )
-      if (state.selectedTransactions.ids.length !== 1) {
-        state.selectedTransactions.transaction = null
-      }
-            if (state.selectedTransactions.ids.length === 1) {
-        state.selectedTransactions.transaction = state.selectedTransactions.ids[0]
-      }
     },
     clearSelectedTransactionIds(state) {
-      state.selectedTransactions.ids = []
-      state.selectedTransactions.transaction = null
+      state.selectedTransactionsIds = []
     },
 
     // SELECTED RECURRING TRANSACTION
@@ -154,8 +138,6 @@ const parametersSlice = createSlice({
     },
   },
 })
-
-
 
 export const {
   setBankAccount,

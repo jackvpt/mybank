@@ -70,10 +70,7 @@ const TransactionEdit = () => {
   const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
 
   const selectedTransactionsIds = useSelector(
-    (state) => state.parameters.selectedTransactions.ids
-  )
-  const selectedTransaction = useSelector(
-    (state) => state.parameters.selectedTransactions.transaction
+    (state) => state.parameters.selectedTransactionsIds
   )
 
   const addTransactionMutation = useAddTransaction({
@@ -174,7 +171,7 @@ const TransactionEdit = () => {
     accountName: bankAccountName,
     type: "card",
     checkNumber: "",
-    label: selectedTransaction ? selectedTransaction.label : "",
+    label: "",
     category: null,
     subCategory: "",
     rawAmount: "",
@@ -209,10 +206,9 @@ const TransactionEdit = () => {
           notes: selectedTransaction.notes,
         })
       }
-    }else {
+    } else {
       setFormData(initialFormData)
     }
-
   }, [selectedTransactionsIds])
 
   /**
