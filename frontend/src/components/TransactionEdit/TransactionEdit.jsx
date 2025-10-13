@@ -9,7 +9,7 @@ import { useLocation } from "react-router-dom"
 // DEV imports
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
-import { ca, fr } from "date-fns/locale"
+import { fr } from "date-fns/locale"
 
 import {
   Button,
