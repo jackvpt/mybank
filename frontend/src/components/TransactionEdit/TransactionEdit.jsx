@@ -2,15 +2,14 @@
 import "./TransactionEdit.scss"
 
 // React imports
-import {  useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { useLocation } from "react-router-dom"
-
 
 // DEV imports
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
-import { fr } from "date-fns/locale"
+import { ca, fr } from "date-fns/locale"
 
 import {
   Button,
@@ -191,10 +190,21 @@ const TransactionEdit = () => {
 
   useEffect(() => {
     if (selectedTransactionsIds.length === 1) {
-      
-      const selectedTransaction = transactions.find(
-        (tx) => tx.id === selectedTransactionsIds[0]
-      )
+      let selectedTransaction = null
+
+      switch (location) {
+        case "/transactions":
+          selectedTransaction = transactions.find(
+            (tx) => tx.id === selectedTransactionsIds[0]
+          )
+          break
+        case "/checktransactions":
+          selectedTransaction = transactions.find(
+            (tx) => tx.id === selectedCheckingTransactionsIds[0]
+          )
+          break
+      }
+
       if (selectedTransaction) {
         setFormData({
           date: new Date(selectedTransaction.date),
@@ -214,7 +224,12 @@ const TransactionEdit = () => {
     } else {
       setFormData(initialFormData)
     }
-  }, [selectedTransactionsIds, selectedCheckingTransactionsIds])
+  }, [
+    selectedTransactionsIds,
+    selectedCheckingTransactionsIds,
+    location,
+    transactions,
+  ])
 
   /**
    * Handles the modification of a transaction.
