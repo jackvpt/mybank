@@ -5,12 +5,21 @@ export const initialState = {
   isTransactionEditWindowVisible: true,
   isRecurringEditWindowVisible: true,
   isCheckTransactionsEditWindowVisible: false,
-  selectedTransactionIds: [],
+  selectedTransactions: {
+    ids: [],
+    transaction: null,
+  },
+  selectedCheckTransactions: {
+    ids: [],
+    transaction: null,
+  },
+  // selectedTransactionIds: [],
   selectedRecurringTransactionIds: [],
-  selectedCheckTransactionIds: [],
+  // selectedCheckTransactionIds: [],
   transactionsTableScrollPosition: null,
   newTransactionId: null,
   checking: {
+    sorting: { order: "asc", orderBy: "date" },
     date: new Date(),
     initialAmount: 0,
     finalAmount: 0,
@@ -45,34 +54,46 @@ const parametersSlice = createSlice({
       state.isCheckTransactionsEditWindowVisible = action.payload
     },
 
-    // SELECTED TRANSACTIONS
     setSelectedTransactionIds(state, action) {
-      const payload = action.payload
+      const { ids, transaction } = action.payload
 
-      if (payload.length > 1) {
-        state.selectedTransactionIds = payload
+      if (ids.length > 1) {
+        state.selectedTransactions.ids = ids
+        state.selectedTransactions.transaction = null
       } else {
-        const id = payload[0]
-        if (state.selectedTransactionIds.includes(id)) {
-          state.selectedTransactionIds = []
+        const id = ids[0]
+        if (state.selectedTransactions.ids.includes(id)) {
+          state.selectedTransactions.ids = []
+          state.selectedTransactions.transaction = null
         } else {
-          state.selectedTransactionIds = [id]
+          state.selectedTransactions.ids = [id]
+          state.selectedTransactions.transaction = transaction
         }
       }
     },
 
     addSelectedTransactionId(state, action) {
-      if (!state.selectedTransactionIds.includes(action.payload)) {
-        state.selectedTransactionIds.push(action.payload)
+      if (!state.selectedTransactions.ids.includes(action.payload)) {
+        state.selectedTransactions.ids.push(action.payload)
+      }
+      if (state.selectedTransactions.ids.length !== 1) {
+        state.selectedTransactions.transaction = null
       }
     },
     removeSelectedTransactionId(state, action) {
-      state.selectedTransactionIds = state.selectedTransactionIds.filter(
+      state.selectedTransactions.ids = state.selectedTransactions.ids.filter(
         (id) => id !== action.payload
       )
+      if (state.selectedTransactions.ids.length !== 1) {
+        state.selectedTransactions.transaction = null
+      }
+            if (state.selectedTransactions.ids.length === 1) {
+        state.selectedTransactions.transaction = state.selectedTransactions.ids[0]
+      }
     },
     clearSelectedTransactionIds(state) {
-      state.selectedTransactionIds = []
+      state.selectedTransactions.ids = []
+      state.selectedTransactions.transaction = null
     },
 
     // SELECTED RECURRING TRANSACTION
@@ -113,6 +134,9 @@ const parametersSlice = createSlice({
     },
 
     // CHECKING ACCOUNT PARAMETERS
+    setCheckingSorting(state, action) {
+      state.checking.sorting = action.payload
+    },
     setCheckingDate(state, action) {
       state.checking.date = action.payload
     },
@@ -131,6 +155,8 @@ const parametersSlice = createSlice({
   },
 })
 
+
+
 export const {
   setBankAccount,
   setIsTransactionEditWindowVisible,
@@ -148,6 +174,7 @@ export const {
   clearSelectedCheckTransactionIds,
   setTransactionsTableScrollPosition,
   setNewTransactionId,
+  setCheckingSorting,
   setCheckingDate,
   setCheckingInitialAmount,
   setCheckingFinalAmount,

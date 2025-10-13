@@ -2,13 +2,13 @@
 import "./TransactionEdit.scss"
 
 // React imports
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 
 // DEV imports
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
-import { fr } from "date-fns/locale"
+import { fr, se } from "date-fns/locale"
 
 import {
   Button,
@@ -68,8 +68,12 @@ const TransactionEdit = () => {
     (state) => state.parameters.bankAccount.name
   )
   const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
-  const selectedTransactionIds = useSelector(
-    (state) => state.parameters.selectedTransactionIds
+
+  const selectedTransactionsIds = useSelector(
+    (state) => state.parameters.selectedTransactions.ids
+  )
+  const selectedTransaction = useSelector(
+    (state) => state.parameters.selectedTransactions.transaction
   )
 
   const addTransactionMutation = useAddTransaction({
@@ -170,7 +174,7 @@ const TransactionEdit = () => {
     accountName: bankAccountName,
     type: "card",
     checkNumber: "",
-    label: "",
+    label: selectedTransaction ? selectedTransaction.label : "",
     category: null,
     subCategory: "",
     rawAmount: "",
@@ -185,27 +189,31 @@ const TransactionEdit = () => {
   const [formData, setFormData] = useState(initialFormData)
 
   useEffect(() => {
-    if (selectedTransactionIds.length === 1) {
-      const selected = transactionsByAccountId.find(
-        (transaction) => transaction.id === selectedTransactionIds[0]
+    if (selectedTransactionsIds.length === 1) {
+      const selectedTransaction = transactions.find(
+        (tx) => tx.id === selectedTransactionsIds[0]
       )
-      if (selected) {
-        setFormData((prev) => ({
-          ...prev,
-          date: new Date(selected.date),
-          rawAmount: Math.abs(selected.amount).toFixed(2),
-          label: selected.label ?? "",
-          category: selected.category ?? "",
-          subCategory: selected.subCategory ?? "",
-          type: selected.type ?? "card",
-          notes: selected.notes ?? "",
-          // keep other fields unchanged if needed
-        }))
+      if (selectedTransaction) {
+        setFormData({
+          date: new Date(selectedTransaction.date),
+          accountId: selectedTransaction.accountId,
+          accountName: selectedTransaction.accountName,
+          type: selectedTransaction.type,
+          checkNumber: selectedTransaction.checkNumber,
+          label: selectedTransaction.label,
+          category: selectedTransaction.category,
+          subCategory: selectedTransaction.subCategory,
+          rawAmount: Math.abs(selectedTransaction.amount).toFixed(2),
+          amount: Math.abs(selectedTransaction.amount),
+          destination: selectedTransaction.destination,
+          notes: selectedTransaction.notes,
+        })
       }
-    } else if (selectedTransactionIds.length === 0) {
+    }else {
       setFormData(initialFormData)
     }
-  }, [selectedTransactionIds])
+
+  }, [selectedTransactionsIds])
 
   /**
    * Handles the modification of a transaction.
@@ -218,7 +226,7 @@ const TransactionEdit = () => {
     e.preventDefault()
     if (!formHasErrors()) {
       updateMutation.mutate({
-        id: selectedTransactionIds,
+        id: selectedTransactionsIds,
         updatedData: formData,
       })
     }
@@ -557,8 +565,8 @@ const TransactionEdit = () => {
           <Button
             variant="contained"
             startIcon={!deleteMutation.isPending ? <Delete /> : ""}
-            disabled={selectedTransactionIds.length === 0}
-            onClick={() => handleOpenConfirm(selectedTransactionIds)}
+            disabled={selectedTransactionsIds.length === 0}
+            onClick={() => handleOpenConfirm(selectedTransactionsIds)}
             sx={{
               width: "100%",
               maxWidth: { sm: "160px" },
@@ -586,7 +594,7 @@ const TransactionEdit = () => {
           <Button
             variant="contained"
             startIcon={!updateMutation.isPending ? <ChangeCircle /> : ""}
-            disabled={formHasErrors() || selectedTransactionIds.length !== 1}
+            disabled={formHasErrors() || selectedTransactionsIds.length !== 1}
             onClick={handleModifyTransaction}
             sx={{
               width: "100%",

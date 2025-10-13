@@ -8,6 +8,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TableFooter,
   TableHead,
   TableRow,
   TableSortLabel,
@@ -89,7 +90,7 @@ const RecurringTransactions = () => {
     refetchOnWindowFocus: true,
   })
 
-  const [order, setOrder] = useState("desc")
+  const [order, setOrder] = useState("asc")
   const [orderBy, setOrderBy] = useState("date")
   const [lastSelectedIndex, setLastSelectedIndex] = useState(null)
 
@@ -282,6 +283,33 @@ const RecurringTransactions = () => {
                   </TableRow>
                 ))}
               </TableBody>
+
+              {sortedRecurringTransactions.length > 0 && (
+                <TableFooter>
+                  <TableRow>
+                    <TableCell
+                      align="center"
+                      colSpan={4}
+                      sx={{ fontWeight: "bold" }}
+                    >
+                      Total
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      {sortedRecurringTransactions
+                        .reduce((sum, tx) => sum + (tx.debit || 0), 0)
+                        .toFixed(2)}{" "}
+                      €
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      {sortedRecurringTransactions
+                        .reduce((sum, tx) => sum + (tx.credit || 0), 0)
+                        .toFixed(2)}{" "}
+                      €
+                    </TableCell>
+                    <TableCell colSpan={2}></TableCell>
+                  </TableRow>
+                </TableFooter>
+              )}
             </Table>
 
             {recurringTransactions.length === 0 && (

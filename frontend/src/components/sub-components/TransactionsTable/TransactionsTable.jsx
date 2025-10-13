@@ -56,7 +56,7 @@ const TransactionsTable = ({ filteredTransactions }) => {
   const [lastSelectedIndex, setLastSelectedIndex] = useState(null)
 
   const selectedTransactionIds = useSelector(
-    (state) => state.parameters.selectedTransactionIds
+    (state) => state.parameters.selectedTransactions.ids
   )
 
   const bankAccountInitialBalance = useSelector(
@@ -84,17 +84,19 @@ const TransactionsTable = ({ filteredTransactions }) => {
       const end = Math.max(index, lastSelectedIndex)
       const ids = sortedTransactions.slice(start, end + 1).map((t) => t.id)
       dispatch(
-        setSelectedTransactionIds([
-          ...new Set([...selectedTransactionIds, ...ids]),
-        ])
+        setSelectedTransactionIds({
+          ids: [...new Set([...selectedTransactionIds, ...ids])],
+          transaction: tx,
+        })
       )
     } else if (e.ctrlKey || e.metaKey) {
       selectedTransactionIds.includes(tx.id)
         ? dispatch(removeSelectedTransactionId(tx.id))
         : dispatch(addSelectedTransactionId(tx.id))
+
       setLastSelectedIndex(index)
     } else {
-      dispatch(setSelectedTransactionIds([tx.id]))
+      dispatch(setSelectedTransactionIds({ ids: [tx.id], transaction: tx }))
       setLastSelectedIndex(index)
     }
   }

@@ -14,21 +14,21 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
-  TextField,
   Typography,
   useMediaQuery,
 } from "@mui/material"
 
 import { updateTransaction } from "../../api/transactions"
 import CheckTransactionsToolBar from "../../components/CheckTransactionsToolBar/CheckTransactionsToolBar"
-import CheckTransactionEdit from "../../components/CheckTransactionEdit/CheckTransactionEdit"
 import {
   setCheckingCurrentAmount,
+  setCheckingSorting,
   setNoneTransactionChecked,
   setSelectedCheckTransactionIds,
 } from "../../features/parametersSlice"
 import CheckTransactionsToolBox from "../../components/CheckTransactionsToolBox/CheckTransactionsToolBox"
 import { useGetTransactionsByAccountId } from "../../hooks/useGetTransactionsByAccountId"
+import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
 
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
@@ -70,8 +70,11 @@ const CheckTransactions = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("tablet"))
   const visibleColumns = visibleColumnsConfig(isMobile)
 
-  const [order, setOrder] = useState("asc")
-  const [orderBy, setOrderBy] = useState("date")
+  const sorting = useSelector(
+    (state) => state.parameters.checking.sorting
+  )
+  const [order, setOrder] = useState(sorting.order)
+  const [orderBy, setOrderBy] = useState(sorting.orderBy)
 
   const {
     data: transactions = [],
@@ -103,8 +106,10 @@ const CheckTransactions = () => {
   })
 
   const handleSort = (property) => {
-    setOrder(orderBy === property && order === "asc" ? "desc" : "asc")
+    const newOrder = orderBy === property && order === "asc" ? "desc" : "asc"
+    setOrder(newOrder)
     setOrderBy(property)
+    dispatch(setCheckingSorting({ order:newOrder, orderBy: property }))
   }
 
   const handleRowClick = (tx) => {
@@ -158,7 +163,7 @@ const CheckTransactions = () => {
       <div className="container-checkTransactions__table">
         <CheckTransactionsToolBox />
         <div className="container-checkTransactions__table__transactions">
-          {isCheckTransactionsEditWindowVisible && <CheckTransactionEdit />}
+          {isCheckTransactionsEditWindowVisible && <TransactionEdit />}
 
           <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
             <TableContainer

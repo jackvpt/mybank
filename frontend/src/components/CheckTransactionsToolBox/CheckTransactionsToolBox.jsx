@@ -37,7 +37,6 @@ const CheckTransactionsToolBox = () => {
   const [toastMessage, setToastMessage] = useState("")
 
   const bankAccountName = useSelector((state) => state.parameters.bankAccount.name)
-  const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
   
   const noneTransactionChecked = useSelector(
     (state) => state.parameters.checking.noneTransactionChecked

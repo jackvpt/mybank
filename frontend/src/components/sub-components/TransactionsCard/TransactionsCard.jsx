@@ -1,10 +1,13 @@
 import { useDispatch } from "react-redux"
 import "./TransactionsCard.scss"
-import { setIsTransactionEditWindowVisible, setSelectedTransactionIds } from "../../../features/parametersSlice"
+import {
+  setIsTransactionEditWindowVisible,
+  setSelectedTransactionIds,
+} from "../../../features/parametersSlice"
 
 const TransactionsCard = ({ date, transactions }) => {
   const dispatch = useDispatch()
-  
+
   const formattedDate = (date) =>
     new Date(date).toLocaleDateString("fr-FR", {
       day: "numeric",
