@@ -6,6 +6,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
+        /** Useful for code splitting and avoid big size files alerts */
         manualChunks: {
           react: ["react", "react-dom"],
           mui: ["@mui/material", "@mui/icons-material"],

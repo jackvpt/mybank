@@ -228,7 +228,6 @@ const TransactionEdit = () => {
     selectedTransactionsIds,
     selectedCheckingTransactionsIds,
     location,
-    transactions,
   ])
 
   /**
