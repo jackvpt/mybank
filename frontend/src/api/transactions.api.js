@@ -13,7 +13,8 @@ const BASE_URL = `${API_URL}/transactions`
 export const fetchAllTransactions = async () => {
   try {
     const { data } = await axios.get(BASE_URL)
-    return data.map((transaction) => new TransactionModel(transaction))
+    console.log('data :>> ', data);
+    return data
   } catch (error) {
     console.error("Error fetching all transactions:", error.message)
     throw error

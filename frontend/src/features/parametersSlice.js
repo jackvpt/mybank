@@ -25,7 +25,6 @@ const parametersSlice = createSlice({
   reducers: {
     // BANK ACCOUNT
     setBankAccount: (state, action) => {
-      console.log('payload :>> ', action.payload);
       state.bankAccount.name = action.payload.name
       state.bankAccount.id = action.payload.id
     },

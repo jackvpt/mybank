@@ -13,5 +13,43 @@
     gap: 10px;
   }
 
+  &-shortcuts {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
 
+    @include responsive-tablet {
+      justify-content: flex-start;
+    }
+
+    .shortcut-button {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      outline: none;
+      font-family: inherit;
+      border: none;
+      width: 100%;
+      padding: 4px 12px;
+      border-radius: 4px;
+      background-color: $secondary-color-2;
+      color: $text-color-2;
+      font-size: 0.8rem;
+      cursor: pointer;
+
+      transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+
+      @include responsive-tablet {
+        width: 120px;
+      }
+
+      &:hover {
+        background-color: darken-custom($secondary-color-2);
+      }
+    }
+  }
 }

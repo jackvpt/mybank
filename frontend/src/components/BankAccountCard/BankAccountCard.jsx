@@ -8,7 +8,6 @@ const BankAccountCard = ({ account, lastTransaction }) => {
   const navigate = useNavigate()
 
   const handleClick = () => {
-    console.log('account :>> ', account);
     dispatch(setBankAccount({ name: account.name, id: account._id }))
     navigate(`/transactions`)
   }

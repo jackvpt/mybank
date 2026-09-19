@@ -26,21 +26,39 @@
 
   &__tools {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: baseline;
     margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    @include responsive-tablet {
+      flex-direction: row;
+      justify-content: space-between;
+    }
 
     .toggle-tools {
       display: flex;
       flex-direction: row;
+
       align-items: baseline;
       gap: 10px;
+      width: 100%;
+
+      @include responsive-tablet {
+        justify-content: flex-end;
+        width:auto;
+      }
     }
 
     .date-form-control {
-      width: 200px;
       margin-bottom: 1rem;
+      width: 100%;
+
+      @include responsive-tablet {
+        // flex: 0 0 200px;
+        width: 200px;
+      }
     }
 
     .date-form-control .MuiInputLabel-root {

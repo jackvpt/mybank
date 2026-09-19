@@ -1,5 +1,6 @@
 @use "../utils/variables" as *;
 @use "sass:map";
+@use "sass:color";
 
 /* Responsive */
 @mixin responsive-mobile {
@@ -23,4 +24,7 @@
   }
 }
 
-
+/* Color Adjustments */
+@function darken-custom($color) {
+  @return color.adjust($color, $lightness: -15%);
+}

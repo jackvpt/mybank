@@ -39,12 +39,13 @@ import {
   fetchTransactionsByAccountName,
   updateTransaction,
   deleteTransactions,
-} from "../../api/transactions"
+} from "../../api/transactions.api"
 import {
   setNewTransactionId,
   setSelectedTransactionIds,
 } from "../../features/parametersSlice"
 import { useAddTransaction } from "../../hooks/useAddTransaction"
+import { useFetchTransactions } from "../../hooks/useFetchTransactions"
 
 const TransactionEdit = () => {
   const dispatch = useDispatch()
@@ -68,20 +69,21 @@ const TransactionEdit = () => {
     }
   }
 
-  const bankAccountName = useSelector((state) => state.parameters.bankAccount.name)
+  const bankAccountName = useSelector(
+    (state) => state.parameters.bankAccount.name,
+  )
   const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
   const selectedTransactionIds = useSelector(
-    (state) => state.parameters.selectedTransactionIds
+    (state) => state.parameters.selectedTransactionIds,
   )
 
-    /**
+  /**
    * React Query: Add transaction mutation
    */
   const addTransactionMutation = useAddTransaction({
     onSuccess: () => {
       setToastMessage("Transaction ajoutée")
       setToastOpen(true)
-
     },
     onError: (error) => {
       console.error("Error adding occupancy:", error)
@@ -134,7 +136,7 @@ const TransactionEdit = () => {
 
   // Fetch categories using React Query
   const {
-    data: transactionsCategories,
+    data: transactionsCategories=[],
     isLoading: isLoadingCategories,
     error: categoriesError,
   } = useQuery({
@@ -147,7 +149,7 @@ const TransactionEdit = () => {
       acc[category.type].push(category)
       return acc
     },
-    {}
+    {},
   )
 
   // Fetch bank accounts using React Query
@@ -161,15 +163,21 @@ const TransactionEdit = () => {
   })
 
   // Fetch transactions using React Query
+  // const {
+  //   data: transactions = [],
+  //   isLoading: isLoadingTransactions,
+  //   error: transactionsError,
+  // } = useQuery({
+  //   queryKey: ["transactions", bankAccountName],
+  //   queryFn: () => fetchTransactionsByAccountName(bankAccountName),
+  //   enabled: !!bankAccountName,
+  // })
+
   const {
-    data: transactions = [],
     isLoading: isLoadingTransactions,
-    error: transactionsError,
-  } = useQuery({
-    queryKey: ["transactions", bankAccountName],
-    queryFn: () => fetchTransactionsByAccountName(bankAccountName),
-    enabled: !!bankAccountName,
-  })
+    error: errorTransactions,
+    data: transactions = [],
+  } = useFetchTransactions()
 
   const transactionTypes = settings ? settings[0].types : []
 
@@ -192,10 +200,53 @@ const TransactionEdit = () => {
   }
   const [formData, setFormData] = useState(initialFormData)
 
+  const shortcuts = [
+    {
+      text: "Courses",
+      type: "card",
+      label: "Courses",
+      amount: "",
+      category: "Courses",
+      subCategory: "",
+    },
+    {
+      text: "Restaurant",
+      type: "card",
+      label: "Restaurant",
+      amount: "",
+      category: "Loisirs",
+      subCategory: "Restaurant",
+    },
+    {
+      text: "Essence",
+      type: "card",
+      label: "Essence",
+      amount: "",
+      category: "Voiture",
+      subCategory: "Carburant",
+    },
+    {
+      text: "Salaire HH",
+      type: "directdeposit",
+      label: "Salaire HeliHolland",
+      amount: "last",
+      category: "Revenus",
+      subCategory: "Salaire",
+    },
+    {
+      text: "Pension",
+      type: "directdeposit",
+      label: "Pension",
+      amount: "last",
+      category: "Revenus",
+      subCategory: "Pension",
+    },
+  ]
+
   useEffect(() => {
     if (selectedTransactionIds.length === 1) {
       const selected = transactions.find(
-        (transaction) => transaction.id === selectedTransactionIds[0]
+        (transaction) => transaction.id === selectedTransactionIds[0],
       )
 
       if (selected) {
@@ -278,6 +329,24 @@ const TransactionEdit = () => {
     }
   }
 
+const handleShortcutClick = (shortcut) => {
+  let amount = shortcut.amount
+  if (amount === "last") {
+    const lastTransaction = transactions
+      .filter((t) => t.label === shortcut.label)
+      .sort((a, b) => new Date(b.date) - new Date(a.date))[0]
+    amount = lastTransaction ? lastTransaction.amount : 0
+  }
+  setFormData((prev) => ({
+    ...prev,
+    type: shortcut.type,
+    label: shortcut.label,
+    amount,
+    category: shortcut.category,
+    subCategory: shortcut.subCategory,
+  }))
+}
+
   /**
    * Checks if the form has errors.
    * @returns {boolean} Returns true if the form has errors, false otherwise.
@@ -304,7 +373,7 @@ const TransactionEdit = () => {
     settingsError ||
     bankAccountsError ||
     categoriesError ||
-    transactionsError
+    errorTransactions
   )
     return (
       <p>
@@ -315,6 +384,20 @@ const TransactionEdit = () => {
   return (
     <section className="container-transaction-edit">
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
+        {/* SHORTCUTS */}
+        <div className="container-transaction-edit-shortcuts">
+          {shortcuts.map((shortcut) => (
+            <button
+              className="shortcut-button"
+              key={shortcut.text}
+              type="button"
+              onClick={() => handleShortcutClick(shortcut)}
+            >
+              {shortcut.text}
+            </button>
+          ))}
+        </div>
+
         <form>
           {/* DATE PICKER */}
           <DatePicker
@@ -486,7 +569,7 @@ const TransactionEdit = () => {
                         {category.name}
                       </MenuItem>
                     )),
-                  ]
+                  ],
                 )}
               </Select>
             </FormControl>
@@ -521,7 +604,7 @@ const TransactionEdit = () => {
                       <MenuItem key={`${category.name}-${sub}`} value={sub}>
                         {sub}
                       </MenuItem>
-                    ))
+                    )),
                   )}
               </Select>
             </FormControl>

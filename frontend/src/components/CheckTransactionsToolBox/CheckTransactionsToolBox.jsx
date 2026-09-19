@@ -23,7 +23,7 @@ import {
   TextField,
 } from "@mui/material"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { validateTransactions } from "../../api/transactions"
+import { validateTransactions } from "../../api/transactions.api"
 import { ChangeCircle } from "@mui/icons-material"
 
 const CheckTransactionsToolBox = () => {

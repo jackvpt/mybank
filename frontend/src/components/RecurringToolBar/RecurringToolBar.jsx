@@ -19,7 +19,7 @@ import {
   fetchAllRecurringTransactions,
   updateRecurringTransaction,
 } from "../../api/recurringTransactions"
-import { postTransaction } from "../../api/transactions"
+import { postTransaction } from "../../api/transactions.api"
 import { setIsRecurringEditWindowVisible } from "../../features/parametersSlice"
 
 const RecurringToolBar = () => {

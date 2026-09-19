@@ -2,7 +2,7 @@ import "./Dashboard.scss"
 import { useQuery } from "@tanstack/react-query"
 import { fetchBankAccounts } from "../../api/bankAccounts"
 import BankAccountCard from "../../components/BankAccountCard/BankAccountCard"
-import { fetchAllTransactions } from "../../api/transactions"
+import { fetchAllTransactions } from "../../api/transactions.api"
 
 const Dashboard = () => {
   const {

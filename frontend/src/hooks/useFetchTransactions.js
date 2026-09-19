@@ -1,22 +1,38 @@
-// 🌐 React Query
-import { useQuery } from "@tanstack/react-query"
-
-// 🧰 API functions
+import { useQuery, keepPreviousData } from "@tanstack/react-query"
 
 import TransactionModel from "../models/TransactionModel"
-import { fetchAllTransactions } from "../api/transactions"
+import { fetchAllTransactions } from "../api/transactions.api"
 
-/**
- * Custom React hook to fetch all guest houses.
- *
- * Uses React Query to fetch and cache the list of guest houses from the API.
- *
- * @returns {object} React Query object containing data, status, and methods
- */
-export const useFetchTransactions = () =>
-  useQuery({
-    queryKey: ["transactions"], // Unique cache key for transactions
-    queryFn: fetchAllTransactions, // API call to fetch transactions
-    refetchOnWindowFocus: false, // Do not refetch on window focus
-    select: (data) => data.map((transaction) => new TransactionModel(transaction)),
+// export const useFetchTransactions = () => {
+//   const select = useCallback(
+//     (data) => data.map((transaction) => new TransactionModel(transaction)),
+//     [],
+//   )
+
+//   return useQuery({
+//     queryKey: ["transactions"],
+//     queryFn: fetchAllTransactions,
+//     refetchOnWindowFocus: false,
+//     select,
+//   })
+// }
+
+// ----------------------------
+// Fetch all transactions
+// ----------------------------
+export const useFetchTransactions = ({ enabled = true } = {}) => {
+  const queryResult = useQuery({
+    queryKey: ["transactions"],
+    queryFn: async () => {
+      const accounts = await fetchAllTransactions()
+      return accounts.map((a) =>
+        a instanceof TransactionModel ? a : new TransactionModel(a),
+      )
+    },
+    enabled,
+    staleTime: 1000 * 60,
+    refetchInterval: 1000 * 60,
+    placeholderData: keepPreviousData,
   })
+  return queryResult
+}

@@ -2,7 +2,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 // 🧰 API functions
-import { postTransaction } from "../api/transactions"
+import { postTransaction } from "../api/transactions.api"
 
 /**
  * Custom hook to add a new transaction.

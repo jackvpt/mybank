@@ -40,7 +40,7 @@ import {
   postTransaction,
   updateTransaction,
   deleteTransactions,
-} from "../../api/transactions"
+} from "../../api/transactions.api"
 
 const CheckTransactionEdit = () => {
   const queryClient = useQueryClient()

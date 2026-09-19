@@ -25,7 +25,7 @@ import {
 import {
   fetchTransactionsByAccountName,
   updateTransaction,
-} from "../../api/transactions"
+} from "../../api/transactions.api"
 import CheckTransactionsToolBar from "../../components/CheckTransactionsToolBar/CheckTransactionsToolBar"
 import CheckTransactionEdit from "../../components/CheckTransactionEdit/CheckTransactionEdit"
 import {
