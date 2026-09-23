@@ -36,7 +36,7 @@ import { fetchAllSettings } from "../../api/settings"
 import { fetchBankAccounts } from "../../api/bankAccounts"
 import { fetchAllCategories } from "../../api/categories"
 import {
-  fetchTransactionsByAccountName,
+  getTransactionsByAccountName,
   updateTransaction,
   deleteTransactions,
 } from "../../api/transactions.api"
@@ -45,7 +45,7 @@ import {
   setSelectedTransactionIds,
 } from "../../features/parametersSlice"
 import { useAddTransaction } from "../../hooks/useAddTransaction"
-import { useFetchTransactions } from "../../hooks/useFetchTransactions"
+import { useGetTransactions } from "../../hooks/useTransactions"
 
 const TransactionEdit = () => {
   const dispatch = useDispatch()
@@ -177,7 +177,7 @@ const TransactionEdit = () => {
     isLoading: isLoadingTransactions,
     error: errorTransactions,
     data: transactions = [],
-  } = useFetchTransactions()
+  } = useGetTransactions()
 
   const transactionTypes = settings ? settings[0].types : []
 

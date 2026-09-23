@@ -36,8 +36,9 @@ import { fetchAllSettings } from "../../api/settings"
 import { fetchBankAccounts } from "../../api/bankAccounts"
 import { fetchAllCategories } from "../../api/categories"
 import {
-  fetchTransactionsByAccountName,
-  postTransaction,
+  getAllTransactions,
+  getTransactionsByAccountName,
+  createTransaction,
   updateTransaction,
   deleteTransactions,
 } from "../../api/transactions.api"
@@ -73,7 +74,7 @@ const CheckTransactionEdit = () => {
    * It uses React Query's useMutation hook to handle the mutation.
    **/
   const addMutation = useMutation({
-    mutationFn: postTransaction,
+    mutationFn: createTransaction,
     onSuccess: () => {
       queryClient.invalidateQueries(["transactions", bankAccountName])
       setToastMessage("Transaction ajoutée")
@@ -163,7 +164,7 @@ const CheckTransactionEdit = () => {
     error: transactionsError,
   } = useQuery({
     queryKey: ["transactions", bankAccountName],
-    queryFn: () => fetchTransactionsByAccountName(bankAccountName),
+    queryFn: () => getTransactionsByAccountName(bankAccountName),
     enabled: !!bankAccountName,
   })
 

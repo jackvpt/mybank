@@ -19,7 +19,7 @@ import {
   fetchAllRecurringTransactions,
   updateRecurringTransaction,
 } from "../../api/recurringTransactions"
-import { postTransaction } from "../../api/transactions.api"
+import { createTransaction } from "../../api/transactions.api"
 import { setIsRecurringEditWindowVisible } from "../../features/parametersSlice"
 
 const RecurringToolBar = () => {
@@ -55,7 +55,7 @@ const RecurringToolBar = () => {
 
   const addBatchMutation = useMutation({
     mutationFn: async (transactions) => {
-      return await Promise.all(transactions.map(postTransaction))
+      return await Promise.all(transactions.map(createTransaction))
     },
     onSuccess: (results) => {
       queryClient.invalidateQueries("recurringTransactions")

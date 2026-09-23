@@ -2,7 +2,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 // 🧰 API functions
-import { postTransaction } from "../api/transactions.api"
+import { createTransaction } from "../api/transactions.api"
 
 /**
  * Custom hook to add a new transaction.
@@ -14,7 +14,7 @@ export const useAddTransaction = ({ onSuccess, onError } = {}) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: postTransaction,
+    mutationFn: createTransaction,
     onSuccess: (...args) => {
       // Invalidate the cache
       queryClient.invalidateQueries({ queryKey: ["transactions"] })
@@ -28,3 +28,5 @@ export const useAddTransaction = ({ onSuccess, onError } = {}) => {
     },
   })
 }
+
+

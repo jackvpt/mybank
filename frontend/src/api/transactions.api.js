@@ -1,20 +1,41 @@
-import TransactionModel from "../models/TransactionModel"
+// 📡 HTTP client
 import axios from "axios"
 
-import { API_URL } from "./apiURL"
+// 🧬 Models
+import TransactionModel from "../models/TransactionModel"
 
-// Base URL for authentication-related endpoints
-const BASE_URL = `${API_URL}/transactions`
+// 🔗 Config
+import { COMMON_API_URL } from "./common_url"
+
+const BASE_URL = `${COMMON_API_URL}/transactions`
+
+
+// Create an Axios instance for easier configuration
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+})
+
+/**
+ * Internal helper: fetches the raw transaction list and maps every item
+ * to a TransactionModel. Centralizes the single network call so all
+ * "fetch" variants stay consistent and avoid duplicate requests logic.
+ * @returns {Promise<TransactionModel[]>}
+ */
+const _getAllModels = async () => {
+  const { data } = await api.get()
+  return data.map((transaction) => new TransactionModel(transaction))
+}
 
 /**
  * Fetches all transactions from the API.
  * @returns {Promise<TransactionModel[]>}
  */
-export const fetchAllTransactions = async () => {
+export const getAllTransactions = async () => {
   try {
-    const { data } = await axios.get(BASE_URL)
-    console.log('data :>> ', data);
-    return data
+    return await _getAllModels()
   } catch (error) {
     console.error("Error fetching all transactions:", error.message)
     throw error
@@ -22,18 +43,17 @@ export const fetchAllTransactions = async () => {
 }
 
 /**
- * Fetches transactions by account name from the API.
+ * Fetches transactions by account name.
+ * NOTE: filtering happens client-side after fetching everything. If the
+ * dataset grows large, consider a server-side filter (e.g. `api.get("", { params: { account: accountName } })`)
+ * once/if the backend supports it.
  * @param {String} accountName
  * @returns {Promise<TransactionModel[]>}
  */
-export const fetchTransactionsByAccountName = async (accountName) => {
+export const getTransactionsByAccountName = async (accountName) => {
   try {
-    const { data } = await axios.get(BASE_URL)
-    const filtered = data
-      .filter((transaction) => transaction.account === accountName)
-      .map((transaction) => new TransactionModel(transaction))
-
-    return filtered
+    const transactions = await _getAllModels()
+    return transactions.filter((t) => t.account === accountName)
   } catch (error) {
     console.error("Error fetching transactions by account name:", error.message)
     throw error
@@ -41,18 +61,15 @@ export const fetchTransactionsByAccountName = async (accountName) => {
 }
 
 /**
- * Fetches transactions by account name from the API.
- * @param {String} accountName
+ * Fetches transactions by account ID.
+ * Same server-side-filter note as above.
+ * @param {String} accountId
  * @returns {Promise<TransactionModel[]>}
  */
-export const fetchTransactionsByAccountId = async (accountId) => {
+export const getTransactionsByAccountId = async (accountId) => {
   try {
-    const { data } = await axios.get(BASE_URL)
-    const filtered = data
-      .filter((transaction) => transaction.accountId === accountId)
-      .map((transaction) => new TransactionModel(transaction))
-
-    return filtered
+    const transactions = await _getAllModels()
+    return transactions.filter((t) => t.accountId === accountId)
   } catch (error) {
     console.error("Error fetching transactions by account ID:", error.message)
     throw error
@@ -64,10 +81,9 @@ export const fetchTransactionsByAccountId = async (accountId) => {
  * @param {Object} transactionData
  * @returns {Promise<TransactionModel>}
  */
-export const postTransaction = async (transactionData) => {
+export const createTransaction = async (transactionData) => {
   try {
-    console.log('transactionData :>> ', transactionData);
-    const { data } = await axios.post(BASE_URL, transactionData)
+    const { data } = await api.post("", transactionData)
     return new TransactionModel(data)
   } catch (error) {
     console.error("Error posting transaction:", error.message)
@@ -83,7 +99,7 @@ export const postTransaction = async (transactionData) => {
  */
 export const updateTransaction = async ({ id, updatedData }) => {
   try {
-    const { data } = await axios.put(`${BASE_URL}/${id}`, updatedData)
+    const { data } = await api.put(`${id}`, updatedData)
     return new TransactionModel(data)
   } catch (error) {
     console.error("Error updating transaction:", error.message)
@@ -99,8 +115,7 @@ export const updateTransaction = async ({ id, updatedData }) => {
  */
 export const deleteTransaction = async (id) => {
   try {
-    const response = await axios.delete(`${BASE_URL}/${id}`)
-    return response.data
+    return (await api.delete(`${id}`)).data
   } catch (error) {
     console.error("Error deleting transaction :", error.message)
     throw error
@@ -113,7 +128,7 @@ export const deleteTransactions = async (transactionsIds) => {
   }
 
   try {
-    const response = await axios.post(`${BASE_URL}/bulk-delete`, {
+    const response = await api.post("/bulk-delete", {
       ids: transactionsIds,
     })
     return response.data
@@ -125,7 +140,7 @@ export const deleteTransactions = async (transactionsIds) => {
 
 export const validateTransactions = async () => {
   try {
-    const response = await axios.patch(`${BASE_URL}/validate`)
+    const response = await api.patch("/validate")
     return response.data
   } catch (error) {
     console.error("Error validating transactions:", error.message)

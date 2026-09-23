@@ -28,7 +28,7 @@ import {
 } from "../../features/parametersSlice"
 import TransactionsToolBar from "../../components/TransactionsToolBar/TransactionsToolBar"
 import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
-import { useFetchTransactions } from "../../hooks/useFetchTransactions"
+import { useGetTransactions } from "../../hooks/useTransactions"
 
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
@@ -81,7 +81,7 @@ const Transactions = () => {
     isLoading: isLoadingTransactions,
     error: errorTransactions,
     data: transactionsData,
-  } = useFetchTransactions()
+  } = useGetTransactions()
 
   const transactions = transactionsData.filter(
     (transaction) => transaction.accountId === bankAccountId

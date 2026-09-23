@@ -23,7 +23,7 @@ import {
 } from "@mui/material"
 
 import {
-  fetchTransactionsByAccountName,
+  getTransactionsByAccountName,
   updateTransaction,
 } from "../../api/transactions.api"
 import CheckTransactionsToolBar from "../../components/CheckTransactionsToolBar/CheckTransactionsToolBar"
@@ -81,7 +81,7 @@ const CheckTransactions = () => {
     error,
   } = useQuery({
     queryKey: ["transactions", bankAccountName],
-    queryFn: () => fetchTransactionsByAccountName(bankAccountName),
+    queryFn: () => getTransactionsByAccountName(bankAccountName),
     enabled: !!bankAccountName,
   })
 

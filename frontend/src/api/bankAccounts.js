@@ -5,7 +5,7 @@ import axios from "axios"
 const BASE_URL = `${API_URL}/bankaccounts`
 
 /**
- * Fetches a bank account by its name from mock data.
+ * Fetches a bank account by its name.
  *
  * @async
  * @function fetchBankAccountByName
@@ -25,20 +25,20 @@ export const fetchBankAccounts = async ()=>{
   }
 }
 
-export const fetchBankAccountByName = async (name) => {
-  try {
-    const response = await fetch("/__mocks__/bankAccounts.json")
-    if (!response.ok) throw new Error("Mock data request failed")
-    const data = await response.json()
-    const bankAccount = data.find((account) => account.name === name)
+// export const fetchBankAccountByName = async (name) => {
+//   try {
+//     const response = await fetch("/__mocks__/bankAccounts.json")
+//     if (!response.ok) throw new Error("Mock data request failed")
+//     const data = await response.json()
+//     const bankAccount = data.find((account) => account.name === name)
 
-    if (!bankAccount) throw new Error(`Account ${name} not found in mock data.`)
+//     if (!bankAccount) throw new Error(`Account ${name} not found in mock data.`)
 
-    return bankAccount
-  } catch (error) {
-    console.error(
-      `Error fetching accounts data from mock data: ${error.message}`
-    )
-    throw error
-  }
-}
+//     return bankAccount
+//   } catch (error) {
+//     console.error(
+//       `Error fetching accounts data from mock data: ${error.message}`
+//     )
+//     throw error
+//   }
+// }

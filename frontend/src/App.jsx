@@ -13,7 +13,7 @@ import { fetchAllRecurringTransactions } from "./api/recurringTransactions"
 import { useAuthToken } from "./hooks/useAuthToken"
 import Loader from "./components/Loader/Loader"
 import { useFetchBankAccounts } from "./hooks/useFetchBankAccounts"
-import { useFetchTransactions } from "./hooks/useFetchTransactions"
+import { useGetTransactions } from "./hooks/useTransactions"
 
 function App() {
   const dispatch = useDispatch()
@@ -25,7 +25,7 @@ function App() {
     useFetchBankAccounts()
 
   const { isLoading: isLoadingTransactions, error: errorTransactions } =
-    useFetchTransactions()
+    useGetTransactions()
 
   useQuery({
     queryKey: ["recurringTransactions"],
