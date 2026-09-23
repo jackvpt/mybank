@@ -20,6 +20,8 @@ const SEVERITIES = ["success", "error", "warning", "info"]
  * (`notifySuccess`, `notifyError`, `notifyWarning`, `notifyInfo`) via
  * context, so any component can trigger a notification without
  * managing its own Snackbar instance.
+ * NOTE: this provider has to be mounted *above* any component that uses the `useNotification` hook
+ * (e.g. in main.jsx)
  */
 export const NotificationProvider = ({ children, autoHideDuration = 4000 }) => {
   const [notification, setNotification] = useState(null)

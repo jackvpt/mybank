@@ -1,15 +1,16 @@
-// CSS
+// 🎨 Styles
 import "./TransactionEdit.scss"
 
-// React imports
+// ⚛️ React
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
-// DEV imports
+// 📅 Date picker
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import { fr } from "date-fns/locale"
 
+// 🧩 UI components
 import {
   Button,
   FormControl,
@@ -17,8 +18,6 @@ import {
   MenuItem,
   Select,
   TextField,
-  Snackbar,
-  Alert,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -28,31 +27,28 @@ import {
   CircularProgress,
 } from "@mui/material"
 
+// 🎯 Icons
 import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
 
-/** API imports */
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+// 🔄 React Query
+import { useQuery } from "@tanstack/react-query"
+
+// 🔌 API calls
 import { fetchAllSettings } from "../../api/settings"
 import { fetchBankAccounts } from "../../api/bankAccounts"
 import { fetchAllCategories } from "../../api/categories"
+
+// 🪝 Custom hooks
 import {
-  getTransactionsByAccountName,
-  updateTransaction,
-  deleteTransactions,
-} from "../../api/transactions.api"
-import {
-  setNewTransactionId,
-  setSelectedTransactionIds,
-} from "../../features/parametersSlice"
-import { useAddTransaction } from "../../hooks/useAddTransaction"
-import { useGetTransactions } from "../../hooks/useTransactions"
+  useGetTransactions,
+  useCreateTransaction,
+  useUpdateTransaction,
+  useDeleteTransactions,
+} from "../../hooks/useTransactions"
 
 const TransactionEdit = () => {
   const dispatch = useDispatch()
-  const queryClient = useQueryClient()
 
-  const [toastOpen, setToastOpen] = useState(false)
-  const [toastMessage, setToastMessage] = useState("")
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [transactionsToDelete, setTransactionsToDelete] = useState([])
 
@@ -77,52 +73,12 @@ const TransactionEdit = () => {
     (state) => state.parameters.selectedTransactionIds,
   )
 
-  /**
-   * React Query: Add transaction mutation
-   */
-  const addTransactionMutation = useAddTransaction({
-    onSuccess: () => {
-      setToastMessage("Transaction ajoutée")
-      setToastOpen(true)
-    },
-    onError: (error) => {
-      console.error("Error adding occupancy:", error)
-    },
-  })
-
-  const updateMutation = useMutation({
-    mutationFn: updateTransaction,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["transactions", bankAccountName])
-      setToastMessage("Transaction modifiée")
-      setToastOpen(true)
-    },
-    onError: (error) => {
-      console.error("Erreur lors de la modification :", error)
-    },
-  })
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteTransactions,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries(["transactions", bankAccountName])
-      setToastMessage(`${data.deletedCount} transaction(s) supprimée(s)`)
-      setToastOpen(true)
-    },
-    onError: (error) => {
-      console.error("Erreur lors de la suppression :", error.message)
-    },
-  })
-
-  /**
-   * Handles the closing of the toast notification.
-   * @param {Event} event - The event that triggered the close.
-   * @param {string} reason - The reason for closing the toast (e.g., "clickaway").
-   */
-  const handleToastClose = (event, reason) => {
-    if (reason === "clickaway") return
-    setToastOpen(false)
-  }
+  // All mutations below come from useTransactions — success/error toasts
+  // and "transactions" query invalidation are handled internally via
+  // useMutationWithNotification, so no local toast state is needed here.
+  const createTransactionMutation = useCreateTransaction()
+  const updateMutation = useUpdateTransaction()
+  const deleteMutation = useDeleteTransactions()
 
   // Fetch settings using React Query
   const {
@@ -136,7 +92,7 @@ const TransactionEdit = () => {
 
   // Fetch categories using React Query
   const {
-    data: transactionsCategories=[],
+    data: transactionsCategories = [],
     isLoading: isLoadingCategories,
     error: categoriesError,
   } = useQuery({
@@ -162,17 +118,7 @@ const TransactionEdit = () => {
     queryFn: fetchBankAccounts,
   })
 
-  // Fetch transactions using React Query
-  // const {
-  //   data: transactions = [],
-  //   isLoading: isLoadingTransactions,
-  //   error: transactionsError,
-  // } = useQuery({
-  //   queryKey: ["transactions", bankAccountName],
-  //   queryFn: () => fetchTransactionsByAccountName(bankAccountName),
-  //   enabled: !!bankAccountName,
-  // })
-
+  // Fetch transactions using the shared hook (already returns TransactionModel instances)
   const {
     isLoading: isLoadingTransactions,
     error: errorTransactions,
@@ -273,8 +219,11 @@ const TransactionEdit = () => {
   const handleModifyTransaction = (e) => {
     e.preventDefault()
     if (!formHasErrors()) {
+      // `selectedTransactionIds` is an array; the button is only enabled
+      // when it has exactly one entry, so we unwrap it here instead of
+      // passing the whole array as `id`.
       updateMutation.mutate({
-        id: selectedTransactionIds,
+        id: selectedTransactionIds[0],
         updatedData: formData,
       })
     }
@@ -292,7 +241,7 @@ const TransactionEdit = () => {
           ...prev,
           label: `Virement vers ${formData.destination}`,
         }))
-        addTransactionMutation.mutate(formData)
+        createTransactionMutation.mutate(formData)
 
         const creditTransaction = {
           ...formData,
@@ -302,50 +251,55 @@ const TransactionEdit = () => {
           label: `Virement depuis ${formData.account}`,
           destination: "",
         }
-        addTransactionMutation.mutate(creditTransaction)
+        createTransactionMutation.mutate(creditTransaction)
       } else {
-        addTransactionMutation.mutate(formData)
+        createTransactionMutation.mutate(formData)
       }
     }
   }
 
   /**
-   * Handles the blur event for the debit field.
-   * If the debit value is not empty and is a valid number,
+   * Handles the blur event for the amount field.
+   * If the value is not empty and is a valid number,
    * it formats the value to two decimal places.
    * @returns {void}
-   * @param {string} field
    */
   const handleAmountBlur = () => {
-    const value = formData.amount.replace(",", ".")
+    // `formData.amount` can be a number (e.g. reset to `0` by
+    // `initialFormData`), and `Number.prototype.replace` doesn't exist —
+    // cast to string first to avoid a crash.
+    const value = String(formData.amount).replace(",", ".")
     if (value !== "" && !isNaN(Number(value))) {
       const formatted = parseFloat(value).toFixed(2)
-      formData.amount = formatted
-      if (formData.type === "deposit") {
-        setFormData((prev) => ({ ...prev, credit: formatted }))
-      } else {
-        setFormData((prev) => ({ ...prev, debit: formatted }))
-      }
+      // Route the change through setFormData instead of mutating
+      // formData directly, so React re-renders correctly.
+      setFormData((prev) => ({
+        ...prev,
+        amount: formatted,
+        ...(prev.type === "deposit"
+          ? { credit: formatted }
+          : { debit: formatted }),
+      }))
     }
   }
 
-const handleShortcutClick = (shortcut) => {
-  let amount = shortcut.amount
-  if (amount === "last") {
-    const lastTransaction = transactions
-      .filter((t) => t.label === shortcut.label)
-      .sort((a, b) => new Date(b.date) - new Date(a.date))[0]
-    amount = lastTransaction ? lastTransaction.amount : 0
+  const handleShortcutClick = (shortcut) => {
+    let amount = shortcut.amount
+    if (amount === "last") {
+      const lastTransaction = transactions
+        .filter((t) => t.label === shortcut.label)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))[0]
+      amount = lastTransaction ? lastTransaction.amount : 0
+    }
+    setFormData((prev) => ({
+      ...prev,
+      type: shortcut.type,
+      label: shortcut.label,
+      amount,
+      category: shortcut.category,
+      subCategory: shortcut.subCategory,
+    }))
   }
-  setFormData((prev) => ({
-    ...prev,
-    type: shortcut.type,
-    label: shortcut.label,
-    amount,
-    category: shortcut.category,
-    subCategory: shortcut.subCategory,
-  }))
-}
 
   /**
    * Checks if the form has errors.
@@ -369,17 +323,12 @@ const handleShortcutClick = (shortcut) => {
     isLoadingTransactions
   )
     return <p>Loading data...</p>
-  if (
-    settingsError ||
-    bankAccountsError ||
-    categoriesError ||
-    errorTransactions
-  )
-    return (
-      <p>
-        Error loading data: {settingsError.message || bankAccountsError.message}
-      </p>
-    )
+
+  // Surface any of the four possible load errors, instead of only
+  // settingsError/bankAccountsError like before.
+  const loadError =
+    settingsError || bankAccountsError || categoriesError || errorTransactions
+  if (loadError) return <p>Error loading data: {loadError.message}</p>
 
   return (
     <section className="container-transaction-edit">
@@ -684,7 +633,7 @@ const handleShortcutClick = (shortcut) => {
           {/* ADD TRANSACTION BUTTON */}
           <Button
             variant="contained"
-            startIcon={!addTransactionMutation.isPending ? <AddCircle /> : ""}
+            startIcon={!createTransactionMutation.isPending ? <AddCircle /> : ""}
             disabled={formHasErrors()}
             onClick={handleAddTransaction}
             sx={{
@@ -702,7 +651,7 @@ const handleShortcutClick = (shortcut) => {
               boxShadow: 3,
             }}
           >
-            {addTransactionMutation.isPending ? (
+            {createTransactionMutation.isPending ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
               "Ajouter"
@@ -710,22 +659,6 @@ const handleShortcutClick = (shortcut) => {
           </Button>
         </form>
       </LocalizationProvider>
-
-      {/* Toast notification for success messages */}
-      <Snackbar
-        open={toastOpen}
-        autoHideDuration={3000}
-        onClose={handleToastClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleToastClose}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
-          {toastMessage}
-        </Alert>
-      </Snackbar>
 
       {/** Modal Dialog Box */}
       <Dialog

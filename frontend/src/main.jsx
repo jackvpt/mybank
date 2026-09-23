@@ -21,6 +21,9 @@ import { store, persistor } from "./store/store.js"
 // 🧩 MUI Core imports
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material"
 
+// 🔔 Hooks
+import { NotificationProvider } from "./hooks/NotificationProvider/NotificationProvider"
+
 /**
  * Initializes a new QueryClient instance for React Query.
  *
@@ -63,16 +66,18 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <ThemeProvider theme={lightTheme}>
-              <CssBaseline />
-              <App />
-            </ThemeProvider>{" "}
-          </BrowserRouter>
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
+        <NotificationProvider>
+          <QueryClientProvider client={queryClient}>
+            <BrowserRouter>
+              <ThemeProvider theme={lightTheme}>
+                <CssBaseline />
+                <App />
+              </ThemeProvider>{" "}
+            </BrowserRouter>
+            <ReactQueryDevtools initialIsOpen={false} />
+          </QueryClientProvider>
+        </NotificationProvider>
       </PersistGate>
     </Provider>
-  </StrictMode>
+  </StrictMode>,
 )
