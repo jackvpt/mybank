@@ -3,7 +3,7 @@ import "./TransactionEdit.scss"
 
 // ⚛️ React
 import { useEffect, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 
 // 📅 Date picker
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
@@ -34,7 +34,7 @@ import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
 import { useQuery } from "@tanstack/react-query"
 
 // 🔌 API calls
-import { fetchAllSettings } from "../../api/settings"
+import { getAllSettings } from "../../api/settings.api.js"
 import { fetchBankAccounts } from "../../api/bankAccounts"
 import { fetchAllCategories } from "../../api/categories"
 
@@ -46,9 +46,10 @@ import {
   useDeleteTransactions,
 } from "../../hooks/useTransactions"
 
-const TransactionEdit = () => {
-  const dispatch = useDispatch()
+// 📦 Data for the shortcut buttons
+import { shortcuts } from "../../data/transactionEditShortCuts.js"
 
+const TransactionEdit = () => {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [transactionsToDelete, setTransactionsToDelete] = useState([])
 
@@ -87,7 +88,7 @@ const TransactionEdit = () => {
     error: settingsError,
   } = useQuery({
     queryKey: ["settings"],
-    queryFn: () => fetchAllSettings(),
+    queryFn: () => getAllSettings(),
   })
 
   // Fetch categories using React Query
@@ -145,49 +146,6 @@ const TransactionEdit = () => {
     notes: "",
   }
   const [formData, setFormData] = useState(initialFormData)
-
-  const shortcuts = [
-    {
-      text: "Courses",
-      type: "card",
-      label: "Courses",
-      amount: "",
-      category: "Courses",
-      subCategory: "",
-    },
-    {
-      text: "Restaurant",
-      type: "card",
-      label: "Restaurant",
-      amount: "",
-      category: "Loisirs",
-      subCategory: "Restaurant",
-    },
-    {
-      text: "Essence",
-      type: "card",
-      label: "Essence",
-      amount: "",
-      category: "Voiture",
-      subCategory: "Carburant",
-    },
-    {
-      text: "Salaire HH",
-      type: "directdeposit",
-      label: "Salaire HeliHolland",
-      amount: "last",
-      category: "Revenus",
-      subCategory: "Salaire",
-    },
-    {
-      text: "Pension",
-      type: "directdeposit",
-      label: "Pension",
-      amount: "last",
-      category: "Revenus",
-      subCategory: "Pension",
-    },
-  ]
 
   useEffect(() => {
     if (selectedTransactionIds.length === 1) {
@@ -633,7 +591,9 @@ const TransactionEdit = () => {
           {/* ADD TRANSACTION BUTTON */}
           <Button
             variant="contained"
-            startIcon={!createTransactionMutation.isPending ? <AddCircle /> : ""}
+            startIcon={
+              !createTransactionMutation.isPending ? <AddCircle /> : ""
+            }
             disabled={formHasErrors()}
             onClick={handleAddTransaction}
             sx={{

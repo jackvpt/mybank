@@ -34,7 +34,7 @@ import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
 
 /** API imports */
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { fetchAllSettings } from "../../api/settings"
+import { getAllSettings } from "../../api/settings.api"
 import { fetchBankAccounts } from "../../api/bankAccounts"
 import { fetchAllCategories } from "../../api/categories"
 import {
@@ -133,7 +133,7 @@ const RecurringTransactionEdit = () => {
     error: settingsError,
   } = useQuery({
     queryKey: ["settings"],
-    queryFn: () => fetchAllSettings(),
+    queryFn: () => getAllSettings(),
   })
 
   // Fetch categories using React Query

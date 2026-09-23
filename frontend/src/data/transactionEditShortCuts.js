@@ -1,0 +1,42 @@
+export const shortcuts = [
+  {
+    text: "Courses",
+    type: "card",
+    label: "Courses",
+    amount: "",
+    category: "Courses",
+    subCategory: "",
+  },
+  {
+    text: "Restaurant",
+    type: "card",
+    label: "Restaurant",
+    amount: "",
+    category: "Loisirs",
+    subCategory: "Restaurant",
+  },
+  {
+    text: "Essence",
+    type: "card",
+    label: "Essence",
+    amount: "",
+    category: "Voiture",
+    subCategory: "Carburant",
+  },
+  {
+    text: "Salaire HH",
+    type: "directdeposit",
+    label: "Salaire HeliHolland",
+    amount: "last",
+    category: "Revenus",
+    subCategory: "Salaire",
+  },
+  {
+    text: "Pension",
+    type: "directdeposit",
+    label: "Pension",
+    amount: "last",
+    category: "Revenus",
+    subCategory: "Pension",
+  },
+]

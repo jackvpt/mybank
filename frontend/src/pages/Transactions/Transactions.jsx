@@ -1,5 +1,5 @@
 import "./Transactions.scss"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
   Box,
@@ -48,23 +48,23 @@ const Transactions = () => {
   const tableContainerRef = useRef(null)
 
   const bankAccountName = useSelector(
-    (state) => state.parameters.bankAccount.name
+    (state) => state.parameters.bankAccount.name,
   )
   const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
 
   const selectedTransactionIds = useSelector(
-    (state) => state.parameters.selectedTransactionIds
+    (state) => state.parameters.selectedTransactionIds,
   )
   const isTransactionEditWindowVisible = useSelector(
-    (state) => state.parameters.isTransactionEditWindowVisible
+    (state) => state.parameters.isTransactionEditWindowVisible,
   )
 
   const transactionsTableScrollPosition = useSelector(
-    (state) => state.parameters.transactionsTableScrollPosition
+    (state) => state.parameters.transactionsTableScrollPosition,
   )
 
   const newTransactionId = useSelector(
-    (state) => state.parameters.newTransactionId
+    (state) => state.parameters.newTransactionId,
   )
 
   const transactionRefs = useRef({})
@@ -83,8 +83,12 @@ const Transactions = () => {
     data: transactionsData,
   } = useGetTransactions()
 
-  const transactions = transactionsData.filter(
-    (transaction) => transaction.accountId === bankAccountId
+  const transactions = useMemo(
+    () =>
+      transactionsData.filter(
+        (transaction) => transaction.accountId === bankAccountId,
+      ),
+    [transactionsData, bankAccountId],
   )
 
   const handleSort = (property) => {
@@ -100,7 +104,7 @@ const Transactions = () => {
       dispatch(
         setSelectedTransactionIds([
           ...new Set([...selectedTransactionIds, ...ids]),
-        ])
+        ]),
       )
     } else if (e.ctrlKey || e.metaKey) {
       selectedTransactionIds.includes(tx.id)
@@ -297,12 +301,12 @@ const Transactions = () => {
                       {tx.credit ? tx.credit.toFixed(2) : ""}
                     </TableCell>
                     {visibleColumns.find(
-                      (col) => col.id === "balance" && col.show
+                      (col) => col.id === "balance" && col.show,
                     ) && (
                       <TableCell align="right">{balance.toFixed(2)}</TableCell>
                     )}
                     {visibleColumns.find(
-                      (col) => col.id === "status" && col.show
+                      (col) => col.id === "status" && col.show,
                     ) && (
                       <TableCell align="center">
                         <Box
@@ -314,8 +318,8 @@ const Transactions = () => {
                               tx.status === "validated"
                                 ? "green"
                                 : tx.status === "pointed"
-                                ? "blue"
-                                : "white",
+                                  ? "blue"
+                                  : "white",
                             border: "1px solid #ccc",
                             margin: "0 auto",
                           }}

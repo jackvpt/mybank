@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query"
 import Router from "./router/Router"
-import { fetchAllSettings } from "./api/settings"
+import { getAllSettings } from "./api/settings.api"
 import { fetchAllCategories } from "./api/categories"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import { useEffect } from "react"
 import {
   clearSelectedCheckTransactionIds,
@@ -34,7 +34,7 @@ function App() {
 
   useQuery({
     queryKey: ["settings"],
-    queryFn: fetchAllSettings,
+    queryFn: getAllSettings,
   })
 
   useQuery({

@@ -22,7 +22,7 @@ import {
   removeSelectedRecurringTransactionId,
   setSelectedRecurringTransactionIds,
 } from "../../features/parametersSlice"
-import { fetchAllSettings } from "../../api/settings"
+import { getAllSettings } from "../../api/settings.api"
 import RecurringToolBar from "../../components/RecurringToolBar/RecurringToolBar"
 
 /**
@@ -40,7 +40,7 @@ const RecurringTransactions = () => {
     error: settingsError,
   } = useQuery({
     queryKey: ["settings"],
-    queryFn: () => fetchAllSettings(),
+    queryFn: () => getAllSettings(),
   })
 
   const isRecurringEditWindowVisible = useSelector(
