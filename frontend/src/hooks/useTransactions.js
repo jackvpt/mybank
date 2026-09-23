@@ -7,7 +7,16 @@ import {
 } from "@tanstack/react-query"
 
 // 🔌 API calls
-import { getAllTransactions, createTransaction } from "../api/transactions.api"
+import {
+  getAllTransactions,
+  getTransactionsByAccountName,
+  getTransactionsByAccountId,
+  createTransaction,
+  updateTransaction,
+  deleteTransaction,
+  deleteTransactions,
+  validateTransactions,
+} from "../api/transactions.api"
 
 // 🧬 Models
 import TransactionModel from "../models/TransactionModel"
@@ -16,11 +25,13 @@ import TransactionModel from "../models/TransactionModel"
 import { useNotification } from "./NotificationProvider/useNotification"
 
 /**
- * Invalidates the "accounts" query, forcing a refetch on next access.
- * Centralized here so every mutation stays consistent.
+ * Invalidates the "transactions" query, forcing a
+ * refetch on next access. Centralized here so every mutation stays
+ * consistent.
  */
-const invalidateAccounts = (client) =>
-  client.invalidateQueries({ queryKey: ["accounts"] })
+const invalidateData = (client) => {
+  client.invalidateQueries({ queryKey: ["transactions"] })
+}
 
 /**
  * useMutationWithNotification
@@ -30,8 +41,8 @@ const invalidateAccounts = (client) =>
  *
  * 1. Success notification (static string or a function of `data`).
  * 2. Error notification (falls back to a generic message).
- * 3. Automatic cache invalidation of "accounts" on settle, unless the
- *    caller explicitly opts out with `invalidate: false`.
+ * 3. Automatic cache invalidation of data on
+ *    settle, unless the caller explicitly opts out with `invalidate: false`.
  *
  * Any `onSuccess` / `onError` / `onSettled` passed in `config` still
  * runs — this wrapper calls them *after* its own logic.
@@ -56,8 +67,6 @@ const useMutationWithNotification = (config) => {
     },
 
     onError: (error, variables, context) => {
-      console.error("useMutationWithNotification error:", config) // 👈 temporaire, pour debug
-
       const message =
         error?.message || config.errorMessage || "Une erreur est survenue"
 
@@ -67,7 +76,7 @@ const useMutationWithNotification = (config) => {
 
     onSettled: (data, error, variables, context) => {
       if (config.invalidate !== false) {
-        invalidateAccounts(queryClient)
+        invalidateData(queryClient)
       }
 
       config.onSettled?.(data, error, variables, context)
@@ -83,15 +92,9 @@ export const useGetTransactions = ({ enabled = true } = {}) => {
     queryKey: ["transactions"],
     queryFn: async () => {
       const transactions = await getAllTransactions()
-
-      // Normalize every entry into an TransactionModel instance, even if
-      // the API already returns model instances (defensive — avoids
-      // double-wrapping while still guaranteeing the shape downstream).
-      return transactions.map((transaction) =>
-        transaction instanceof TransactionModel
-          ? transaction
-          : new TransactionModel(transaction),
-      )
+      // Model conversion lives here: the API layer returns raw data,
+      // this hook is responsible for turning it into domain objects.
+      return transactions.map((transaction) => new TransactionModel(transaction))
     },
 
     enabled,
@@ -107,11 +110,94 @@ export const useGetTransactions = ({ enabled = true } = {}) => {
 }
 
 // ----------------------------
+// Get transactions by account name
+// ----------------------------
+export const useGetTransactionsByAccountName = (accountName, { enabled = true } = {}) => {
+  return useQuery({
+    queryKey: ["transactions", "byAccountName", accountName],
+    queryFn: async () => {
+      const transactions = await getTransactionsByAccountName(accountName)
+      return transactions.map((transaction) => new TransactionModel(transaction))
+    },
+
+    // Avoids firing with an empty/undefined accountName.
+    enabled: enabled && !!accountName,
+
+    placeholderData: keepPreviousData,
+    staleTime: 10000 * 60,
+  })
+}
+
+// ----------------------------
+// Get transactions by account ID
+// ----------------------------
+export const useGetTransactionsByAccountId = (accountId, { enabled = true } = {}) => {
+  return useQuery({
+    queryKey: ["transactions", "byAccountId", accountId],
+    queryFn: async () => {
+      const transactions = await getTransactionsByAccountId(accountId)
+      return transactions.map((transaction) => new TransactionModel(transaction))
+    },
+
+    enabled: enabled && !!accountId,
+
+    placeholderData: keepPreviousData,
+    staleTime: 10000 * 60,
+  })
+}
+
+// ----------------------------
 // Create a new transaction
 // ----------------------------
 export const useCreateTransaction = () =>
   useMutationWithNotification({
-    mutationFn: createTransaction,
+    mutationFn: async (transactionData) => {
+      const created = await createTransaction(transactionData)
+      return new TransactionModel(created)
+    },
     successMessage: "Transaction ajoutée",
     errorMessage: "Erreur lors de la création",
+  })
+
+// ----------------------------
+// Update an existing transaction
+// ----------------------------
+export const useUpdateTransaction = () =>
+  useMutationWithNotification({
+    mutationFn: async ({ id, updatedData }) => {
+      const updated = await updateTransaction({ id, updatedData })
+      return new TransactionModel(updated)
+    },
+    successMessage: "Transaction mise à jour",
+    errorMessage: "Erreur lors de la mise à jour",
+  })
+
+// ----------------------------
+// Delete a single transaction
+// ----------------------------
+export const useDeleteTransaction = () =>
+  useMutationWithNotification({
+    mutationFn: deleteTransaction,
+    successMessage: "Transaction supprimée",
+    errorMessage: "Erreur lors de la suppression",
+  })
+
+// ----------------------------
+// Bulk delete transactions
+// ----------------------------
+export const useDeleteTransactions = () =>
+  useMutationWithNotification({
+    mutationFn: deleteTransactions,
+    successMessage: "Transactions supprimées",
+    errorMessage: "Erreur lors de la suppression",
+  })
+
+// ----------------------------
+// Validate transactions
+// ----------------------------
+export const useValidateTransactions = () =>
+  useMutationWithNotification({
+    mutationFn: validateTransactions,
+    successMessage: "Transactions validées",
+    errorMessage: "Erreur lors de la validation",
   })
