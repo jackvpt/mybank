@@ -1,6 +1,8 @@
 // 📁 CSS imports
 import "./Loader.scss"
 
+// 🖼️ Image imports
+import Logo from "../../assets/images/logo_mybank_black.svg?react"
 /**
  * Loader component displaying a loading animation.
  * Uses a modal overlay with a spinner and localized loading text.
@@ -9,7 +11,6 @@ import "./Loader.scss"
  * @returns {JSX.Element} Rendered Loader component
  */
 const Loader = () => {
-
   return (
     <section className="loader">
       {/* Modal overlay */}
@@ -20,14 +21,8 @@ const Loader = () => {
 
           {/* Loading text */}
           <div className="loader__text">
-            
             {/* Logo */}
-            <img
-              className="loader__image"
-              src="/logo-hh.png"
-              alt="App logo"
-              width={"48px"}
-            />
+            <Logo className="loader__image" />{" "}
           </div>
         </div>
       </div>
