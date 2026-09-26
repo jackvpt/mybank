@@ -2,7 +2,7 @@
 import axios from "axios"
 
 // 🔗 Config
-import { COMMON_API_URL } from "./common_url"
+import { COMMON_API_URL } from "./common_api_url"
 
 const BASE_URL = `${COMMON_API_URL}/settings`
 

@@ -1,7 +1,8 @@
-import { API_URL } from "./apiURL"
+// Data
+import { COMMON_API_URL } from "./common_api_url"
 
 // Base URL for authentication-related endpoints
-const BASE_URL = `${API_URL}/categories`
+const BASE_URL = `${COMMON_API_URL}/categories`
 
 /**
  * Sorts categories by type and name.

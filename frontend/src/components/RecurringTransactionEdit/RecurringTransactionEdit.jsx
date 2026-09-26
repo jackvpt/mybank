@@ -35,7 +35,7 @@ import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
 /** API imports */
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getAllSettings } from "../../api/settings.api"
-import { fetchBankAccounts } from "../../api/bankAccounts"
+import { getAllBankAccounts } from "../../api/bankAccounts.api"
 import { fetchAllCategories } from "../../api/categories"
 import {
   deleteRecurringTransaction,
@@ -153,7 +153,7 @@ const RecurringTransactionEdit = () => {
     error: bankAccountsError,
   } = useQuery({
     queryKey: ["bankAccounts"],
-    queryFn: fetchBankAccounts,
+    queryFn: getAllBankAccounts,
   })
 
   // Fetch recurring transactions using React Query

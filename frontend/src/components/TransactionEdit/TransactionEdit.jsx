@@ -35,7 +35,7 @@ import { useQuery } from "@tanstack/react-query"
 
 // 🔌 API calls
 import { getAllSettings } from "../../api/settings.api.js"
-import { fetchBankAccounts } from "../../api/bankAccounts"
+import { getAllBankAccounts } from "../../api/bankAccounts.api"
 import { fetchAllCategories } from "../../api/categories"
 
 // 🪝 Custom hooks
@@ -116,7 +116,7 @@ const TransactionEdit = () => {
     error: bankAccountsError,
   } = useQuery({
     queryKey: ["bankAccounts"],
-    queryFn: fetchBankAccounts,
+    queryFn: getAllBankAccounts,
   })
 
   // Fetch transactions using the shared hook (already returns TransactionModel instances)

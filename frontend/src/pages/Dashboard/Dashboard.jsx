@@ -1,6 +1,6 @@
 import "./Dashboard.scss"
 import { useQuery } from "@tanstack/react-query"
-import { fetchBankAccounts } from "../../api/bankAccounts"
+import { getAllBankAccounts } from "../../api/bankAccounts.api"
 import BankAccountCard from "../../components/BankAccountCard/BankAccountCard"
 import { getAllTransactions } from "../../api/transactions.api"
 
@@ -11,7 +11,7 @@ const Dashboard = () => {
     error: accountError,
   } = useQuery({
     queryKey: ["bankAccounts"],
-    queryFn: fetchBankAccounts,
+    queryFn: getAllBankAccounts,
   })
 
   const {

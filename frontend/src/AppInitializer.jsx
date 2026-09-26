@@ -1,6 +1,6 @@
 // 🪝 Hooks
 import { useAuthToken } from "/src/hooks/useAuthToken"
-import { useFetchBankAccounts } from "/src/hooks/useFetchBankAccounts"
+import { useGetBankAccounts } from "/src/hooks/useBankAccounts"
 import { useGetTransactions } from "/src/hooks/useTransactions"
 import { useQuery } from "@tanstack/react-query"
 import { useDispatch } from "react-redux"
@@ -49,7 +49,7 @@ const AppInitializer = ({ children }) => {
     isLoading: accountsLoading,
     isError: accountsError,
     error: accountsErrorObj,
-  } = useFetchBankAccounts()
+  } = useGetBankAccounts()
 
   // Step 3: transactions, once auth is confirmed.
   const {

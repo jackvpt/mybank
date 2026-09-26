@@ -2,7 +2,7 @@
 import { useMutation } from "@tanstack/react-query"
 
 // 🧰 API functions
-import { login } from "../api/auth"
+import { login } from "../api/auth.api"
 
 // 📦 React imports
 import { useDispatch } from "react-redux"
