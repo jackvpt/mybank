@@ -1,68 +1,15 @@
-import { useQuery } from "@tanstack/react-query"
+// 🧭 Router
 import Router from "./router/Router"
-import { getAllSettings } from "./api/settings.api"
-import { fetchAllCategories } from "./api/categories"
-import { useDispatch } from "react-redux"
-import { useEffect } from "react"
-import {
-  clearSelectedCheckTransactionIds,
-  clearSelectedRecurringTransactionIds,
-  clearSelectedTransactionIds,
-} from "./features/parametersSlice"
-import { fetchAllRecurringTransactions } from "./api/recurringTransactions"
-import { useAuthToken } from "./hooks/useAuthToken"
-import Loader from "./components/Loader/Loader"
-import { useFetchBankAccounts } from "./hooks/useFetchBankAccounts"
-import { useGetTransactions } from "./hooks/useTransactions"
 
-function App() {
-  const dispatch = useDispatch()
+// 🧩 Components
+import AppInitializer from "./AppInitializer"
 
-  // Token validation
-  const { isAuthLoading, errorAuthToken } = useAuthToken()
-
-  const { isLoading: isLoadingBankAccounts, error: errorBankAccounts, data: bankAccounts } =
-    useFetchBankAccounts()
-
-  const { isLoading: isLoadingTransactions, error: errorTransactions } =
-    useGetTransactions()
-
-  useQuery({
-    queryKey: ["recurringTransactions"],
-    queryFn: fetchAllRecurringTransactions,
-  })
-
-  useQuery({
-    queryKey: ["settings"],
-    queryFn: getAllSettings,
-  })
-
-  useQuery({
-    queryKey: ["categories"],
-    queryFn: fetchAllCategories,
-  })
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        dispatch(clearSelectedTransactionIds())
-        dispatch(clearSelectedRecurringTransactionIds())
-        dispatch(clearSelectedCheckTransactionIds())
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [dispatch])
-
-  if (isAuthLoading || isLoadingBankAccounts || isLoadingTransactions)
-    return <Loader />
-
+const App = () => {
   return (
-    <>
-      {/* Main router handling all application routes */}
+    <AppInitializer>
       <Router />
-    </>
+    </AppInitializer>
   )
 }
+
 export default App

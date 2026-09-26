@@ -85,7 +85,7 @@ const Transactions = () => {
 
   const transactions = useMemo(
     () =>
-      transactionsData.filter(
+      (transactionsData ?? []).filter(
         (transaction) => transaction.accountId === bankAccountId,
       ),
     [transactionsData, bankAccountId],
