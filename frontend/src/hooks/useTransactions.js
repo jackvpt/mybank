@@ -9,8 +9,6 @@ import {
 // 🔌 API calls
 import {
   getAllTransactions,
-  getTransactionsByAccountName,
-  getTransactionsByAccountId,
   createTransaction,
   updateTransaction,
   deleteTransaction,
@@ -23,6 +21,20 @@ import TransactionModel from "../models/TransactionModel"
 
 // 🔔 Notifications
 import { useNotification } from "./NotificationProvider/useNotification"
+
+// ⏱️ Query cache config
+const STALE_TIME = 10 * 60 * 1000 // Time before data is considered stale (no more fresh)
+const REFETCH_INTERVAL = 10 * 60 * 1000 // Time between automatic refetches (if the query is active in the viewport)
+
+const DEFAULT_QUERY_OPTIONS = {
+  staleTime: STALE_TIME,
+  refetchInterval: REFETCH_INTERVAL,
+
+  // v5 replacement for `keepPreviousData: true`: keeps showing the
+  // last successful data while a refetch is in flight, instead of
+  // flashing a loading state.
+  placeholderData: keepPreviousData,
+}
 
 /**
  * Invalidates the "transactions" query, forcing a
@@ -87,62 +99,66 @@ const useMutationWithNotification = (config) => {
 // ----------------------------
 // Get all transactions
 // ----------------------------
-export const useGetTransactions = ({ enabled = true } = {}) => {
+export const useGetAllTransactions = ({ enabled = true } = {}) => {
   return useQuery({
     queryKey: ["transactions"],
     queryFn: async () => {
       const transactions = await getAllTransactions()
       // Model conversion lives here: the API layer returns raw data,
       // this hook is responsible for turning it into domain objects.
-      return transactions.map((transaction) => new TransactionModel(transaction))
+      return transactions.map(
+        (transaction) => new TransactionModel(transaction),
+      )
     },
 
     enabled,
 
-    // v5 replacement for `keepPreviousData: true`: keeps showing the
-    // last successful data while a refetch is in flight, instead of
-    // flashing a loading state.
-    placeholderData: keepPreviousData,
-
-    staleTime: 10000 * 60, // 10 minutes
-    refetchInterval: 600000, // poll every 10 minutes — matches staleTime above
+    ...DEFAULT_QUERY_OPTIONS,
   })
 }
 
 // ----------------------------
 // Get transactions by account name
 // ----------------------------
-export const useGetTransactionsByAccountName = (accountName, { enabled = true } = {}) => {
+export const useGetTransactionsByAccountName = (
+  accountName,
+  { enabled = true } = {},
+) => {
   return useQuery({
     queryKey: ["transactions", "byAccountName", accountName],
     queryFn: async () => {
-      const transactions = await getTransactionsByAccountName(accountName)
-      return transactions.map((transaction) => new TransactionModel(transaction))
+      const allTransactions = await getAllTransactions()
+      return allTransactions
+        .filter((transaction) => transaction.accountName === accountName)
+        .map((transaction) => new TransactionModel(transaction))
     },
 
     // Avoids firing with an empty/undefined accountName.
     enabled: enabled && !!accountName,
 
-    placeholderData: keepPreviousData,
-    staleTime: 10000 * 60,
+    ...DEFAULT_QUERY_OPTIONS,
   })
 }
 
 // ----------------------------
 // Get transactions by account ID
 // ----------------------------
-export const useGetTransactionsByAccountId = (accountId, { enabled = true } = {}) => {
+export const useGetTransactionsByAccountId = (
+  accountId,
+  { enabled = true } = {},
+) => {
   return useQuery({
     queryKey: ["transactions", "byAccountId", accountId],
     queryFn: async () => {
-      const transactions = await getTransactionsByAccountId(accountId)
-      return transactions.map((transaction) => new TransactionModel(transaction))
+      const allTransactions = await getAllTransactions()
+      return allTransactions
+        .filter((transaction) => transaction.accountId === accountId)
+        .map((transaction) => new TransactionModel(transaction))
     },
 
     enabled: enabled && !!accountId,
 
-    placeholderData: keepPreviousData,
-    staleTime: 10000 * 60,
+    ...DEFAULT_QUERY_OPTIONS,
   })
 }
 

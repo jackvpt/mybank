@@ -28,7 +28,7 @@ import {
 } from "../../features/parametersSlice"
 import TransactionsToolBar from "../../components/TransactionsToolBar/TransactionsToolBar"
 import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
-import { useGetTransactions } from "../../hooks/useTransactions"
+import { useGetAllTransactions } from "../../hooks/useTransactions"
 
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
@@ -81,7 +81,7 @@ const Transactions = () => {
     isLoading: isLoadingTransactions,
     error: errorTransactions,
     data: transactionsData,
-  } = useGetTransactions()
+  } = useGetAllTransactions()
 
   const transactions = useMemo(
     () =>

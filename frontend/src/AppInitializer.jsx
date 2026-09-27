@@ -1,7 +1,7 @@
 // 🪝 Hooks
 import { useAuthToken } from "/src/hooks/useAuthToken"
 import { useGetBankAccounts } from "/src/hooks/useBankAccounts"
-import { useGetTransactions } from "/src/hooks/useTransactions"
+import { useGetAllTransactions } from "/src/hooks/useTransactions"
 import { useQuery } from "@tanstack/react-query"
 import { useDispatch } from "react-redux"
 import { useEffect } from "react"
@@ -56,7 +56,7 @@ const AppInitializer = ({ children }) => {
     isLoading: transactionsLoading,
     isError: transactionsError,
     error: transactionsErrorObj,
-  } = useGetTransactions()
+  } = useGetAllTransactions()
 
   // Secondary data — non-blocking for rendering, but still gated on
   // auth to avoid calls with an invalid token.

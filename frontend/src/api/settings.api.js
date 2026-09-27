@@ -14,18 +14,6 @@ const api = axios.create({
   },
 })
 
-// export const getAllSettings = async () => {
-//   try {
-//     const response = await fetch(`${BASE_URL}`)
-//     if (!response.ok) throw new Error("Settings request failed")
-//     const data = await response.json()
-//     return data
-//   } catch (error) {
-//     console.error(`Error fetching settings data: ${error.message}`)
-//     throw error
-//   }
-// }
-
 /**
  * Gets all settings from the API.
  * @returns {Promise<Object[]>} raw settings objects

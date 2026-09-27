@@ -36,8 +36,6 @@ import { getAllSettings } from "../../api/settings.api"
 import { getAllBankAccounts } from "../../api/bankAccounts.api"
 import { fetchAllCategories } from "../../api/categories"
 import {
-  getAllTransactions,
-  getTransactionsByAccountName,
   createTransaction,
   updateTransaction,
   deleteTransactions,

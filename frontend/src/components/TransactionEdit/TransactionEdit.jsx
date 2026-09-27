@@ -40,7 +40,7 @@ import { fetchAllCategories } from "../../api/categories"
 
 // 🪝 Custom hooks
 import {
-  useGetTransactions,
+  useGetAllTransactions,
   useCreateTransaction,
   useUpdateTransaction,
   useDeleteTransactions,
@@ -124,7 +124,7 @@ const TransactionEdit = () => {
     isLoading: isLoadingTransactions,
     error: errorTransactions,
     data: transactions = [],
-  } = useGetTransactions()
+  } = useGetAllTransactions()
 
   const transactionTypes = settings ? settings[0].types : []
 

@@ -22,8 +22,9 @@ import {
   removeSelectedRecurringTransactionId,
   setSelectedRecurringTransactionIds,
 } from "../../features/parametersSlice"
-import { getAllSettings } from "../../api/settings.api"
 import RecurringToolBar from "../../components/RecurringToolBar/RecurringToolBar"
+
+import { useGetSettings } from "../../hooks/useSettings"
 
 /**
  * RecurringTransactions component that fetches and displays recurring transactions.
@@ -33,15 +34,12 @@ import RecurringToolBar from "../../components/RecurringToolBar/RecurringToolBar
 const RecurringTransactions = () => {
   const dispatch = useDispatch()
 
-  // Fetch settings using React Query
+  // Get all settings using the custom hook
   const {
     data: settings,
     isLoading: isLoadingSettings,
     error: settingsError,
-  } = useQuery({
-    queryKey: ["settings"],
-    queryFn: () => getAllSettings(),
-  })
+  } = useGetSettings()
 
   const isRecurringEditWindowVisible = useSelector(
     (state) => state.parameters.isRecurringEditWindowVisible
@@ -180,7 +178,7 @@ const RecurringTransactions = () => {
     return text
   }
 
-  return (
+    return (
     <section className="container-recurringTransactions">
       <div className="container-recurringTransactions__tools">
         <RecurringToolBar />

@@ -1,5 +1,5 @@
 import "./CheckTransactions.scss"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 // DEV imports
@@ -23,7 +23,6 @@ import {
 } from "@mui/material"
 
 import {
-  getTransactionsByAccountName,
   updateTransaction,
 } from "../../api/transactions.api"
 import CheckTransactionsToolBar from "../../components/CheckTransactionsToolBar/CheckTransactionsToolBar"
@@ -34,6 +33,8 @@ import {
   setSelectedCheckTransactionIds,
 } from "../../features/parametersSlice"
 import CheckTransactionsToolBox from "../../components/CheckTransactionsToolBox/CheckTransactionsToolBox"
+
+import { useGetAllTransactions } from "../../hooks/useTransactions"
 
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
@@ -52,7 +53,7 @@ const CheckTransactions = () => {
   const dispatch = useDispatch()
 
   const checkInitialAmount = useSelector(
-    (state) => state.parameters.checking.initialAmount
+    (state) => state.parameters.checking.initialAmount,
   )
 
   const updateMutation = useMutation({
@@ -65,9 +66,13 @@ const CheckTransactions = () => {
     },
   })
 
-  const bankAccountName = useSelector((state) => state.parameters.bankAccount)
+  const bankAccountName = useSelector(
+    (state) => state.parameters.bankAccount.name,
+  )
+  const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
+
   const selectedCheckTransactionIds = useSelector(
-    (state) => state.parameters.selectedCheckTransactionIds
+    (state) => state.parameters.selectedCheckTransactionIds,
   )
   const isMobile = useMediaQuery(theme.breakpoints.down("tablet"))
   const visibleColumns = visibleColumnsConfig(isMobile)
@@ -75,22 +80,22 @@ const CheckTransactions = () => {
   const [order, setOrder] = useState("asc")
   const [orderBy, setOrderBy] = useState("date")
 
-  const {
-    data: transactions = [],
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["transactions", bankAccountName],
-    queryFn: () => getTransactionsByAccountName(bankAccountName),
-    enabled: !!bankAccountName,
-  })
+  const { isLoading, error, data: transactionsData = [] } = useGetTransactions()
+
+  const transactions = useMemo(
+    () =>
+      (transactionsData ?? []).filter(
+        (transaction) => transaction.accountId === bankAccountId,
+      ),
+    [transactionsData, bankAccountId],
+  )
 
   const unvalidatedTransactions = transactions.filter(
-    (tx) => tx.status !== "validated"
+    (tx) => tx.status !== "validated",
   )
 
   const isCheckTransactionsEditWindowVisible = useSelector(
-    (state) => state.parameters.isCheckTransactionsEditWindowVisible
+    (state) => state.parameters.isCheckTransactionsEditWindowVisible,
   )
 
   // Sort transactions
@@ -131,16 +136,16 @@ const CheckTransactions = () => {
 
   const updateCheckCurrentAmount = () => {
     const pointedTransactions = unvalidatedTransactions.filter(
-      (tx) => tx.status === "pointed"
+      (tx) => tx.status === "pointed",
     )
 
     const totalDebit = pointedTransactions.reduce(
       (sum, tx) => sum + (tx.debit || 0),
-      0
+      0,
     )
     const totalCredit = pointedTransactions.reduce(
       (sum, tx) => sum + (tx.credit || 0),
-      0
+      0,
     )
     const currentAmount =
       parseFloat(checkInitialAmount) + totalCredit - totalDebit
@@ -233,7 +238,7 @@ const CheckTransactions = () => {
                         </TableCell>
 
                         {visibleColumns.find(
-                          (col) => col.id === "status" && col.show
+                          (col) => col.id === "status" && col.show,
                         ) && (
                           <TableCell align="center">
                             <Box
@@ -250,8 +255,8 @@ const CheckTransactions = () => {
                                   tx.status === "validated"
                                     ? "green"
                                     : tx.status === "pointed"
-                                    ? "blue"
-                                    : "white",
+                                      ? "blue"
+                                      : "white",
                                 border: "1px solid #ccc",
                                 margin: "0 auto",
                               }}
