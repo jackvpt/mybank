@@ -1,8 +1,8 @@
 @use "../../styles/utils/variables" as *;
 @use "../../styles/utils/mixins" as *;
 
-.loader {
-  &__modal {
+.container__loader {
+  &--modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -12,11 +12,11 @@
     flex-direction: column;
     justify-content: center; // center horizontally
     align-items: center; // center vertically
-    background:whitesmoke; // optional: dark overlay
+    background:whitesmoke;
     z-index: 9999; // make sure it stays on top
   }
 
-  &__container {
+  &--content {
     display: flex;
     flex-direction: column; // stack image, spinner and text vertically
     align-items: center; // center horizontally
@@ -24,7 +24,7 @@
     text-align: center;
   }
 
-  &__spinner {
+  &--spinner {
     color: $primary-color-2;
     font-size: 100px; // spinner size
     width: 1em;
@@ -36,7 +36,7 @@
       round 1.7s infinite ease;
   }
 
-  &__text {
+  &--text {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -52,7 +52,7 @@
     // color: $text-color-1;
   }
 
-  &__image {
+  &--image {
     width: clamp(32px, 8vw, 48px);
     height: auto;
     color: $primary-color-2;

@@ -9,12 +9,12 @@ import Header from "../components/Header/Header"
 import Footer from "../components/Footer/Footer"
 
 // 📄 Pages
-import Login from "../pages/Login/Login"
+import LoginPage from "../pages/LoginPage/LoginPage"
 import Error from "../pages/Error/Error"
-import Dashboard from "../pages/Dashboard/Dashboard"
-import Transactions from "../pages/Transactions/Transactions"
-import RecurringTransactions from "../pages/RecurringTransactions/RecurringTransactions"
-import CheckTransactions from "../pages/CheckTransactions/CheckTransactions"
+import DashboardPage from "../pages/DashboardPage/DashboardPage"
+import TransactionsPage from "../pages/TransactionsPage/TransactionsPage"
+import RecurringTransactionsPage from "../pages/RecurringTransactionsPage/RecurringTransactionsPage"
+import CheckTransactionsPage from "../pages/CheckTransactionsPage/CheckTransactionsPage"
 
 /**
  * Router — application router component using React Router v6.
@@ -43,15 +43,15 @@ const Router = () => {
           {isAuthenticated ? (
             <>
               {/* Routes for authenticated users only */}
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/transactions" element={<Transactions />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/transactions" element={<TransactionsPage />} />
               <Route
                 path="/recurringtransactions"
-                element={<RecurringTransactions />}
+                element={<RecurringTransactionsPage />}
               />
               <Route
                 path="/checktransactions"
-                element={<CheckTransactions />}
+                element={<CheckTransactionsPage />}
               />
 
               {/* Logged-in users shouldn't see login —
@@ -67,7 +67,7 @@ const Router = () => {
           ) : (
             <>
               {/* Routes available to unauthenticated visitors */}
-              <Route path="/login" element={<Login />} />
+              <Route path="/login" element={<LoginPage />} />
 
               {/* Redirect any other unknown route to login */}
               <Route path="*" element={<Navigate to="/login" replace />} />

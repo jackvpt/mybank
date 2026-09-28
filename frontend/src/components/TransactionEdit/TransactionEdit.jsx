@@ -36,7 +36,6 @@ import { useQuery } from "@tanstack/react-query"
 // 🔌 API calls
 import { getAllSettings } from "../../api/settings.api.js"
 import { getAllBankAccounts } from "../../api/bankAccounts.api"
-import { fetchAllCategories } from "../../api/categories"
 
 // 🪝 Custom hooks
 import {
@@ -45,6 +44,7 @@ import {
   useUpdateTransaction,
   useDeleteTransactions,
 } from "../../hooks/useTransactions"
+import { useGetAllCategories } from "../../hooks/useCategories"
 
 // 📦 Data for the shortcut buttons
 import { shortcuts } from "../../data/transactionEditShortCuts.js"
@@ -91,15 +91,13 @@ const TransactionEdit = () => {
     queryFn: () => getAllSettings(),
   })
 
-  // Fetch categories using React Query
+  // Fetch categories
   const {
     data: transactionsCategories = [],
     isLoading: isLoadingCategories,
     error: categoriesError,
-  } = useQuery({
-    queryKey: ["categories"],
-    queryFn: () => fetchAllCategories(),
-  })
+  } = useGetAllCategories()
+
   const groupedTransactionsCategories = transactionsCategories.reduce(
     (acc, category) => {
       if (!acc[category.type]) acc[category.type] = []

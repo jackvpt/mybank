@@ -1,4 +1,4 @@
-import "./Transactions.scss"
+import "./TransactionsPage.scss"
 import { useState, useEffect, useRef, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -29,6 +29,7 @@ import {
 import TransactionsToolBar from "../../components/TransactionsToolBar/TransactionsToolBar"
 import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
 import { useGetAllTransactions } from "../../hooks/useTransactions"
+import Loader from "../../components/Loader/Loader"
 
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
@@ -144,7 +145,7 @@ const Transactions = () => {
     }
   }, [transactions, transactionsTableScrollPosition, dispatch])
 
-  if (isLoadingTransactions) return <p>Chargement des transactions...</p>
+  if (!isLoadingTransactions) return <Loader />
   if (errorTransactions) return <p>Erreur : {errorTransactions.message}</p>
 
   // Filter transactions by date

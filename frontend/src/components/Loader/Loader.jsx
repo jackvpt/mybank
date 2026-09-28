@@ -12,17 +12,17 @@ import Logo from "../../assets/images/logo_mybank_black.svg?react"
  */
 const Loader = () => {
   return (
-    <section className="loader">
+    <section className="container__loader">
       {/* Modal overlay */}
-      <div className="loader__modal">
-        <div className="loader__container">
+      <div className="container__loader--modal">
+        <div className="container__loader--content">
           {/* Spinner animation */}
-          <div className="loader__spinner"></div>
+          <div className="container__loader--spinner"></div>
 
           {/* Loading text */}
-          <div className="loader__text">
+          <div className="container__loader--text">
             {/* Logo */}
-            <Logo className="loader__image" />{" "}
+            <Logo className="container__loader--image" />{" "}
           </div>
         </div>
       </div>

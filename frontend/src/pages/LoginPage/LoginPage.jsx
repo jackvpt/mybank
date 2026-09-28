@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { Link } from "react-router-dom"
-import "./Login.scss"
+import "./LoginPage.scss"
 import {
   Button,
   Checkbox,

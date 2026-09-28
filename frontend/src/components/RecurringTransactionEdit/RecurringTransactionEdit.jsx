@@ -36,7 +36,6 @@ import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getAllSettings } from "../../api/settings.api"
 import { getAllBankAccounts } from "../../api/bankAccounts.api"
-import { fetchAllCategories } from "../../api/categories"
 import {
   deleteRecurringTransaction,
   deleteRecurringTransactions,
@@ -44,6 +43,7 @@ import {
   postRecurringTransaction,
   updateRecurringTransaction,
 } from "../../api/recurringTransactions"
+import { useGetAllCategories } from "../../hooks/useCategories"
 import { fr } from "date-fns/locale"
 
 const RecurringTransactionEdit = () => {
@@ -71,7 +71,7 @@ const RecurringTransactionEdit = () => {
   }
 
   const selectedRecurringTransactionIds = useSelector(
-    (state) => state.parameters.selectedRecurringTransactionIds
+    (state) => state.parameters.selectedRecurringTransactionIds,
   )
 
   /**
@@ -107,7 +107,7 @@ const RecurringTransactionEdit = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries("recurringTransactions")
       setToastMessage(
-        `${data.deletedCount} transaction(s) récurrente(s) supprimée(s)`
+        `${data.deletedCount} transaction(s) récurrente(s) supprimée(s)`,
       )
       setToastOpen(true)
     },
@@ -136,15 +136,12 @@ const RecurringTransactionEdit = () => {
     queryFn: () => getAllSettings(),
   })
 
-  // Fetch categories using React Query
+  // Fetch categories
   const {
-    data: transactionsCategories,
+    data: transactionsCategories = [],
     isLoading: isLoadingCategories,
     error: categoriesError,
-  } = useQuery({
-    queryKey: ["categories"],
-    queryFn: () => fetchAllCategories(),
-  })
+  } = useGetAllCategories()
 
   // Fetch bank accounts using React Query
   const {
@@ -197,7 +194,7 @@ const RecurringTransactionEdit = () => {
     if (selectedRecurringTransactionIds.length === 1) {
       const selected = recurringTransactions.find(
         (recurringTransaction) =>
-          recurringTransaction.id === selectedRecurringTransactionIds[0]
+          recurringTransaction.id === selectedRecurringTransactionIds[0],
       )
 
       if (selected) {
@@ -244,7 +241,7 @@ const RecurringTransactionEdit = () => {
           label: `Virement vers ${formData.destination}`,
         }))
       }
-      console.log('formData :>> ', formData);
+      console.log("formData :>> ", formData)
       addMutation.mutate(formData)
     }
   }
@@ -537,7 +534,7 @@ const RecurringTransactionEdit = () => {
                       <MenuItem key={`${category.name}-${sub}`} value={sub}>
                         {sub}
                       </MenuItem>
-                    ))
+                    )),
                   )}
               </Select>
             </FormControl>

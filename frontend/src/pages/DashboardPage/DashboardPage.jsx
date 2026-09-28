@@ -1,4 +1,4 @@
-import "./Dashboard.scss"
+import "./DashboardPage.scss"
 import { useQuery } from "@tanstack/react-query"
 import { getAllBankAccounts } from "../../api/bankAccounts.api"
 import BankAccountCard from "../../components/BankAccountCard/BankAccountCard"

@@ -1,4 +1,4 @@
-import "./CheckTransactions.scss"
+import "./CheckTransactionsPage.scss"
 import { useState, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -80,7 +80,7 @@ const CheckTransactions = () => {
   const [order, setOrder] = useState("asc")
   const [orderBy, setOrderBy] = useState("date")
 
-  const { isLoading, error, data: transactionsData = [] } = useGetTransactions()
+  const { isLoading, error, data: transactionsData = [] } = useGetAllTransactions()
 
   const transactions = useMemo(
     () =>

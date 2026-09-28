@@ -1,4 +1,4 @@
-import "./RecurringTransactions.scss"
+import "./RecurringTransactionsPage.scss"
 import { fetchAllRecurringTransactions } from "../../api/recurringTransactions"
 import { useQuery } from "@tanstack/react-query"
 import {

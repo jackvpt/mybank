@@ -34,7 +34,7 @@ import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getAllSettings } from "../../api/settings.api"
 import { getAllBankAccounts } from "../../api/bankAccounts.api"
-import { fetchAllCategories } from "../../api/categories"
+import {useGetAllCategories} from "../../hooks/useCategories"
 import {
   createTransaction,
   updateTransaction,
@@ -127,15 +127,12 @@ const CheckTransactionEdit = () => {
     queryFn: () => getAllSettings(),
   })
 
-  // Fetch categories using React Query
+  // Fetch categories
   const {
-    data: transactionsCategories,
+    data: transactionsCategories = [],
     isLoading: isLoadingCategories,
     error: categoriesError,
-  } = useQuery({
-    queryKey: ["categories"],
-    queryFn: () => fetchAllCategories(),
-  })
+  } = useGetAllCategories()
   const groupedTransactionsCategories = transactionsCategories.reduce(
     (acc, category) => {
       if (!acc[category.type]) acc[category.type] = []

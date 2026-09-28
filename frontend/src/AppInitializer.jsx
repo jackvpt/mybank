@@ -1,15 +1,9 @@
 // 🪝 Hooks
 import { useAuthToken } from "/src/hooks/useAuthToken"
-import { useGetBankAccounts } from "/src/hooks/useBankAccounts"
-import { useGetAllTransactions } from "/src/hooks/useTransactions"
-import { useQuery } from "@tanstack/react-query"
+import { useAppData } from "/src/hooks/useAppData"
+
 import { useDispatch } from "react-redux"
 import { useEffect } from "react"
-
-// 🌐 API
-import { getAllSettings } from "/src/api/settings.api"
-import { fetchAllCategories } from "/src/api/categories"
-import { fetchAllRecurringTransactions } from "/src/api/recurringTransactions"
 
 // 🔁 Redux actions
 import {
@@ -39,41 +33,12 @@ import PropTypes from "prop-types"
 const AppInitializer = ({ children }) => {
   const dispatch = useDispatch()
 
-  // Step 1: validate token / restore session.
+  // Validate token / restore session.
   const { isLoading: isAuthLoading, isSuccess: isAuthenticated } =
     useAuthToken()
   const isAuthResolved = !isAuthLoading
 
-  // Step 2: bank accounts, ONLY once auth is confirmed.
-  const {
-    isLoading: accountsLoading,
-    isError: accountsError,
-    error: accountsErrorObj,
-  } = useGetBankAccounts()
-
-  // Step 3: transactions, once auth is confirmed.
-  const {
-    isLoading: transactionsLoading,
-    isError: transactionsError,
-    error: transactionsErrorObj,
-  } = useGetAllTransactions()
-
-  // Secondary data — non-blocking for rendering, but still gated on
-  // auth to avoid calls with an invalid token.
-  useQuery({
-    queryKey: ["recurringTransactions"],
-    queryFn: fetchAllRecurringTransactions,
-  })
-
-  useQuery({
-    queryKey: ["settings"],
-    queryFn: getAllSettings,
-  })
-
-  useQuery({
-    queryKey: ["categories"],
-    queryFn: fetchAllCategories,
-  })
+  const { accounts, transactions } = useAppData({ enabled: isAuthenticated })
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -91,21 +56,19 @@ const AppInitializer = ({ children }) => {
   // Global loading state
   if (
     !isAuthResolved ||
-    (isAuthenticated && (accountsLoading || transactionsLoading))
+    (isAuthenticated && (accounts.isLoading || transactions.isLoading))
   ) {
     return <Loader />
   }
 
-  // Global error state
-  if (isAuthenticated && (accountsError || transactionsError)) {
+  if (isAuthenticated && (accounts.isError || transactions.isError)) {
     return (
       <p>
         Error loading data:{" "}
-        {accountsErrorObj?.message || transactionsErrorObj?.message}
+        {accounts.error?.message || transactions.error?.message}
       </p>
     )
   }
-
 
   return children
 }

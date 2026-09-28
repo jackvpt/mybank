@@ -20,7 +20,7 @@ const api = axios.create({
  */
 export const getAllSettings = async () => {
   try {
-    const { data } = await api.get("")
+    const { data } = await api.get()
     return data
   } catch (error) {
     console.error("Error fetching all settings:", error.message)
