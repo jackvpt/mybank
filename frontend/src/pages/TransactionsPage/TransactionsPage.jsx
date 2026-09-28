@@ -145,7 +145,7 @@ const Transactions = () => {
     }
   }, [transactions, transactionsTableScrollPosition, dispatch])
 
-  if (!isLoadingTransactions) return <Loader />
+  if (isLoadingTransactions) return <Loader variant="inline" size="md" />
   if (errorTransactions) return <p>Erreur : {errorTransactions.message}</p>
 
   // Filter transactions by date

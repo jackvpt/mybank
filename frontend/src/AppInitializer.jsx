@@ -58,7 +58,7 @@ const AppInitializer = ({ children }) => {
     !isAuthResolved ||
     (isAuthenticated && (accounts.isLoading || transactions.isLoading))
   ) {
-    return <Loader />
+    return <Loader label="Chargement..." />
   }
 
   if (isAuthenticated && (accounts.isError || transactions.isError)) {

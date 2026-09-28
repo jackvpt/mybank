@@ -22,9 +22,7 @@ import {
   useMediaQuery,
 } from "@mui/material"
 
-import {
-  updateTransaction,
-} from "../../api/transactions.api"
+import { updateTransaction } from "../../api/transactions.api"
 import CheckTransactionsToolBar from "../../components/CheckTransactionsToolBar/CheckTransactionsToolBar"
 import CheckTransactionEdit from "../../components/CheckTransactionEdit/CheckTransactionEdit"
 import {
@@ -35,6 +33,7 @@ import {
 import CheckTransactionsToolBox from "../../components/CheckTransactionsToolBox/CheckTransactionsToolBox"
 
 import { useGetAllTransactions } from "../../hooks/useTransactions"
+import Loader from "../../components/Loader/Loader"
 
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
@@ -80,7 +79,11 @@ const CheckTransactions = () => {
   const [order, setOrder] = useState("asc")
   const [orderBy, setOrderBy] = useState("date")
 
-  const { isLoading, error, data: transactionsData = [] } = useGetAllTransactions()
+  const {
+    isLoading,
+    error,
+    data: transactionsData = [],
+  } = useGetAllTransactions()
 
   const transactions = useMemo(
     () =>
@@ -155,7 +158,8 @@ const CheckTransactions = () => {
     dispatch(setNoneTransactionChecked(pointedTransactions.length === 0))
   }
 
-  if (isLoading) return <p>Chargement des transactions...</p>
+  if (isLoading) return <Loader variant="inline" size="md" />
+
   if (error) return <p>Erreur : {error.message}</p>
 
   updateCheckCurrentAmount()

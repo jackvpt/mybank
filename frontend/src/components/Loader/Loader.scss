@@ -3,30 +3,42 @@
 
 .container__loader {
   &--modal {
+    --loader-size: 100px; // lg par défaut
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%; // full width of the screen
-    height: 100%; // full height of the screen
+    inset: 0; // replace top/left/width/height
     display: flex;
     flex-direction: column;
-    justify-content: center; // center horizontally
-    align-items: center; // center vertically
-    background:whitesmoke;
-    z-index: 9999; // make sure it stays on top
+    justify-content: center;
+    align-items: center;
+    background: whitesmoke;
+    z-index: 9999;
+  }
+
+  &--md { --loader-size: 48px; }
+&--sm { --loader-size: 24px; }
+
+&--ring {
+  position: relative; // le logo se centre sur le spinner
+}
+
+  // Inline variant : covers the parent (which must must position: relative)
+  &--inline {
+    position: absolute;
+    z-index: 10;
+    background: rgba(245, 245, 245, 0.7); // voile sur le contenu
   }
 
   &--content {
     display: flex;
     flex-direction: column; // stack image, spinner and text vertically
     align-items: center; // center horizontally
-    justify-content: flex-start; // center vertically               // spacing between items
+    justify-content: flex-start;
     text-align: center;
   }
 
   &--spinner {
     color: $primary-color-2;
-    font-size: 100px; // spinner size
+  font-size: var(--loader-size); 
     width: 1em;
     height: 1em;
     border-radius: 50%;
@@ -34,6 +46,20 @@
     animation:
       mltShdSpin 1.7s infinite ease,
       round 1.7s infinite ease;
+  }
+
+  // Sizes : it changes the font-size, not width/height (shadows are with em)
+  &--sm &--spinner {
+    font-size: 24px;
+  }
+  &--md &--spinner {
+    font-size: 48px;
+  }
+
+  // No logo for small loaders
+  &--sm &--text,
+  &--md &--text {
+    display: none;
   }
 
   &--text {
@@ -49,8 +75,14 @@
     gap: 1.5rem;
 
     font-size: 1.5rem;
-    // color: $text-color-1;
   }
+
+&--label {
+  margin-top: calc(var(--loader-size) * 0.6); // dégage l'anneau, proportionnel à la taille
+  font-size: 1rem;
+  color: $primary-color-2;
+  text-align: center;
+}
 
   &--image {
     width: clamp(32px, 8vw, 48px);

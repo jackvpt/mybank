@@ -25,6 +25,7 @@ import {
 import RecurringToolBar from "../../components/RecurringToolBar/RecurringToolBar"
 
 import { useGetSettings } from "../../hooks/useSettings"
+import Loader from "../../components/Loader/Loader"
 
 /**
  * RecurringTransactions component that fetches and displays recurring transactions.
@@ -42,11 +43,11 @@ const RecurringTransactions = () => {
   } = useGetSettings()
 
   const isRecurringEditWindowVisible = useSelector(
-    (state) => state.parameters.isRecurringEditWindowVisible
+    (state) => state.parameters.isRecurringEditWindowVisible,
   )
 
   const selectedRecurringTransactionIds = useSelector(
-    (state) => state.parameters.selectedRecurringTransactionIds
+    (state) => state.parameters.selectedRecurringTransactionIds,
   )
 
   /**
@@ -123,7 +124,7 @@ const RecurringTransactions = () => {
       return order === "asc"
         ? String(aValue).localeCompare(String(bValue))
         : String(bValue).localeCompare(String(aValue))
-    }
+    },
   )
 
   const handleRowClick = (e, tx, index) => {
@@ -136,7 +137,7 @@ const RecurringTransactions = () => {
       dispatch(
         setSelectedRecurringTransactionIds([
           ...new Set([...selectedRecurringTransactionIds, ...ids]),
-        ])
+        ]),
       )
     } else if (e.ctrlKey || e.metaKey) {
       selectedRecurringTransactionIds.includes(tx.id)
@@ -150,7 +151,7 @@ const RecurringTransactions = () => {
   }
 
   if (isLoadingRecurringTransactions || isLoadingSettings)
-    return <p>Loading recurring transactions...</p>
+    return <Loader variant="inline" size="md" />
   if (recurringTransactionsError || settingsError)
     return (
       <p>Error fetching transactions: {recurringTransactionsError.message}</p>
@@ -178,7 +179,7 @@ const RecurringTransactions = () => {
     return text
   }
 
-    return (
+  return (
     <section className="container-recurringTransactions">
       <div className="container-recurringTransactions__tools">
         <RecurringToolBar />
@@ -247,10 +248,10 @@ const RecurringTransactions = () => {
               </TableHead>
               {/* Table body */}
               <TableBody>
-                {sortedRecurringTransactions.map((tx,index) => (
+                {sortedRecurringTransactions.map((tx, index) => (
                   <TableRow
                     key={tx.id}
-                    onClick={(e) => handleRowClick(e,tx,index)}
+                    onClick={(e) => handleRowClick(e, tx, index)}
                     className={`transaction-row ${
                       selectedRecurringTransactionIds.includes(tx.id)
                         ? "rowSelected"
