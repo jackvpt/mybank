@@ -4,9 +4,9 @@
 import { useQuery } from "@tanstack/react-query"
 
 // 🪝 Hooks
-import { useGetBankAccounts } from "./useBankAccounts"
+import { useGetAllBankAccounts } from "./useBankAccounts"
 import { useGetAllTransactions } from "./useTransactions"
-import { useGetSettings } from "./useSettings"
+import { useGetAllSettings } from "./useSettings"
 import { useGetAllCategories } from "./useCategories"
 
 // 🌐 API
@@ -26,7 +26,7 @@ import { fetchAllRecurringTransactions } from "../api/recurringTransactions"
  * fire with an unconfirmed/invalid token.
  */
 export const useAppData = ({ enabled = true } = {}) => {
-  const accounts = useGetBankAccounts({ enabled })
+  const accounts = useGetAllBankAccounts({ enabled })
   const transactions = useGetAllTransactions({ enabled })
 
   useQuery({
@@ -35,7 +35,7 @@ export const useAppData = ({ enabled = true } = {}) => {
     enabled,
   })
 
-  useGetSettings({ enabled })
+  useGetAllSettings({ enabled })
   useGetAllCategories({ enabled })
 
   return { accounts, transactions }

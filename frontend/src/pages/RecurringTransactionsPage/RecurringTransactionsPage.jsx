@@ -24,7 +24,7 @@ import {
 } from "../../store/features/parametersSlice"
 import RecurringToolBar from "../../components/RecurringToolBar/RecurringToolBar"
 
-import { useGetSettings } from "../../hooks/useSettings"
+import { useGetAllSettings } from "../../hooks/useSettings"
 import Loader from "../../components/Loader/Loader"
 
 /**
@@ -40,7 +40,7 @@ const RecurringTransactions = () => {
     data: settings,
     isLoading: isLoadingSettings,
     error: settingsError,
-  } = useGetSettings()
+  } = useGetAllSettings()
 
   const isRecurringEditWindowVisible = useSelector(
     (state) => state.parameters.isRecurringEditWindowVisible,

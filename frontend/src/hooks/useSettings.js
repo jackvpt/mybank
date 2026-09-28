@@ -7,7 +7,7 @@ import { getAllSettings } from "../api/settings.api"
 // ----------------------------
 // Get all settings
 // ----------------------------
-export const useGetSettings = ({ enabled = true } = {}) => {
+export const useGetAllSettings = ({ enabled = true } = {}) => {
   return useQuery({
     queryKey: ["settings"],
     queryFn: async () => {

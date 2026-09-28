@@ -8,9 +8,9 @@ import { getAllBankAccounts } from "../api/bankAccounts.api"
 import TransactionModel from "../models/TransactionModel"
 
 // ----------------------------
-// Get all transactions
+// Get all bank accounts
 // ----------------------------
-export const useGetBankAccounts = ({ enabled = true } = {}) => {
+export const useGetAllBankAccounts = ({ enabled = true } = {}) => {
   return useQuery({
     queryKey: ["bankaccounts"],
     queryFn: async () => {
