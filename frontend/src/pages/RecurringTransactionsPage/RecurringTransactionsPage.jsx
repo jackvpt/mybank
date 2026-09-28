@@ -21,7 +21,7 @@ import {
   addSelectedRecurringTransactionId,
   removeSelectedRecurringTransactionId,
   setSelectedRecurringTransactionIds,
-} from "../../features/parametersSlice"
+} from "../../store/features/parametersSlice"
 import RecurringToolBar from "../../components/RecurringToolBar/RecurringToolBar"
 
 import { useGetSettings } from "../../hooks/useSettings"

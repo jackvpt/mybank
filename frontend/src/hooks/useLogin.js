@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
 
 // 🗃️ State & Data fetching
-import { setUser } from "../features/userSlice"
+import { setUser } from "../store/features/userSlice"
 import UserModel from "../models/UserModel"
 
 /**

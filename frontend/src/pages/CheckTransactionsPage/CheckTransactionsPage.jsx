@@ -1,7 +1,7 @@
 import "./CheckTransactionsPage.scss"
 import { useState, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation,  useQueryClient } from "@tanstack/react-query"
 // DEV imports
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
@@ -29,7 +29,7 @@ import {
   setCheckingCurrentAmount,
   setNoneTransactionChecked,
   setSelectedCheckTransactionIds,
-} from "../../features/parametersSlice"
+} from "../../store/features/parametersSlice"
 import CheckTransactionsToolBox from "../../components/CheckTransactionsToolBox/CheckTransactionsToolBox"
 
 import { useGetAllTransactions } from "../../hooks/useTransactions"

@@ -10,7 +10,7 @@ import {
   clearSelectedCheckTransactionIds,
   clearSelectedRecurringTransactionIds,
   clearSelectedTransactionIds,
-} from "/src/features/parametersSlice"
+} from "/src/store/features/parametersSlice"
 
 // 🧩 Components
 import Loader from "/src/components/Loader/Loader"

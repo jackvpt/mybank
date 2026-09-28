@@ -20,7 +20,7 @@ import {
   updateRecurringTransaction,
 } from "../../api/recurringTransactions"
 import { createTransaction } from "../../api/transactions.api"
-import { setIsRecurringEditWindowVisible } from "../../features/parametersSlice"
+import { setIsRecurringEditWindowVisible } from "../../store/features/parametersSlice"
 
 const RecurringToolBar = () => {
   // Fetch recurring transactions using React Query

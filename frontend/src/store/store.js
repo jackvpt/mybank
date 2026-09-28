@@ -1,68 +1,76 @@
-// 📦 React imports
 import { configureStore, combineReducers } from "@reduxjs/toolkit"
-import { persistStore, persistReducer } from "redux-persist"
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from "redux-persist"
+import storage from "redux-persist/lib/storage" // localStorage
 
-import storage from "redux-persist/lib/storage" // defaults to localStorage
+// 🧩 Slices
+import userReducer, { clearUser } from "./features/userSlice"
+import parametersReducer from "./features/parametersSlice"
+// import searchAccountReducer from "../features/searchSlice"
 
-// 🗃️ State & Data fetching
-import parametersSlice from "../features/parametersSlice"
-import userSlice from "../features/userSlice"
-
-
-/**
- * Root reducer combining all slices of the Redux store.
- *
- * @category Redux
- * @constant
- */
-const rootReducer = combineReducers({
-  parameters: parametersSlice, // Volatile state, not persisted
-    user: userSlice, // User state, will be persisted
+// 🔗 Combine all reducers
+const appReducer = combineReducers({
+  user: userReducer,
+  parameters: parametersReducer,
+  // searchAccount: searchAccountReducer,
 })
 
-/**
- * Configuration object for redux-persist.
- *
- * @category Redux
- * @constant
- * @type {object}
- * @property {string} key - Key for storage.
- * @property {object} storage - Storage engine (localStorage).
- * @property {string[]} whitelist - Slices of state to persist.
- */
-const persistConfig = {
-  key: "root",
-  storage,
-  whitelist: ["user"], // Only 'user' slice is persisted
+// 🚪 Root reducer: wipes the whole state on logout
+// Passing `undefined` makes every slice fall back to its initial state,
+// so no data from the previous user can leak to the next one.
+// redux-persist then overwrites the persisted "user" slice with the empty one.
+const rootReducer = (state, action) => {
+  if (action.type === clearUser.type) {
+    state = undefined
+  }
+  return appReducer(state, action)
 }
 
-/**
- * Creates a persisted reducer with the configuration and root reducer.
- *
- * @category Redux
- * @constant
- */
+// 💾 Persist config
+const persistConfig = {
+  key: "root",
+  version: 1, // bump when the shape of the persisted state changes
+  storage,
+  whitelist: ["user", "parameters"],
+}
+
+// 🔁 Persisted reducer
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 
-/**
- * Configures the Redux store with Redux Toolkit.
- *
- * @category Redux
- * @returns {import('@reduxjs/toolkit').EnhancedStore} The configured Redux store.
- */
+// 🏪 Store
 export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // Disable warnings from redux-persist
+      serializableCheck: {
+        // Actions dispatched by redux-persist carry non-serializable values
+        ignoredActions: [
+          FLUSH,
+          REHYDRATE,
+          PAUSE,
+          PERSIST,
+          PURGE,
+          REGISTER,
+          // ⚠️ Temporary: only needed while Date objects are stored in state.
+          // Remove it (and ignoredPaths) once dates are stored as ISO strings.
+          "selectedAccount/setSelectedAccount",
+        ],
+        // ⚠️ Temporary, same reason as above
+        ignoredPaths: [
+          "selectedAccount.createdAt",
+          "selectedAccount.updatedAt",
+        ],
+      },
     }),
 })
 
-/**
- * Creates the persistor to enable persisting the store.
- *
- * @category Redux
- * @returns {import('redux-persist').Persistor} The persistor instance.
- */
+// 💾 Persistor (consumed by <PersistGate> in main.jsx)
 export const persistor = persistStore(store)
-

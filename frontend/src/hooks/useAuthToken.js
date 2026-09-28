@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom"
 import { validateToken } from "../api/auth.api"
 
 // 🍰 Redux features
-import { setUser, clearUser } from "../features/userSlice"
+import { setUser, clearUser } from "../store/features/userSlice"
 
 // 🧩 Models
 import UserModel from "../models/UserModel"

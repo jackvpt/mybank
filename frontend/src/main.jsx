@@ -23,6 +23,7 @@ import { createTheme, CssBaseline, ThemeProvider } from "@mui/material"
 
 // 🔔 Hooks
 import { NotificationProvider } from "./hooks/NotificationProvider/NotificationProvider"
+import Loader from "./components/Loader/Loader.jsx"
 
 /**
  * Initializes a new QueryClient instance for React Query.
@@ -65,18 +66,18 @@ const lightTheme = createTheme({
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <NotificationProvider>
-          <QueryClientProvider client={queryClient}>
-            <BrowserRouter>
-              <ThemeProvider theme={lightTheme}>
-                <CssBaseline />
+      <PersistGate loading={<Loader />} persistor={persistor}>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <ThemeProvider theme={lightTheme}>
+              <CssBaseline />
+              <NotificationProvider>
                 <App />
-              </ThemeProvider>{" "}
-            </BrowserRouter>
-            <ReactQueryDevtools initialIsOpen={false} />
-          </QueryClientProvider>
-        </NotificationProvider>
+              </NotificationProvider>
+            </ThemeProvider>
+          </BrowserRouter>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
       </PersistGate>
     </Provider>
   </StrictMode>,

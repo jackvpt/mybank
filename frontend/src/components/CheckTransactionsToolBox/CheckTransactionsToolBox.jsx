@@ -13,7 +13,7 @@ import {
   setCheckingCurrentAmount,
   setCheckingFinalAmount,
   setCheckingInitialAmount,
-} from "../../features/parametersSlice"
+} from "../../store/features/parametersSlice"
 import { stringToAmount } from "../../utils/formatNumber"
 import {
   Alert,

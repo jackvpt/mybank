@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import "./BankAccountCard.scss"
 import { useDispatch } from "react-redux"
-import { setBankAccount } from "../../features/parametersSlice"
+import { setBankAccount } from "../../store/features/parametersSlice"
 
 const BankAccountCard = ({ account, lastTransaction }) => {
   const dispatch = useDispatch()
@@ -11,6 +11,7 @@ const BankAccountCard = ({ account, lastTransaction }) => {
     dispatch(setBankAccount({ name: account.name, id: account._id }))
     navigate(`/transactions`)
   }
+  
   return (
     <article className="container-bankAccountCard" onClick={handleClick}>
       <h2 className="bankAccountName">{account.name}</h2>

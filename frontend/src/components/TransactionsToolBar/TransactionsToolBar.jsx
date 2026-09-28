@@ -2,7 +2,7 @@ import "./TransactionsToolBar.scss"
 import { useSelector, useDispatch } from "react-redux"
 import { ToggleButton } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit"
-import { setIsTransactionEditWindowVisible } from "../../features/parametersSlice"
+import { setIsTransactionEditWindowVisible } from "../../store/features/parametersSlice"
 
 const RecurringToolBar = () => {
   const dispatch = useDispatch()

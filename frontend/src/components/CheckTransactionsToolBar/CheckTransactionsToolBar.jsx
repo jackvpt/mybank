@@ -2,7 +2,7 @@ import "./CheckTransactionsToolBar.scss"
 import { useSelector, useDispatch } from "react-redux"
 import { ToggleButton } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit"
-import { setIsCheckTransactionsEditWindowVisible } from "../../features/parametersSlice"
+import { setIsCheckTransactionsEditWindowVisible } from "../../store/features/parametersSlice"
 
 const CheckTransactionsToolBar = () => {
   const dispatch = useDispatch()

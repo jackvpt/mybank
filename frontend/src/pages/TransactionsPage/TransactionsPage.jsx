@@ -25,7 +25,7 @@ import {
   setNewTransactionId,
   setSelectedTransactionIds,
   setTransactionsTableScrollPosition,
-} from "../../features/parametersSlice"
+} from "../../store/features/parametersSlice"
 import TransactionsToolBar from "../../components/TransactionsToolBar/TransactionsToolBar"
 import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
 import { useGetAllTransactions } from "../../hooks/useTransactions"
@@ -44,13 +44,15 @@ const visibleColumnsConfig = (isMobile) => [
   { id: "status", label: "État", show: !isMobile },
 ]
 
-const Transactions = () => {
+const TransactionsPage = () => {
   const dispatch = useDispatch()
+  
   const tableContainerRef = useRef(null)
 
   const bankAccountName = useSelector(
     (state) => state.parameters.bankAccount.name,
   )
+
   const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
 
   const selectedTransactionIds = useSelector(
@@ -347,4 +349,4 @@ const Transactions = () => {
   )
 }
 
-export default Transactions
+export default TransactionsPage
