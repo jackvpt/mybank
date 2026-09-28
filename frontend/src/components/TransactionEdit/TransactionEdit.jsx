@@ -2,42 +2,41 @@
 import "./TransactionEdit.scss"
 
 // ⚛️ React
-import { useEffect, useState } from "react"
-import { useSelector } from "react-redux"
+import { useCallback, useEffect, useMemo, useState } from "react"
+
+// 🏪 Redux
+import { useDispatch, useSelector } from "react-redux"
+import { clearSelectedTransactionIds } from "../../store/features/parametersSlice"
 
 // 📅 Date picker
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
+import { isValid } from "date-fns"
 import { fr } from "date-fns/locale"
 
-// 🧩 UI components
+// 🧱 MUI components
 import {
   Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   InputLabel,
+  ListSubheader,
   MenuItem,
   Select,
   TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  ListSubheader,
-  CircularProgress,
 } from "@mui/material"
 
-// 🎯 Icons
-import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
+// 🎯 Icons (direct imports keep the Vite dev server fast)
+import DeleteIcon from "@mui/icons-material/Delete"
+import AddCircleIcon from "@mui/icons-material/AddCircle"
+import ChangeCircleIcon from "@mui/icons-material/ChangeCircle"
 
-// 🔄 React Query
-import { useQuery } from "@tanstack/react-query"
-
-// 🔌 API calls
-import { getAllSettings } from "../../api/settings.api.js"
-import { getAllBankAccounts } from "../../api/bankAccounts.api"
-
-// 🪝 Custom hooks
+// 🪝 Hooks
 import {
   useGetAllTransactions,
   useCreateTransaction,
@@ -45,27 +44,89 @@ import {
   useDeleteTransactions,
 } from "../../hooks/useTransactions"
 import { useGetAllCategories } from "../../hooks/useCategories"
+import { useGetAllSettings } from "../../hooks/useSettings"
+import { useGetAllBankAccounts } from "../../hooks/useBankAccounts"
 
 // 📦 Data for the shortcut buttons
-import { shortcuts } from "../../data/transactionEditShortCuts.js"
+import { shortcuts } from "../../data/transactionEditShortCuts"
 
+// 🔒 Stable empty array: a new `[]` on each render would re-trigger effects and memos
+const EMPTY_LIST = []
+
+// 🏷️ Transaction types with a specific behavior
+const DEFAULT_TYPE = "card"
+const CREDIT_TYPE = "deposit" // amount goes to `credit`, any other type goes to `debit`
+const TRANSFER_TYPE = "transfer"
+
+// 📐 Shared field style
+const SELECT_SX = { width: "auto", minWidth: 240 }
+
+/**
+ * Convert a form amount ("12,5", "12.50", 12.5) to a number.
+ * Returns NaN when the value is not a valid number.
+ *
+ * @param {string|number} value
+ * @returns {number}
+ */
+const parseAmount = (value) => Number(String(value ?? "").replace(",", "."))
+
+/**
+ * Contained action button with an icon, and a spinner while a mutation is pending.
+ * Disabled during the mutation to prevent double submissions.
+ *
+ * @param {object} props
+ * @param {string} props.label - Button text
+ * @param {JSX.Element} props.icon - Start icon
+ * @param {string} props.color - Background color
+ * @param {string} props.hoverColor - Background color on hover
+ * @param {boolean} props.isPending - Mutation in progress
+ */
+const ActionButton = ({
+  label,
+  icon,
+  color,
+  hoverColor,
+  isPending,
+  disabled,
+  ...props
+}) => (
+  <Button
+    variant="contained"
+    startIcon={isPending ? undefined : icon}
+    disabled={disabled || isPending}
+    sx={{
+      minWidth: 140,
+      backgroundColor: color,
+      color: "#fff",
+      "&:hover": { backgroundColor: hoverColor },
+      textTransform: "none",
+      fontWeight: 600,
+      px: 3,
+      py: 1,
+      borderRadius: 1,
+      boxShadow: 3,
+    }}
+    {...props}
+  >
+    {isPending ? <CircularProgress size={24} color="inherit" /> : label}
+  </Button>
+)
+
+/**
+ * Transaction form: create, modify or delete transactions of the selected account.
+ * Edits the transaction when exactly one row is selected in the table.
+ *
+ * @component
+ * @returns {JSX.Element} Rendered TransactionEdit component
+ */
 const TransactionEdit = () => {
+  const dispatch = useDispatch()
+
+  // 🗑️ Delete confirmation dialog
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [transactionsToDelete, setTransactionsToDelete] = useState([])
 
-  const handleOpenConfirm = (ids) => {
-    setTransactionsToDelete(ids)
-    setConfirmOpen(true)
-  }
-
-  const handleConfirmDelete = () => {
-    if (transactionsToDelete.length > 0) {
-      deleteMutation.mutate(transactionsToDelete)
-      setConfirmOpen(false)
-      setTransactionsToDelete([])
-    }
-  }
-
+  // 🏪 Redux state
   const bankAccountName = useSelector(
     (state) => state.parameters.bankAccount.name,
   )
@@ -74,222 +135,236 @@ const TransactionEdit = () => {
     (state) => state.parameters.selectedTransactionIds,
   )
 
-  // All mutations below come from useTransactions — success/error toasts
-  // and "transactions" query invalidation are handled internally via
-  // useMutationWithNotification, so no local toast state is needed here.
-  const createTransactionMutation = useCreateTransaction()
-  const updateMutation = useUpdateTransaction()
-  const deleteMutation = useDeleteTransactions()
+  // 🔄 Mutations (toasts and "transactions" query invalidation are handled
+  // inside useTransactions via useMutationWithNotification)
+  const { mutate: createTransaction, isPending: isCreating } =
+    useCreateTransaction()
 
-  // Fetch settings using React Query
-  const {
-    data: settings,
-    isLoading: isLoadingSettings,
-    error: settingsError,
-  } = useQuery({
-    queryKey: ["settings"],
-    queryFn: () => getAllSettings(),
-  })
+  const { mutate: updateTransaction, isPending: isUpdating } = useUpdateTransaction()
+  const { mutate: deleteTransactions, isPending: isDeleting } = useDeleteTransactions()
 
-  // Fetch categories
-  const {
-    data: transactionsCategories = [],
-    isLoading: isLoadingCategories,
-    error: categoriesError,
-  } = useGetAllCategories()
+  // 🌐 Data
+  const { data: settings } = useGetAllSettings()
 
-  const groupedTransactionsCategories = transactionsCategories.reduce(
-    (acc, category) => {
-      if (!acc[category.type]) acc[category.type] = []
-      acc[category.type].push(category)
-      return acc
-    },
-    {},
+  const { data: transactionsCategories = EMPTY_LIST } = useGetAllCategories()
+
+  const { data: bankAccounts = EMPTY_LIST } = useGetAllBankAccounts()
+
+  const { data: transactions = EMPTY_LIST } = useGetAllTransactions()
+
+  // 📝 Form state
+  // Rebuilt when the selected account changes, so a new transaction
+  // is never created on the previously selected account.
+  const getInitialFormData = useCallback(
+    () => ({
+      date: new Date(),
+      accountId: bankAccountId,
+      accountName: bankAccountName,
+      type: DEFAULT_TYPE,
+      checkNumber: "",
+      label: "",
+      category: null,
+      subCategory: "",
+      amount: 0,
+      debit: 0,
+      credit: 0,
+      status: null,
+      destination: "",
+      periodicity: null,
+      notes: "",
+    }),
+    [bankAccountId, bankAccountName],
   )
 
-  // Fetch bank accounts using React Query
-  const {
-    data: bankAccounts,
-    isLoading: isLoadingBankAccounts,
-    error: bankAccountsError,
-  } = useQuery({
-    queryKey: ["bankAccounts"],
-    queryFn: getAllBankAccounts,
-  })
+  const [formData, setFormData] = useState(getInitialFormData)
 
-  // Fetch transactions using the shared hook (already returns TransactionModel instances)
-  const {
-    isLoading: isLoadingTransactions,
-    error: errorTransactions,
-    data: transactions = [],
-  } = useGetAllTransactions()
-
-  const transactionTypes = settings ? settings[0].types : []
-
-  const initialFormData = {
-    date: new Date(),
-    accountId: bankAccountId,
-    accountName: bankAccountName,
-    type: "card",
-    checkNumber: "",
-    label: "",
-    category: null,
-    subCategory: "",
-    amount: 0,
-    debit: 0,
-    credit: 0,
-    status: null,
-    destination: "",
-    periodicity: null,
-    notes: "",
-  }
-  const [formData, setFormData] = useState(initialFormData)
-
+  // 🔁 Sync the form with the selection:
+  // one selected row -> load it, otherwise (or after a data refresh) -> empty form.
+  // This is also what resets the form after a transaction is added.
   useEffect(() => {
-    if (selectedTransactionIds.length === 1) {
-      const selected = transactions.find(
-        (transaction) => transaction.id === selectedTransactionIds[0],
-      )
+    const selected =
+      selectedTransactionIds.length === 1
+        ? transactions.find((tx) => tx.id === selectedTransactionIds[0])
+        : null
 
-      if (selected) {
-        setFormData({
-          ...selected,
-          date: new Date(selected.date),
-          category: selected.category ?? "",
-          subCategory: selected.subCategory ?? "",
-          type: selected.type ?? "card",
-        })
-      }
-    } else {
-      setFormData(initialFormData)
-    }
-  }, [selectedTransactionIds, transactions])
+    setFormData(
+      selected
+        ? {
+            ...selected,
+            date: new Date(selected.date),
+            category: selected.category ?? "",
+            subCategory: selected.subCategory ?? "",
+            type: selected.type ?? DEFAULT_TYPE,
+          }
+        : getInitialFormData(),
+    )
+  }, [selectedTransactionIds, transactions, getInitialFormData])
+
+  // 🧮 Derived data
+  const transactionTypes = settings?.[0]?.types ?? EMPTY_LIST
+
+  // Categories grouped by type ("debit" / "credit")
+  const groupedTransactionsCategories = useMemo(
+    () =>
+      transactionsCategories.reduce((acc, category) => {
+        if (!acc[category.type]) acc[category.type] = []
+        acc[category.type].push(category)
+        return acc
+      }, {}),
+    [transactionsCategories],
+  )
+
+  // Sub-categories of the selected category
+  const subCategories = useMemo(
+    () =>
+      transactionsCategories.find((c) => c.name === formData.category)
+        ?.subcategories ?? EMPTY_LIST,
+    [transactionsCategories, formData.category],
+  )
+
+  // Transfer destinations: every account except the current one
+  const destinationAccounts = useMemo(
+    () => bankAccounts.filter((account) => account.name !== bankAccountName),
+    [bankAccounts, bankAccountName],
+  )
+
+  // ✅ Validation (computed once per render, used by the buttons and handlers)
+  const amount = parseAmount(formData.amount)
+  const isTransfer = formData.type === TRANSFER_TYPE
+
+  const hasErrors =
+    !isValid(formData.date) ||
+    !Number.isFinite(amount) ||
+    amount === 0 ||
+    (isTransfer && formData.destination === "") ||
+    (formData.type === "check" && formData.checkNumber === "") ||
+    (!isTransfer && formData.label.trim() === "")
+
+  // ✍️ Form helpers
+  const setField = (name, value) =>
+    setFormData((prev) => ({ ...prev, [name]: value }))
+
+  const handleChange = (name) => (e) => setField(name, e.target.value)
 
   /**
-   * Handles the modification of a transaction.
-   * It checks for form errors and if none are found,
-   * it calls the updateMutation to update the transaction.
-   * @param {Event} e - The event object.
-   * @returns {void}
+   * Build the payload sent to the API from the form data.
+   * `amount`, `debit` and `credit` are derived here from the type,
+   * so they can never be out of sync with the form.
+   *
+   * @param {object} [overrides] - Fields to override
+   * @returns {object}
    */
-  const handleModifyTransaction = (e) => {
-    e.preventDefault()
-    if (!formHasErrors()) {
-      // `selectedTransactionIds` is an array; the button is only enabled
-      // when it has exactly one entry, so we unwrap it here instead of
-      // passing the whole array as `id`.
-      updateMutation.mutate({
-        id: selectedTransactionIds[0],
-        updatedData: formData,
-      })
+  const buildPayload = (overrides = {}) => {
+    const isCredit = formData.type === CREDIT_TYPE
+    return {
+      ...formData,
+      amount,
+      debit: isCredit ? 0 : amount,
+      credit: isCredit ? amount : 0,
+      ...overrides,
     }
   }
 
-  /**
-   * Add the transaction.
-   * @param {Event} e
-   */
-  const handleAddTransaction = (e) => {
-    e.preventDefault()
-    if (!formHasErrors()) {
-      if (formData.type === "transfer") {
-        setFormData((prev) => ({
-          ...prev,
-          label: `Virement vers ${formData.destination}`,
-        }))
-        createTransactionMutation.mutate(formData)
-
-        const creditTransaction = {
-          ...formData,
-          account: formData.destination,
-          debit: 0,
-          credit: formData.amount,
-          label: `Virement depuis ${formData.account}`,
-          destination: "",
-        }
-        createTransactionMutation.mutate(creditTransaction)
-      } else {
-        createTransactionMutation.mutate(formData)
-      }
-    }
-  }
-
-  /**
-   * Handles the blur event for the amount field.
-   * If the value is not empty and is a valid number,
-   * it formats the value to two decimal places.
-   * @returns {void}
-   */
+  // 🔢 Format the amount with two decimals when leaving the field
   const handleAmountBlur = () => {
-    // `formData.amount` can be a number (e.g. reset to `0` by
-    // `initialFormData`), and `Number.prototype.replace` doesn't exist —
-    // cast to string first to avoid a crash.
-    const value = String(formData.amount).replace(",", ".")
-    if (value !== "" && !isNaN(Number(value))) {
-      const formatted = parseFloat(value).toFixed(2)
-      // Route the change through setFormData instead of mutating
-      // formData directly, so React re-renders correctly.
-      setFormData((prev) => ({
-        ...prev,
-        amount: formatted,
-        ...(prev.type === "deposit"
-          ? { credit: formatted }
-          : { debit: formatted }),
-      }))
-    }
+    if (Number.isFinite(amount)) setField("amount", amount.toFixed(2))
   }
 
+  // ⚡ Fill the form from a shortcut button
   const handleShortcutClick = (shortcut) => {
-    let amount = shortcut.amount
-    if (amount === "last") {
+    let shortcutAmount = shortcut.amount
+
+    // "last": reuse the amount of the latest transaction with the same label
+    // on the current account
+    if (shortcutAmount === "last") {
       const lastTransaction = transactions
-        .filter((t) => t.label === shortcut.label)
+        .filter(
+          (t) => t.accountId === bankAccountId && t.label === shortcut.label,
+        )
         .sort((a, b) => new Date(b.date) - new Date(a.date))[0]
-      amount = lastTransaction ? lastTransaction.amount : 0
+      shortcutAmount = lastTransaction ? lastTransaction.amount : 0
     }
+
     setFormData((prev) => ({
       ...prev,
       type: shortcut.type,
       label: shortcut.label,
-      amount,
+      amount: shortcutAmount,
       category: shortcut.category,
       subCategory: shortcut.subCategory,
     }))
   }
 
-  /**
-   * Checks if the form has errors.
-   * @returns {boolean} Returns true if the form has errors, false otherwise.
-   */
-  const formHasErrors = () => {
-    return (
-      (formData.type === "transfer" && formData.destination === "") ||
-      (formData.type === "check" && formData.checkNumber === "") ||
-      formData.amount === 0 ||
-      formData.amount === "" ||
-      isNaN(formData.amount) ||
-      (formData.type !== "transfer" && formData.label === "")
+  // ➕ Create the transaction (a transfer creates a debit and a credit)
+  const handleAddTransaction = () => {
+    if (hasErrors) return
+
+    if (isTransfer) {
+      const destination = destinationAccounts.find(
+        (account) => account.name === formData.destination,
+      )
+      if (!destination) return
+
+      // Debit on the current account
+      createTransaction(
+        buildPayload({
+          accountId: bankAccountId,
+          accountName: bankAccountName,
+          label: `Virement vers ${destination.name}`,
+          debit: amount,
+          credit: 0,
+        }),
+      )
+
+      // Credit on the destination account
+      createTransaction(
+        buildPayload({
+          accountId: destination._id,
+          accountName: destination.name,
+          label: `Virement depuis ${bankAccountName}`,
+          debit: 0,
+          credit: amount,
+          destination: "",
+        }),
+      )
+      return
+    }
+
+    createTransaction(
+      buildPayload({ accountId: bankAccountId, accountName: bankAccountName }),
     )
   }
 
-  if (
-    isLoadingSettings ||
-    isLoadingBankAccounts ||
-    isLoadingCategories ||
-    isLoadingTransactions
-  )
-    return <p>Loading data...</p>
+  // ✏️ Modify the selected transaction (button enabled only with exactly one selected)
+  const handleModifyTransaction = () => {
+    if (hasErrors) return
+    updateTransaction({
+      id: selectedTransactionIds[0],
+      updatedData: buildPayload(),
+    })
+  }
 
-  // Surface any of the four possible load errors, instead of only
-  // settingsError/bankAccountsError like before.
-  const loadError =
-    settingsError || bankAccountsError || categoriesError || errorTransactions
-  if (loadError) return <p>Error loading data: {loadError.message}</p>
+  // 🗑️ Delete flow: open the dialog, then confirm
+  const handleOpenConfirm = (ids) => {
+    setTransactionsToDelete(ids)
+    setConfirmOpen(true)
+  }
+
+  const handleConfirmDelete = () => {
+    if (transactionsToDelete.length === 0) return
+
+    deleteTransactions(transactionsToDelete, {
+      // The deleted ids would otherwise stay selected in the store
+      onSuccess: () => dispatch(clearSelectedTransactionIds()),
+    })
+    setConfirmOpen(false)
+    setTransactionsToDelete([])
+  }
 
   return (
     <section className="container-transaction-edit">
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
-        {/* SHORTCUTS */}
+        {/* ⚡ SHORTCUTS */}
         <div className="container-transaction-edit-shortcuts">
           {shortcuts.map((shortcut) => (
             <button
@@ -303,30 +378,24 @@ const TransactionEdit = () => {
           ))}
         </div>
 
-        <form>
-          {/* DATE PICKER */}
+        <form onSubmit={(e) => e.preventDefault()}>
+          {/* 📅 DATE PICKER */}
           <DatePicker
             label="Date"
             value={formData.date}
-            onChange={(newValue) =>
-              setFormData((prev) => ({ ...prev, date: newValue }))
-            }
+            onChange={(newValue) => setField("date", newValue)}
             format="dd/MM/yyyy"
             sx={{ width: "auto", minWidth: 150, maxWidth: 180 }}
-            slotProps={{
-              textField: {
-                size: "small",
-              },
-            }}
+            slotProps={{ textField: { size: "small" } }}
           />
 
-          {/* TYPE SELECT */}
+          {/* 🏷️ TYPE SELECT */}
           <FormControl
             fullWidth
             variant="outlined"
             required
             size="small"
-            sx={{ width: "auto", minWidth: 240 }}
+            sx={SELECT_SX}
           >
             <InputLabel id="type-label">Type</InputLabel>
             <Select
@@ -334,9 +403,7 @@ const TransactionEdit = () => {
               id="type"
               name="type"
               value={formData.type}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, type: e.target.value }))
-              }
+              onChange={handleChange("type")}
               label="Type"
             >
               {transactionTypes.map((type) => (
@@ -347,47 +414,37 @@ const TransactionEdit = () => {
             </Select>
           </FormControl>
 
-          {/* CHECK NUMBER */}
+          {/* 🧾 CHECK NUMBER */}
           {formData.type === "check" && (
             <TextField
               type="text"
               label="N° chèque"
               value={formData.checkNumber}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  checkNumber: e.target.value,
-                }))
-              }
+              onChange={handleChange("checkNumber")}
               size="small"
               sx={{ width: 120 }}
             />
           )}
 
-          {/* DESTINATION SELECT */}
-          {formData.type === "transfer" && (
+          {/* 🏦 DESTINATION SELECT */}
+          {isTransfer && (
             <FormControl
               fullWidth
               variant="outlined"
               required
               size="small"
-              sx={{ width: "auto", minWidth: 240 }}
+              sx={SELECT_SX}
             >
-              <InputLabel id="type-label">Destination</InputLabel>
+              <InputLabel id="destination-label">Destination</InputLabel>
               <Select
                 labelId="destination-label"
                 id="destination"
                 name="destination"
                 value={formData.destination}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    destination: e.target.value,
-                  }))
-                }
+                onChange={handleChange("destination")}
                 label="Destination"
               >
-                {bankAccounts.map((account) => (
+                {destinationAccounts.map((account) => (
                   <MenuItem key={account._id} value={account.name}>
                     {account.name} - {account.bankAbbreviation}
                   </MenuItem>
@@ -396,15 +453,13 @@ const TransactionEdit = () => {
             </FormControl>
           )}
 
-          {/* LABEL */}
-          {formData.type !== "transfer" && (
+          {/* 🔤 LABEL (generated automatically for transfers) */}
+          {!isTransfer && (
             <TextField
               label="Libellé"
               name="label"
               value={formData.label}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, label: e.target.value }))
-              }
+              onChange={handleChange("label")}
               placeholder="Courses"
               required
               fullWidth
@@ -414,43 +469,35 @@ const TransactionEdit = () => {
             />
           )}
 
-          {/* AMOUNT */}
+          {/* 💶 AMOUNT */}
           <TextField
             type="text"
             label="Montant"
             value={formData.amount}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                amount: e.target.value,
-              }))
-            }
-            onBlur={() => handleAmountBlur()}
+            onChange={handleChange("amount")}
+            onBlur={handleAmountBlur}
             placeholder="0.00"
             size="small"
             sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
           />
 
-          {/* CATEGORIES SELECT */}
-          {formData.type !== "transfer" && (
-            <FormControl
-              fullWidth
-              size="small"
-              sx={{ width: "auto", minWidth: 240 }}
-            >
-              <InputLabel>Catégorie</InputLabel>
+          {/* 🗂️ CATEGORY SELECT */}
+          {!isTransfer && (
+            <FormControl fullWidth size="small" sx={SELECT_SX}>
+              <InputLabel id="category-label">Catégorie</InputLabel>
               <Select
                 labelId="category-label"
                 id="category"
                 name="category"
                 value={formData.category ?? ""}
-                onChange={(e) => {
+                onChange={(e) =>
+                  // Changing the category invalidates the sub-category
                   setFormData((prev) => ({
                     ...prev,
                     category: e.target.value,
                     subCategory: "",
                   }))
-                }}
+                }
                 label="Catégorie"
               >
                 {Object.entries(groupedTransactionsCategories).map(
@@ -480,145 +527,74 @@ const TransactionEdit = () => {
             </FormControl>
           )}
 
-          {/* SUB-CATEGORIES SELECT */}
-          {formData.type !== "transfer" && (
-            <FormControl
-              fullWidth
-              size="small"
-              sx={{ width: "auto", minWidth: 240 }}
-            >
-              <InputLabel>Sous catégorie</InputLabel>
+          {/* 🗃️ SUB-CATEGORY SELECT */}
+          {!isTransfer && (
+            <FormControl fullWidth size="small" sx={SELECT_SX}>
+              <InputLabel id="subCategory-label">Sous catégorie</InputLabel>
               <Select
                 labelId="subCategory-label"
                 id="subCategory"
                 name="subCategory"
-                value={formData.subCategory}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    subCategory: e.target.value,
-                  }))
-                }
+                value={formData.subCategory ?? ""}
+                onChange={handleChange("subCategory")}
                 label="Sous catégorie"
                 disabled={!formData.category}
               >
-                {transactionsCategories
-                  .filter((category) => category.name === formData.category)
-                  .flatMap((category) =>
-                    category.subcategories?.map((sub) => (
-                      <MenuItem key={`${category.name}-${sub}`} value={sub}>
-                        {sub}
-                      </MenuItem>
-                    )),
-                  )}
+                {subCategories.map((sub) => (
+                  <MenuItem key={sub} value={sub}>
+                    {sub}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           )}
 
-          {/* NOTES */}
+          {/* 📝 NOTES */}
           <TextField
             type="text"
             label="Notes"
             value={formData.notes}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                notes: e.target.value,
-              }))
-            }
+            onChange={handleChange("notes")}
             size="small"
             sx={{ minWidth: 200 }}
           />
 
-          {/* DELETE TRANSACTION BUTTON */}
-          <Button
-            variant="contained"
-            startIcon={!deleteMutation.isPending ? <Delete /> : ""}
+          {/* 🗑️ DELETE BUTTON */}
+          <ActionButton
+            label="Supprimer"
+            icon={<DeleteIcon />}
+            color="red"
+            hoverColor="darkred"
+            isPending={deleteTransactions.isPending}
             disabled={selectedTransactionIds.length === 0}
             onClick={() => handleOpenConfirm(selectedTransactionIds)}
-            sx={{
-              minWidth: 140,
-              backgroundColor: "red",
-              color: "#fff",
-              "&:hover": {
-                backgroundColor: "darkred",
-              },
-              textTransform: "none",
-              fontWeight: 600,
-              px: 3,
-              py: 1,
-              borderRadius: 1,
-              boxShadow: 3,
-            }}
-          >
-            {deleteMutation.isPending ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Supprimer"
-            )}
-          </Button>
+          />
 
-          {/* MODIFY TRANSACTION BUTTON */}
-          <Button
-            variant="contained"
-            startIcon={!updateMutation.isPending ? <ChangeCircle /> : ""}
-            disabled={formHasErrors() || selectedTransactionIds.length !== 1}
+          {/* ✏️ MODIFY BUTTON */}
+          <ActionButton
+            label="Modifier"
+            icon={<ChangeCircleIcon />}
+            color="#1976d2"
+            hoverColor="#1565c0"
+            isPending={updateTransaction.isPending}
+            disabled={hasErrors || selectedTransactionIds.length !== 1}
             onClick={handleModifyTransaction}
-            sx={{
-              minWidth: 140,
-              backgroundColor: "#1976d2",
-              color: "#fff",
-              "&:hover": {
-                backgroundColor: "#1565c0",
-              },
-              textTransform: "none",
-              fontWeight: 600,
-              px: 3,
-              py: 1,
-              borderRadius: 1,
-              boxShadow: 3,
-            }}
-          >
-            {updateMutation.isPending ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Modifier"
-            )}
-          </Button>
+          />
 
-          {/* ADD TRANSACTION BUTTON */}
-          <Button
-            variant="contained"
-            startIcon={
-              !createTransactionMutation.isPending ? <AddCircle /> : ""
-            }
-            disabled={formHasErrors()}
+          {/* ➕ ADD BUTTON */}
+          <ActionButton
+            label="Ajouter"
+            icon={<AddCircleIcon />}
+            color="green"
+            hoverColor="darkgreen"
+            isPending={createTransaction.isPending}
+            disabled={hasErrors}
             onClick={handleAddTransaction}
-            sx={{
-              minWidth: 140,
-              backgroundColor: "green",
-              color: "#fff",
-              "&:hover": {
-                backgroundColor: "darkgreen",
-              },
-              textTransform: "none",
-              fontWeight: 600,
-              px: 3,
-              py: 1,
-              borderRadius: 1,
-              boxShadow: 3,
-            }}
-          >
-            {createTransactionMutation.isPending ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Ajouter"
-            )}
-          </Button>
+          />
         </form>
       </LocalizationProvider>
 
-      {/** Modal Dialog Box */}
+      {/* ⚠️ Delete confirmation dialog */}
       <Dialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
