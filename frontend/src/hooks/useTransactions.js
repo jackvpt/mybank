@@ -168,6 +168,7 @@ export const useGetTransactionsByAccountId = (
 export const useCreateTransaction = () =>
   useMutationWithNotification({
     mutationFn: async (transactionData) => {
+      console.log("Creating transaction with data:", transactionData)
       const created = await createTransaction(transactionData)
       return new TransactionModel(created)
     },

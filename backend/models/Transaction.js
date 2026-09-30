@@ -8,6 +8,7 @@ const transactionSchema = mongoose.Schema({
     date: { type: Date, required: true },
     type: { type: String, required: true },
     checkNumber: { type: String, required: false },
+    amount: { type: Number, required: true },
     debit: { type: Number, required: false },
     credit: { type: Number, required: false },
     status: { type: String, required: false },
@@ -20,4 +21,3 @@ const transactionSchema = mongoose.Schema({
 
 /** Model methods converts Schema in usable model */
 module.exports = mongoose.model("Transaction", transactionSchema) /** 'Transaction' is the collection name which becomes 'Transactions' */
-

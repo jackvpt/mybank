@@ -19,6 +19,7 @@ exports.getAllTransactions = async (req, res) => {
 /** POST New Transaction */
 exports.createTransaction = async (req, res) => {
   const transactionObject = req.body
+  console.log("Creating transaction:", transactionObject) // Log the incoming transaction object
 
   try {
     const transaction = new Transaction({
