@@ -117,9 +117,7 @@ const TransactionsPage = () => {
   const bankAccountName = useSelector(
     (state) => state.parameters.bankAccount.name,
   )
-  const bankAccountId = useSelector(
-    (state) => state.parameters.bankAccount.id,
-  )
+  const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
   const selectedTransactionIds = useSelector(
     (state) => state.parameters.selectedTransactionIds,
   )
@@ -135,7 +133,9 @@ const TransactionsPage = () => {
 
   // 📱 Responsive layout
   const isMobile = useMediaQuery(MOBILE_QUERY)
-  const visibleColumns = COLUMNS.filter((col) => !(isMobile && col.mobileHidden))
+  const visibleColumns = COLUMNS.filter(
+    (col) => !(isMobile && col.mobileHidden),
+  )
 
   // 🎛️ Local UI state
   const [dateFilter, setDateFilter] = useState("all")
@@ -155,13 +155,19 @@ const TransactionsPage = () => {
   // correct whatever the active filter or sort is.
   const transactions = useMemo(() => {
     const byDate = (transactionsData ?? [])
-      .filter((tx) => tx.accountId === bankAccountId)
-      .sort((a, b) => new Date(a.date) - new Date(b.date))
+      .filter(
+        (transaction) =>
+          transaction.accountId === bankAccountId && transaction.hasValidDate,
+      )
+      .sort(
+        (a, b) => a.date - b.date || String(a.id).localeCompare(String(b.id)),
+      )
 
-    let balance = 0
+    let balance = 0 // TODO: start from the account's opening balance if it has one
     return byDate.map((tx) => {
-      balance += (tx.credit || 0) - (tx.debit || 0)
-      return { ...tx, balance }
+      balance = Math.round((balance + (tx.amount || 0)) * 100) / 100
+      tx.balance = balance
+      return tx
     })
   }, [transactionsData, bankAccountId])
 
@@ -171,10 +177,12 @@ const TransactionsPage = () => {
     const direction = order === "asc" ? 1 : -1
 
     return transactions
-      .filter((tx) => isInDateFilter(new Date(tx.date), dateFilter, today))
+      .filter((transaction) =>
+        isInDateFilter(transaction.date, dateFilter, today),
+      )
       .sort((a, b) => {
         if (orderBy === "date") {
-          return direction * (new Date(a.date) - new Date(b.date))
+          return direction * (a.date - b.date)
         }
         if (NUMERIC_COLUMNS.includes(orderBy)) {
           return direction * ((a[orderBy] || 0) - (b[orderBy] || 0))
@@ -337,41 +345,44 @@ const TransactionsPage = () => {
 
             {/* Transaction rows */}
             <TableBody>
-              {sortedTransactions.map((tx, index) => (
+              {sortedTransactions.map((transaction, index) => (
                 <TableRow
-                  key={tx.id}
+                  key={transaction.id}
                   ref={(el) => {
-                    if (el) transactionRefs.current[tx.id] = el
+                    if (el) transactionRefs.current[transaction.id] = el
                   }}
-                  onClick={(e) => handleRowClick(e, tx, index)}
+                  onClick={(e) => handleRowClick(e, transaction, index)}
                   className={
-                    selectedTransactionIds.includes(tx.id)
+                    selectedTransactionIds.includes(transaction.id)
                       ? "transaction-row rowSelected"
                       : "transaction-row"
                   }
                 >
                   <TableCell align="center">
-                    {new Date(tx.date).toLocaleDateString()}
+                    {new Date(transaction.date).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>{tx.label}</TableCell>
+                  <TableCell>{transaction.label}</TableCell>
                   <TableCell align="right">
-                    {tx.debit ? tx.debit.toFixed(2) : ""}
+                    {transaction.debit ? transaction.debit.toFixed(2) : ""}
                   </TableCell>
                   <TableCell align="right">
-                    {tx.credit ? tx.credit.toFixed(2) : ""}
+                    {transaction.credit ? transaction.credit.toFixed(2) : ""}
                   </TableCell>
 
                   {/* Balance and status are hidden on mobile */}
                   {!isMobile && (
                     <>
-                      <TableCell align="right">{tx.balance.toFixed(2)}</TableCell>
+                      <TableCell align="right">
+                        {transaction.balance.toFixed(2)}
+                      </TableCell>
                       <TableCell align="center">
                         <Box
                           sx={{
                             width: 12,
                             height: 12,
                             borderRadius: "50%",
-                            backgroundColor: STATUS_COLORS[tx.status] ?? "white",
+                            backgroundColor:
+                              STATUS_COLORS[transaction.status] ?? "white",
                             border: "1px solid #ccc",
                             margin: "0 auto",
                           }}

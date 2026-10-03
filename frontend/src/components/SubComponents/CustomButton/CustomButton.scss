@@ -1,0 +1,62 @@
+:root {
+  --color-button-add: #2e7d32;
+  --color-button-update: #1976d2;
+  --color-button-delete: red;
+  --color-button-reset: #757575;
+}
+
+.custom-btn {
+  --btn-color: var(--color-button-add);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 150px;
+  height: 40px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--btn-color);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.custom-btn--create { --btn-color: var(--color-button-add); }
+.custom-btn--update { --btn-color: var(--color-button-update); }
+.custom-btn--delete { --btn-color: var(--color-button-delete); }
+.custom-btn--reset  { --btn-color: var(--color-button-reset); }
+
+.custom-btn:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--btn-color), black 20%);
+}
+.custom-btn:active:not(:disabled) {
+  background-color: color-mix(in srgb, var(--btn-color), black 30%);
+  transform: scale(0.98);
+}
+
+.custom-btn:focus-visible {
+  outline: 2px solid var(--btn-color);
+  outline-offset: 2px;
+}
+
+.custom-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.custom-btn__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: custom-btn-spin 0.7s linear infinite;
+}
+
+@keyframes custom-btn-spin {
+  to { transform: rotate(360deg); }
+}

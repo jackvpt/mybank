@@ -34,7 +34,7 @@ import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
 
 /** API imports */
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { getAllSettings } from "../../api/settings.api"
+import { useGetAllSettings } from "../../hooks/useSettings"
 import { getAllBankAccounts } from "../../api/bankAccounts.api"
 import {
   deleteRecurringTransaction,
@@ -131,10 +131,7 @@ const RecurringTransactionEdit = () => {
     data: settings,
     isLoading: isLoadingSettings,
     error: settingsError,
-  } = useQuery({
-    queryKey: ["settings"],
-    queryFn: () => getAllSettings(),
-  })
+  } = useGetAllSettings({ enabled: true })
 
   // Fetch categories
   const {
@@ -163,7 +160,7 @@ const RecurringTransactionEdit = () => {
     queryFn: () => fetchAllRecurringTransactions(),
   })
 
-  const transactionTypes = settings ? settings[0].types : []
+  const transactionTypes = settings ? settings.types : []
 
   const initialFormData = {
     date: (() => {
@@ -188,7 +185,7 @@ const RecurringTransactionEdit = () => {
   }
   const [formData, setFormData] = useState(initialFormData)
 
-  const periodicities = settings[0]?.periodicities
+  const periodicities = settings?.periodicities
 
   useEffect(() => {
     if (selectedRecurringTransactionIds.length === 1) {

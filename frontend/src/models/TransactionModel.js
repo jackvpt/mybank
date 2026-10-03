@@ -55,7 +55,7 @@ export default class TransactionModel {
     /** @type {string | undefined} */
     this.subCategory = data.subCategory
 
-    /** @type {number} NaN when missing or not numeric (caught by getErrors). */
+    /** @type {number} */
     this.amount = Number(data.amount)
 
     /** @type {string | null} */
@@ -66,6 +66,16 @@ export default class TransactionModel {
 
     /** @type {string} */
     this.notes = data.notes || ""
+  }
+
+  /** @returns {number} Display only (debit column): absolute amount when negative, else 0. */
+  get debit() {
+    return this.amount < 0 ? Math.abs(this.amount) : 0
+  }
+
+  /** @returns {number} Display only (credit column): amount when positive, else 0. */
+  get credit() {
+    return this.amount > 0 ? this.amount : 0
   }
 
   /** @returns {boolean} True if the date is a real date. */
@@ -97,10 +107,12 @@ export default class TransactionModel {
     if (!this.hasValidDate) errors.push("date")
     if (!this.type) errors.push("type")
     if (!this.label?.trim()) errors.push("label")
-    if (!this.category) errors.push("category")
-    if (!Number.isFinite(this.amount) || this.amount === 0) errors.push("amount")
-    if (this.type === TYPE_CHECK && !this.checkNumber) errors.push("checkNumber")
-    if (this.type === TYPE_TRANSFER && !this.destination) errors.push("destination")
+    if (!Number.isFinite(this.amount) || this.amount === 0)
+      errors.push("amount")
+    if (this.type === TYPE_CHECK && !this.checkNumber)
+      errors.push("checkNumber")
+    if (this.type === TYPE_TRANSFER && !this.destination)
+      errors.push("destination")
     if (this.status && !STATUSES.includes(this.status)) errors.push("status")
     return errors
   }

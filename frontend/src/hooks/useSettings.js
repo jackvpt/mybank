@@ -4,6 +4,10 @@ import { useQuery, keepPreviousData } from "@tanstack/react-query"
 // 🔌 API calls
 import { getAllSettings } from "../api/settings.api"
 
+// 🔧 Modelss
+import TypeModel from "../models/TypeModel"
+import PeriodicityModel from "../models/PeriodicityModel"
+
 // ----------------------------
 // Get all settings
 // ----------------------------
@@ -11,10 +15,16 @@ export const useGetAllSettings = ({ enabled = true } = {}) => {
   return useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
-      const settings = await getAllSettings()
+      const allSettings = await getAllSettings()
+      const globalSettings = allSettings[0]
       // Model conversion lives here: the API layer returns raw data,
       // this hook is responsible for turning it into domain objects.
-      return settings
+      return {
+        types: (globalSettings?.types ?? []).map((type) => new TypeModel(type)),
+        periodicities: (globalSettings?.periodicities ?? []).map(
+          (periodicity) => new PeriodicityModel(periodicity),
+        ),
+      }
     },
 
     enabled,

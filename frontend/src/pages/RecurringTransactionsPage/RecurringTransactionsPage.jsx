@@ -164,7 +164,7 @@ const RecurringTransactions = () => {
    * @returns {string} Text representation of the periodicity
    */
   const convertPeriodicityToText = (periodicity) => {
-    const periodicities = settings[0].periodicities
+    const periodicities = settings.periodicities
     const text = periodicities.find((p) => p.name === periodicity)?.text
     return text
   }
@@ -174,7 +174,7 @@ const RecurringTransactions = () => {
    * @returns {string} Text representation of the periodicity
    */
   const convertTypeToText = (type) => {
-    const types = settings[0].types
+    const types = settings.types
     const text = types.find((p) => p.name === type)?.text
     return text
   }

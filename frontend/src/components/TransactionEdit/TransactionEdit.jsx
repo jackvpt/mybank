@@ -50,25 +50,17 @@ import { useGetAllBankAccounts } from "../../hooks/useBankAccounts"
 // 📦 Data for the shortcut buttons
 import { shortcuts } from "../../data/transactionEditShortCuts"
 
+// Components
+import CustomButton from "../SubComponents/CustomButton/CustomButton"
+
+// 📦 Models
+import TransactionModel from "../../models/TransactionModel"
+
 // 🔒 Stable empty array: a new `[]` on each render would re-trigger effects and memos
 const EMPTY_LIST = []
 
-// 🏷️ Transaction types with a specific behavior
-const DEFAULT_TYPE = "card"
-const CREDIT_TYPE = "deposit" // amount goes to `credit`, any other type goes to `debit`
-const TRANSFER_TYPE = "transfer"
-
 // 📐 Shared field style
 const SELECT_SX = { width: "auto", minWidth: 240 }
-
-/**
- * Convert a form amount ("12,5", "12.50", 12.5) to a number.
- * Returns NaN when the value is not a valid number.
- *
- * @param {string|number} value
- * @returns {number}
- */
-const parseAmount = (value) => Number(String(value ?? "").replace(",", "."))
 
 /**
  * Contained action button with an icon, and a spinner while a mutation is pending.
@@ -140,8 +132,10 @@ const TransactionEdit = () => {
   const { mutate: createTransaction, isPending: isCreating } =
     useCreateTransaction()
 
-  const { mutate: updateTransaction, isPending: isUpdating } = useUpdateTransaction()
-  const { mutate: deleteTransactions, isPending: isDeleting } = useDeleteTransactions()
+  const { mutate: updateTransaction, isPending: isUpdating } =
+    useUpdateTransaction()
+  const { mutate: deleteTransactions, isPending: isDeleting } =
+    useDeleteTransactions()
 
   // 🌐 Data
   const { data: settings } = useGetAllSettings()
@@ -160,17 +154,14 @@ const TransactionEdit = () => {
       date: new Date(),
       accountId: bankAccountId,
       accountName: bankAccountName,
-      type: DEFAULT_TYPE,
+      type: "card",
       checkNumber: "",
       label: "",
       category: null,
       subCategory: "",
       amount: 0,
-      debit: 0,
-      credit: 0,
       status: null,
       destination: "",
-      periodicity: null,
       notes: "",
     }),
     [bankAccountId, bankAccountName],
@@ -194,14 +185,14 @@ const TransactionEdit = () => {
             date: new Date(selected.date),
             category: selected.category ?? "",
             subCategory: selected.subCategory ?? "",
-            type: selected.type ?? DEFAULT_TYPE,
+            type: selected.type ?? "card",
           }
         : getInitialFormData(),
     )
   }, [selectedTransactionIds, transactions, getInitialFormData])
 
   // 🧮 Derived data
-  const transactionTypes = settings?.[0]?.types ?? EMPTY_LIST
+  const transactionTypes = settings?.types ?? EMPTY_LIST
 
   // Categories grouped by type ("debit" / "credit")
   const groupedTransactionsCategories = useMemo(
@@ -229,13 +220,28 @@ const TransactionEdit = () => {
   )
 
   // ✅ Validation (computed once per render, used by the buttons and handlers)
-  const amount = parseAmount(formData.amount)
-  const isTransfer = formData.type === TRANSFER_TYPE
+  const isTransfer = formData.type === "transfer"
 
-  const hasErrors =
+  /**
+   * Calculate the absolute amount, based on the type of transaction (debit or credit).
+   * This is used to ensure that the amount is always stored as a negative number for debits,
+   * and a positive number for credits, regardless of what the user entered in the form.
+   * @returns {number} The absolute amount, negative for debits, positive for credits.
+   */
+  const absoluteAmount = () => {
+    const categoryType = transactionTypes.find(
+      (type) => type.name === formData.type,
+    )?.category
+
+    return categoryType === "debit"
+      ? -Math.abs(formData.amount)
+      : formData.amount
+  }
+
+  const formHasErrors =
     !isValid(formData.date) ||
-    !Number.isFinite(amount) ||
-    amount === 0 ||
+    !Number.isFinite(absoluteAmount()) ||
+    absoluteAmount() === 0 ||
     (isTransfer && formData.destination === "") ||
     (formData.type === "check" && formData.checkNumber === "") ||
     (!isTransfer && formData.label.trim() === "")
@@ -244,7 +250,14 @@ const TransactionEdit = () => {
   const setField = (name, value) =>
     setFormData((prev) => ({ ...prev, [name]: value }))
 
-  const handleChange = (name) => (e) => setField(name, e.target.value)
+  const handleChange = (name) => (e) => {
+    let value = e.target.value
+
+    if (name === "amount")
+      value = e.target.value.replace(",", ".").replace(/[^0-9.]/g, "")
+
+    setField(name, value)
+  }
 
   /**
    * Build the payload sent to the API from the form data.
@@ -255,19 +268,22 @@ const TransactionEdit = () => {
    * @returns {object}
    */
   const buildPayload = (overrides = {}) => {
-    const isCredit = formData.type === CREDIT_TYPE
-    return {
+    const newTransaction = new TransactionModel({
       ...formData,
-      amount,
-      debit: isCredit ? 0 : amount,
-      credit: isCredit ? amount : 0,
       ...overrides,
-    }
+    })
+
+    if (!newTransaction.isValid)
+      console.error("Transaction is not valid", newTransaction.getErrors())
+
+    console.log("Transaction payload", newTransaction.toPayload())
+    return newTransaction.toPayload()
   }
 
   // 🔢 Format the amount with two decimals when leaving the field
   const handleAmountBlur = () => {
-    if (Number.isFinite(amount)) setField("amount", amount.toFixed(2))
+    const num = Math.abs(parseFloat(formData.amount))
+    if (Number.isFinite(num)) setField("amount", num.toFixed(2))
   }
 
   // ⚡ Fill the form from a shortcut button
@@ -297,7 +313,7 @@ const TransactionEdit = () => {
 
   // ➕ Create the transaction (a transfer creates a debit and a credit)
   const handleAddTransaction = () => {
-    if (hasErrors) return
+    if (formHasErrors) return
 
     if (isTransfer) {
       const destination = destinationAccounts.find(
@@ -311,8 +327,7 @@ const TransactionEdit = () => {
           accountId: bankAccountId,
           accountName: bankAccountName,
           label: `Virement vers ${destination.name}`,
-          debit: amount,
-          credit: 0,
+          amount: absoluteAmount(),
         }),
       )
 
@@ -322,22 +337,25 @@ const TransactionEdit = () => {
           accountId: destination._id,
           accountName: destination.name,
           label: `Virement depuis ${bankAccountName}`,
-          debit: 0,
-          credit: amount,
+          amount: absoluteAmount(),
           destination: "",
         }),
       )
       return
     }
-
     createTransaction(
-      buildPayload({ accountId: bankAccountId, accountName: bankAccountName }),
+      buildPayload({
+        accountId: bankAccountId,
+        accountName: bankAccountName,
+        amount: absoluteAmount(),
+      }),
     )
   }
 
   // ✏️ Modify the selected transaction (button enabled only with exactly one selected)
   const handleModifyTransaction = () => {
-    if (hasErrors) return
+    if (formHasErrors) return
+
     updateTransaction({
       id: selectedTransactionIds[0],
       updatedData: buildPayload(),
@@ -473,12 +491,13 @@ const TransactionEdit = () => {
           <TextField
             type="text"
             label="Montant"
-            value={formData.amount}
+            value={String(formData.amount ?? "").replace("-", "")}
             onChange={handleChange("amount")}
             onBlur={handleAmountBlur}
             placeholder="0.00"
             size="small"
             sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
+            slotProps={{ htmlInput: { inputMode: "decimal" } }}
           />
 
           {/* 🗂️ CATEGORY SELECT */}
@@ -560,36 +579,36 @@ const TransactionEdit = () => {
           />
 
           {/* 🗑️ DELETE BUTTON */}
-          <ActionButton
-            label="Supprimer"
-            icon={<DeleteIcon />}
-            color="red"
-            hoverColor="darkred"
-            isPending={deleteTransactions.isPending}
+          <CustomButton
+            action="delete"
+            loading={deleteTransactions.isPending}
             disabled={selectedTransactionIds.length === 0}
             onClick={() => handleOpenConfirm(selectedTransactionIds)}
           />
 
           {/* ✏️ MODIFY BUTTON */}
-          <ActionButton
-            label="Modifier"
-            icon={<ChangeCircleIcon />}
-            color="#1976d2"
-            hoverColor="#1565c0"
-            isPending={updateTransaction.isPending}
-            disabled={hasErrors || selectedTransactionIds.length !== 1}
+          <CustomButton
+            action="update"
+            loading={updateTransaction.isPending}
+            disabled={formHasErrors || selectedTransactionIds.length !== 1}
             onClick={handleModifyTransaction}
           />
 
           {/* ➕ ADD BUTTON */}
-          <ActionButton
-            label="Ajouter"
-            icon={<AddCircleIcon />}
-            color="green"
-            hoverColor="darkgreen"
-            isPending={createTransaction.isPending}
-            disabled={hasErrors}
+          <CustomButton
+            action="create"
+            loading={createTransaction.isPending}
+            disabled={formHasErrors}
             onClick={handleAddTransaction}
+          />
+
+          {/* 🔄 RESET BUTTON */}
+          <CustomButton
+            action="reset"
+            onClick={() => {
+              setFormData(getInitialFormData())
+              dispatch(clearSelectedTransactionIds())
+            }}
           />
         </form>
       </LocalizationProvider>
