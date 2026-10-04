@@ -1,0 +1,163 @@
+.customSelect {
+  --sel-primary: #1976d2; /* à aligner sur ton thème */
+  position: relative;
+  width: auto;
+  min-width: 150px;
+
+  &__field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 40px;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  &__trigger {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0 32px 0 14px;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    font-size: 1rem;
+    text-align: left;
+    color: rgba(0, 0, 0, 0.87);
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__trigger:disabled {
+    cursor: default;
+    color: rgba(0, 0, 0, 0.38);
+  }
+
+  &__arrow {
+    position: absolute;
+    right: 7px;
+    top: calc(50% - 12px);
+    color: rgba(0, 0, 0, 0.54);
+    pointer-events: none;
+    transition: transform 0.2s;
+  }
+
+  &__arrow.is-open {
+    transform: rotate(180deg);
+  }
+  &__field.is-disabled &__arrow {
+    color: rgba(0, 0, 0, 0.26);
+  }
+
+  /* label : dans le champ si vide, réduit sur la bordure sinon */
+  &__label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(14px, 10px) scale(1);
+    transform-origin: top left;
+    line-height: 20px;
+    color: rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    z-index: 1;
+    white-space: nowrap;
+    transition:
+      transform 0.2s,
+      color 0.2s;
+  }
+  &__label.is-shrunk {
+    transform: translate(14px, -9px) scale(0.75);
+  }
+  &__field.is-focused &__label {
+    color: var(--sel-primary);
+  }
+  &__field.is-disabled &__label {
+    color: rgba(0, 0, 0, 0.38);
+  }
+
+  /* Border + corner */
+  &__outline {
+    position: absolute;
+    inset: -5px 0 0 0;
+    margin: 0;
+    padding: 0 8px;
+    border: 1px solid rgba(0, 0, 0, 0.23);
+    border-radius: inherit;
+    pointer-events: none;
+    min-width: 0;
+  }
+
+  &__outline legend {
+    float: unset;
+    width: auto;
+    max-width: 0.01px; /* pas d'encoche tant que le label est dans le champ */
+    height: 11px;
+    padding: 0;
+    font-size: 0.75em;
+    visibility: hidden;
+    white-space: nowrap;
+    transition: max-width 0.2s;
+  }
+
+  &__outline legend.is-shrunk {
+    max-width: 100%;
+  }
+  &__outline legend span {
+    padding: 0 5px;
+    display: inline-block;
+  }
+
+  &__field:hover &__outline {
+    border-color: rgba(0, 0, 0, 0.87);
+  }
+  &__field.is-focused &__outline {
+    border: 2px solid var(--sel-primary);
+  }
+  &__field.is-disabled &__outline {
+    border-color: rgba(0, 0, 0, 0.12);
+  }
+
+  /* liste */
+  &__list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 100%;
+    max-height: 240px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 8px 0;
+    list-style: none;
+    box-sizing: border-box;
+    z-index: 1300;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow:
+      0 5px 5px -3px rgba(0, 0, 0, 0.2),
+      0 8px 10px 1px rgba(0, 0, 0, 0.14),
+      0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  }
+
+  &__option {
+    padding: 6px 16px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  &__option.is-active {
+    background: rgba(0, 0, 0, 0.04);
+  }
+  &__option.is-selected {
+    background: color-mix(in srgb, var(--sel-primary), transparent 92%);
+  }
+  &__option.is-selected.is-active {
+    background: color-mix(in srgb, var(--sel-primary), transparent 84%);
+  }
+}

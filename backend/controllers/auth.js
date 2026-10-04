@@ -160,7 +160,7 @@ exports.validate = async (req, res) => {
     const user = await User.findById(decoded.userId)
 
     if (!user) {
-      console.log("User not found for this token")
+      console.log(`User not found for this token: ${decoded.userId}`)
       return res.status(401).json({ message: "Invalid token: user not found" })
     }
 

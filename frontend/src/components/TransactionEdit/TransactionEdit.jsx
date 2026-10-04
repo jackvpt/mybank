@@ -17,7 +17,6 @@ import { fr } from "date-fns/locale"
 // 🧱 MUI components
 import {
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -30,11 +29,6 @@ import {
   Select,
   TextField,
 } from "@mui/material"
-
-// 🎯 Icons (direct imports keep the Vite dev server fast)
-import DeleteIcon from "@mui/icons-material/Delete"
-import AddCircleIcon from "@mui/icons-material/AddCircle"
-import ChangeCircleIcon from "@mui/icons-material/ChangeCircle"
 
 // 🪝 Hooks
 import {
@@ -51,58 +45,15 @@ import { useGetAllBankAccounts } from "../../hooks/useBankAccounts"
 import { shortcuts } from "../../data/transactionEditShortCuts"
 
 // Components
+import CustomDatePicker from "../SubComponents/CustomDatePicker/CustomDatePicker"
+import CustomSelect from "../SubComponents/CustomSelect/CustomSelect"
 import CustomButton from "../SubComponents/CustomButton/CustomButton"
 
 // 📦 Models
 import TransactionModel from "../../models/TransactionModel"
 
-// 🔒 Stable empty array: a new `[]` on each render would re-trigger effects and memos
-const EMPTY_LIST = []
-
 // 📐 Shared field style
 const SELECT_SX = { width: "auto", minWidth: 240 }
-
-/**
- * Contained action button with an icon, and a spinner while a mutation is pending.
- * Disabled during the mutation to prevent double submissions.
- *
- * @param {object} props
- * @param {string} props.label - Button text
- * @param {JSX.Element} props.icon - Start icon
- * @param {string} props.color - Background color
- * @param {string} props.hoverColor - Background color on hover
- * @param {boolean} props.isPending - Mutation in progress
- */
-const ActionButton = ({
-  label,
-  icon,
-  color,
-  hoverColor,
-  isPending,
-  disabled,
-  ...props
-}) => (
-  <Button
-    variant="contained"
-    startIcon={isPending ? undefined : icon}
-    disabled={disabled || isPending}
-    sx={{
-      minWidth: 140,
-      backgroundColor: color,
-      color: "#fff",
-      "&:hover": { backgroundColor: hoverColor },
-      textTransform: "none",
-      fontWeight: 600,
-      px: 3,
-      py: 1,
-      borderRadius: 1,
-      boxShadow: 3,
-    }}
-    {...props}
-  >
-    {isPending ? <CircularProgress size={24} color="inherit" /> : label}
-  </Button>
-)
 
 /**
  * Transaction form: create, modify or delete transactions of the selected account.
@@ -131,7 +82,6 @@ const TransactionEdit = () => {
   // inside useTransactions via useMutationWithNotification)
   const { mutate: createTransaction, isPending: isCreating } =
     useCreateTransaction()
-
   const { mutate: updateTransaction, isPending: isUpdating } =
     useUpdateTransaction()
   const { mutate: deleteTransactions, isPending: isDeleting } =
@@ -139,12 +89,10 @@ const TransactionEdit = () => {
 
   // 🌐 Data
   const { data: settings } = useGetAllSettings()
-
-  const { data: transactionsCategories = EMPTY_LIST } = useGetAllCategories()
-
-  const { data: bankAccounts = EMPTY_LIST } = useGetAllBankAccounts()
-
-  const { data: transactions = EMPTY_LIST } = useGetAllTransactions()
+  const transactionTypes = settings?.types ?? []
+  const { data: transactionsCategories = [] } = useGetAllCategories()
+  const { data: bankAccounts = [] } = useGetAllBankAccounts()
+  const { data: transactions = [] } = useGetAllTransactions()
 
   // 📝 Form state
   // Rebuilt when the selected account changes, so a new transaction
@@ -175,7 +123,9 @@ const TransactionEdit = () => {
   useEffect(() => {
     const selected =
       selectedTransactionIds.length === 1
-        ? transactions.find((tx) => tx.id === selectedTransactionIds[0])
+        ? transactions.find(
+            (transaction) => transaction.id === selectedTransactionIds[0],
+          )
         : null
 
     setFormData(
@@ -191,25 +141,25 @@ const TransactionEdit = () => {
     )
   }, [selectedTransactionIds, transactions, getInitialFormData])
 
-  // 🧮 Derived data
-  const transactionTypes = settings?.types ?? EMPTY_LIST
+  const debitOrCredit = transactionTypes.find(
+    (type) => type.name === formData.type,
+  )?.category
 
-  // Categories grouped by type ("debit" / "credit")
-  const groupedTransactionsCategories = useMemo(
+  // Categories of the selected type
+  const categoriesByType = useMemo(
     () =>
-      transactionsCategories.reduce((acc, category) => {
-        if (!acc[category.type]) acc[category.type] = []
-        acc[category.type].push(category)
-        return acc
-      }, {}),
-    [transactionsCategories],
+      (transactionsCategories ?? []).filter(
+        (category) => category.type === debitOrCredit,
+      ),
+    [transactionsCategories, formData.type],
   )
 
   // Sub-categories of the selected category
   const subCategories = useMemo(
     () =>
-      transactionsCategories.find((c) => c.name === formData.category)
-        ?.subcategories ?? EMPTY_LIST,
+      transactionsCategories.find(
+        (category) => category.name === formData.category,
+      )?.subcategories ?? [],
     [transactionsCategories, formData.category],
   )
 
@@ -235,7 +185,7 @@ const TransactionEdit = () => {
 
     return categoryType === "debit"
       ? -Math.abs(formData.amount)
-      : formData.amount
+      : Math.abs(formData.amount)
   }
 
   const formHasErrors =
@@ -247,8 +197,9 @@ const TransactionEdit = () => {
     (!isTransfer && formData.label.trim() === "")
 
   // ✍️ Form helpers
-  const setField = (name, value) =>
+  const setField = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
   const handleChange = (name) => (e) => {
     let value = e.target.value
@@ -276,7 +227,6 @@ const TransactionEdit = () => {
     if (!newTransaction.isValid)
       console.error("Transaction is not valid", newTransaction.getErrors())
 
-    console.log("Transaction payload", newTransaction.toPayload())
     return newTransaction.toPayload()
   }
 
@@ -295,7 +245,9 @@ const TransactionEdit = () => {
     if (shortcutAmount === "last") {
       const lastTransaction = transactions
         .filter(
-          (t) => t.accountId === bankAccountId && t.label === shortcut.label,
+          (transaction) =>
+            transaction.accountId === bankAccountId &&
+            transaction.label === shortcut.label,
         )
         .sort((a, b) => new Date(b.date) - new Date(a.date))[0]
       shortcutAmount = lastTransaction ? lastTransaction.amount : 0
@@ -343,6 +295,7 @@ const TransactionEdit = () => {
       )
       return
     }
+
     createTransaction(
       buildPayload({
         accountId: bankAccountId,
@@ -352,13 +305,13 @@ const TransactionEdit = () => {
     )
   }
 
-  // ✏️ Modify the selected transaction (button enabled only with exactly one selected)
-  const handleModifyTransaction = () => {
+  // ✏️ Update the selected transaction (button enabled only with exactly one selected)
+  const handleUpdateTransaction = () => {
     if (formHasErrors) return
 
     updateTransaction({
       id: selectedTransactionIds[0],
-      updatedData: buildPayload(),
+      updatedData: buildPayload({ amount: absoluteAmount() }),
     })
   }
 
@@ -398,13 +351,11 @@ const TransactionEdit = () => {
 
         <form onSubmit={(e) => e.preventDefault()}>
           {/* 📅 DATE PICKER */}
-          <DatePicker
+          <CustomDatePicker
             label="Date"
             value={formData.date}
             onChange={(newValue) => setField("date", newValue)}
             format="dd/MM/yyyy"
-            sx={{ width: "auto", minWidth: 150, maxWidth: 180 }}
-            slotProps={{ textField: { size: "small" } }}
           />
 
           {/* 🏷️ TYPE SELECT */}
@@ -415,21 +366,15 @@ const TransactionEdit = () => {
             size="small"
             sx={SELECT_SX}
           >
-            <InputLabel id="type-label">Type</InputLabel>
-            <Select
-              labelId="type-label"
-              id="type"
-              name="type"
-              value={formData.type}
-              onChange={handleChange("type")}
+            <CustomSelect
               label="Type"
-            >
-              {transactionTypes.map((type) => (
-                <MenuItem key={type.name} value={type.name}>
-                  {type.text}
-                </MenuItem>
-              ))}
-            </Select>
+              value={formData.type}
+              onChange={(value) => setField("type", value)}
+              options={transactionTypes.map(({ name, text }) => ({
+                value: name,
+                label: text,
+              }))}
+            />
           </FormControl>
 
           {/* 🧾 CHECK NUMBER */}
@@ -502,48 +447,22 @@ const TransactionEdit = () => {
 
           {/* 🗂️ CATEGORY SELECT */}
           {!isTransfer && (
-            <FormControl fullWidth size="small" sx={SELECT_SX}>
-              <InputLabel id="category-label">Catégorie</InputLabel>
-              <Select
-                labelId="category-label"
-                id="category"
-                name="category"
-                value={formData.category ?? ""}
-                onChange={(e) =>
-                  // Changing the category invalidates the sub-category
-                  setFormData((prev) => ({
-                    ...prev,
-                    category: e.target.value,
-                    subCategory: "",
-                  }))
-                }
-                label="Catégorie"
-              >
-                {Object.entries(groupedTransactionsCategories).map(
-                  ([type, categories]) => [
-                    <ListSubheader
-                      key={type}
-                      sx={{
-                        backgroundColor: "#ddd",
-                        color: "#1976d2",
-                        fontWeight: 900,
-                      }}
-                    >
-                      {type === "debit" ? "Débit" : "Crédit"}
-                    </ListSubheader>,
-                    ...categories.map((category) => (
-                      <MenuItem
-                        key={category.name}
-                        value={category.name}
-                        sx={{ fontSize: "0.85rem" }}
-                      >
-                        {category.name}
-                      </MenuItem>
-                    )),
-                  ],
-                )}
-              </Select>
-            </FormControl>
+            <CustomSelect
+              label="Catégorie"
+              value={formData.category ?? ""}
+              onChange={(value) =>
+                // Changing the category invalidates the sub-category
+                setFormData((prev) => ({
+                  ...prev,
+                  category: value,
+                  subCategory: "",
+                }))
+              }
+              options={categoriesByType.map((category) => ({
+                value: category.name,
+                label: category.name,
+              }))}
+            />
           )}
 
           {/* 🗃️ SUB-CATEGORY SELECT */}
@@ -581,7 +500,7 @@ const TransactionEdit = () => {
           {/* 🗑️ DELETE BUTTON */}
           <CustomButton
             action="delete"
-            loading={deleteTransactions.isPending}
+            loading={isDeleting}
             disabled={selectedTransactionIds.length === 0}
             onClick={() => handleOpenConfirm(selectedTransactionIds)}
           />
@@ -589,15 +508,15 @@ const TransactionEdit = () => {
           {/* ✏️ MODIFY BUTTON */}
           <CustomButton
             action="update"
-            loading={updateTransaction.isPending}
+            loading={isUpdating}
             disabled={formHasErrors || selectedTransactionIds.length !== 1}
-            onClick={handleModifyTransaction}
+            onClick={handleUpdateTransaction}
           />
 
           {/* ➕ ADD BUTTON */}
           <CustomButton
             action="create"
-            loading={createTransaction.isPending}
+            loading={isCreating}
             disabled={formHasErrors}
             onClick={handleAddTransaction}
           />

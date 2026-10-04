@@ -1,0 +1,193 @@
+.datepicker {
+  --dp-primary: #1976d2; /* à aligner sur ton thème */
+  position: relative;
+  width: auto;
+  min-width: 150px;
+  max-width: 180px;
+
+  &__field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 4px 0 14px;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    font-size: 1rem;
+    color: rgba(0, 0, 0, 0.87);
+  }
+  &__input::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+  /* label always "reduced" */
+  &__label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(14px, -9px) scale(0.75);
+    transform-origin: top left;
+    color: rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    z-index: 1;
+    white-space: nowrap;
+  }
+  &__field.is-focused &__label {
+    color: var(--dp-primary);
+  }
+
+  /* border + label corner */
+  &__outline {
+    position: absolute;
+    inset: -5px 0 0 0;
+    margin: 0;
+    padding: 0 8px;
+    border: 1px solid rgba(0, 0, 0, 0.23);
+    border-radius: inherit;
+    pointer-events: none;
+    min-width: 0;
+  }
+
+  &__outline legend {
+    float: unset;
+    width: auto;
+    max-width: 100%;
+    height: 11px;
+    padding: 0;
+    font-size: 0.75em;
+    visibility: hidden;
+    white-space: nowrap;
+  }
+
+  &__outline legend span {
+    padding: 0 5px;
+    display: inline-block;
+  }
+
+  &__field:hover .datepicker__outline {
+    border-color: rgba(0, 0, 0, 0.87);
+  }
+
+  &__field.is-focused .datepicker__outline {
+    border: 2px solid var(--dp-primary);
+  }
+
+  &__field.is-disabled .datepicker__outline {
+    border-color: rgba(0, 0, 0, 0.12);
+  }
+
+  &__field.is-disabled .datepicker__input,
+  &__field.is-disabled .datepicker__label {
+    color: rgba(0, 0, 0, 0.38);
+  }
+
+  &__toggle,
+  &__nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: rgba(0, 0, 0, 0.54);
+    cursor: pointer;
+    transition: background-color 0.15s;
+  }
+
+  &__toggle:hover:not(:disabled),
+  &__nav:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  &__toggle:disabled {
+    cursor: default;
+    color: rgba(0, 0, 0, 0.26);
+  }
+
+  /* popover */
+  &__popover {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 1300;
+    width: 288px;
+    padding: 8px 12px 12px;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow:
+      0 5px 5px -3px rgba(0, 0, 0, 0.2),
+      0 8px 10px 1px rgba(0, 0, 0, 0.14),
+      0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  &__month {
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(7, 36px);
+    justify-content: space-between;
+    row-gap: 2px;
+  }
+
+  &__dow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    font-size: 0.75rem;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  &__day {
+    width: 36px;
+    height: 36px;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background: transparent;
+    font: inherit;
+    font-size: 0.75rem;
+    color: rgba(0, 0, 0, 0.87);
+    cursor: pointer;
+  }
+
+  &__day:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  &__day.is-today {
+    border-color: rgba(0, 0, 0, 0.6);
+  }
+
+  &__day.is-selected {
+    background: var(--dp-primary);
+    border-color: var(--dp-primary);
+    color: #fff;
+  }
+
+  &__day.is-selected:hover {
+    background: color-mix(in srgb, var(--dp-primary), black 20%);
+  }
+}
