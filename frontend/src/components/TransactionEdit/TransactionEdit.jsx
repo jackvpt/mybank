@@ -51,6 +51,7 @@ import CustomButton from "../SubComponents/CustomButton/CustomButton"
 
 // 📦 Models
 import TransactionModel from "../../models/TransactionModel"
+import CustomTextField from "../SubComponents/CustomTextField/CustomTextField"
 
 // 📐 Shared field style
 const SELECT_SX = { width: "auto", minWidth: 240 }
@@ -433,16 +434,14 @@ const TransactionEdit = () => {
           )}
 
           {/* 💶 AMOUNT */}
-          <TextField
-            type="text"
+          <CustomTextField
+            id="amount"
             label="Montant"
             value={String(formData.amount ?? "").replace("-", "")}
             onChange={handleChange("amount")}
-            onBlur={handleAmountBlur}
-            placeholder="0.00"
-            size="small"
-            sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
-            slotProps={{ htmlInput: { inputMode: "decimal" } }}
+            type="text"
+            clearField={true}
+            copy={false}
           />
 
           {/* 🗂️ CATEGORY SELECT */}
@@ -488,13 +487,14 @@ const TransactionEdit = () => {
           )}
 
           {/* 📝 NOTES */}
-          <TextField
-            type="text"
+          <CustomTextField
+            id="notes"
             label="Notes"
             value={formData.notes}
             onChange={handleChange("notes")}
-            size="small"
-            sx={{ minWidth: 200 }}
+            type="text"
+            clearField={true}
+            copy={false}
           />
 
           {/* 🗑️ DELETE BUTTON */}

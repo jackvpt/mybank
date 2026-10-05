@@ -28,3 +28,9 @@
 @function darken-custom($color) {
   @return color.adjust($color, $lightness: -15%);
 }
+
+@mixin normal-border{
+  padding:0.5rem;
+  border: 1px solid $primary-color-6;
+  border-radius: 4px;
+}

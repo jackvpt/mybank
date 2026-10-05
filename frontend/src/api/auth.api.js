@@ -63,15 +63,10 @@ export const login = async (userData) => {
  * @throws {Object} Error response from the server or network error.
  */
 export const validateToken = async (token) => {
-  try {
-    const { data } = await axios.get(`${BASE_URL}/validate`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    return data
-  } catch (error) {
-    console.error("Error validating token:", error)
-    throw error.response?.data || error
-  }
+  const { data } = await axios.get(`${BASE_URL}/validate`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  return data
 }
 
 /**

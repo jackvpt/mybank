@@ -1,3 +1,6 @@
+// 🔄 React
+import { useEffect } from "react"
+
 // 🔄 React Query
 import { useQuery } from "@tanstack/react-query"
 
@@ -29,8 +32,6 @@ import UserModel from "../models/UserModel"
  *    — nothing happens, no redirect, no dispatch.
  * 3. If a token exists, it's validated against the API.
  *    - On success: user data + token are stored in Redux.
- *    - On failure: token is wiped from both storages, Redux user
- *      state is cleared, and the user is redirected to /login.
  *
  * @returns {UseQueryResult} the full React Query result object
  *          (status, data, error, isLoading, isFetching, refetch, ...)
@@ -45,23 +46,40 @@ export function useAuthToken() {
   // a new token in storage and this hook re-renders).
   const token = localStorage.getItem("token") || sessionStorage.getItem("token")
 
-  return useQuery({
-    queryKey: ["token", token],
-    queryFn: () => validateToken(token),
-    enabled: !!token,
-    retry: false,
-    refetchInterval: 30000,
-    staleTime: 0,
-    onSuccess: (data) => {
-      console.log("✅ Token is valid", data)
-      dispatch(setUser(new UserModel(data.user)))
-    },
-    onError: (err) => {
-      console.log("❌ Token validation failed:", err.message)
-      localStorage.removeItem("token")
-      sessionStorage.removeItem("token")
-      dispatch(clearUser())
-      navigate("/login", { replace: true })
-    },
-  })
+const query = useQuery({
+  queryKey: ["token", token],
+  queryFn: () => validateToken(token),
+  enabled: !!token,
+  retry: false,
+  staleTime: 0,
+  refetchOnWindowFocus: false,
+  retryOnMount: false,
+  refetchInterval: (q) => (q.state.status === "error" ? false : 30000),
+})
+
+// ✅ Replaces onSuccess
+useEffect(() => {
+  if (query.data) {
+    dispatch(setUser(new UserModel(query.data.user)))
+  }
+}, [query.data, dispatch])
+
+// ❌ Replaces onError
+useEffect(() => {
+  if (!query.error) return
+
+  const status = query.error.response?.status
+  if (status === 401 || status === 403) {
+    // token réellement invalide → déconnexion
+    localStorage.removeItem("token")
+    sessionStorage.removeItem("token")
+    dispatch(clearUser())
+    navigate("/login", { replace: true })
+  } else {
+    // Network / backend down : token kept in storage, user kept in Redux, no redirect. Just log a warning.
+    console.warn("Backend not available, token not invalidated:", query.error.message)
+  }
+}, [query.error, dispatch, navigate])
+
+return query
 }

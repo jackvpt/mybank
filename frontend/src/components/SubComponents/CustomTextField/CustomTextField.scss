@@ -1,0 +1,110 @@
+@use "../../../styles/utils/variables" as *;
+@use "../../../styles/utils/mixins" as *;
+
+.container__customtextfield {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+
+  &--input {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+
+    input {
+      font-weight: 400;
+    }
+
+    &::selection {
+      background-color: $primary-color-2;
+      color: $text-color-2;
+    }
+
+    &--copy-btn {
+      width: 24px;
+
+      button {
+        all: unset;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        line-height: 1;
+        font-size: 0.8rem;
+        padding: 0.2em 0.5em;
+        cursor: pointer;
+
+        &:hover {
+          filter: brightness(0.8);
+        }
+
+        &:disabled {
+          background-color: $primary-color-3;
+          cursor: not-allowed;
+          color: $secondary-color-3;
+        }
+      }
+    }
+  }
+}
+
+.container__customtextfield input {
+  @include normal-border;
+
+  outline: none;
+  transition: 0.2s;
+  background-color: $primary-color-1;
+  color: $text-color-1;
+  padding-right: 2rem;
+  width: 250px;
+}
+
+.container__customtextfield label {
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* focus input */
+.container__customtextfield.focused input {
+  border-color: $primary-color-2;
+}
+
+/* error */
+.container__customtextfield.error input {
+  border-color: #d32f2f;
+}
+
+.container__customtextfield.error label {
+  color: #d32f2f;
+}
+
+.container__customtextfield .helper {
+  margin-top: 4px;
+  color: #666;
+}
+
+.container__customtextfield.error .helper {
+  color: #d32f2f;
+}
+
+/* disabled */
+.container__customtextfield.disabled input {
+  background-color: $primary-color-3;
+  cursor: not-allowed;
+}
+
+/* Clear button */
+.container__customfield--clear-btn {
+  position: absolute;
+  right: 0.25rem;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.75rem;
+  color: $secondary-color-3;
+  cursor: pointer;
+}
