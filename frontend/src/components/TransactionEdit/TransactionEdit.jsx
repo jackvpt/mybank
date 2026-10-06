@@ -52,6 +52,9 @@ import CustomButton from "../SubComponents/CustomButton/CustomButton"
 import TransactionModel from "../../models/TransactionModel"
 import CustomTextField from "../SubComponents/CustomTextField/CustomTextField"
 
+// 🧮 Functions
+import { formatAmount } from "../../utils/formatNumber"
+
 // 📐 Shared field style
 const SELECT_SX = { width: "auto", minWidth: 240 }
 
@@ -133,6 +136,7 @@ const TransactionEdit = () => {
         ? {
             ...selected,
             date: new Date(selected.date),
+            amount: formatAmount(selected.amount),
             category: selected.category ?? "",
             subCategory: selected.subCategory ?? "",
             type: selected.type ?? "card",
@@ -188,6 +192,33 @@ const TransactionEdit = () => {
       : Math.abs(formData.amount)
   }
 
+  /**
+   * Find the last transaction with the same label on the current account.
+   * This is used to pre-fill the amount field when the user clicks on a shortcut button.
+   * It is case-insensitive and ignores leading/trailing whitespace.
+   *
+   * @returns {object|null} The last transaction with the same label, or null if none found.
+   * @param {string} label
+   * @returns
+   */
+  const findLastTransaction = (label) => {
+    const wanted = String(label ?? "")
+      .trim()
+      .toLowerCase()
+    if (!wanted) return null
+    return (
+      transactions
+        .filter(
+          (t) =>
+            t.accountId === bankAccountId &&
+            String(t.label ?? "")
+              .trim()
+              .toLowerCase() === wanted,
+        )
+        .sort((a, b) => new Date(b.date) - new Date(a.date))[0] ?? null
+    )
+  }
+
   const formHasErrors =
     !isValid(formData.date) ||
     !Number.isFinite(absoluteAmount()) ||
@@ -219,12 +250,16 @@ const TransactionEdit = () => {
    */
   const handleAmountBlur = () => {
     const raw = String(formData.amount ?? "")
-    const negative = raw.startsWith("-")
-    const n = parseFloat(raw.replace("-", "").replace(",", "."))
-    setField(
-      "amount",
-      Number.isNaN(n) || n === 0 ? "" : `${negative ? "-" : ""}${n.toFixed(2)}`,
-    )
+    setField("amount", formatAmount(raw))
+  }
+
+  const handleLabelBlur = () => {
+    const lastTransaction = findLastTransaction(formData.label)
+    if (!lastTransaction) return
+
+    setField("amount", formatAmount(lastTransaction.amount))
+    setField("category", lastTransaction.category)
+    setField("subCategory", lastTransaction.subCategory)
   }
 
   /**
@@ -264,12 +299,8 @@ const TransactionEdit = () => {
       shortcutAmount = lastTransaction ? lastTransaction.amount : 0
     }
 
-    const amountNumber = Number(shortcutAmount ?? 0)
-    shortcutAmount =
-      Number.isNaN(amountNumber) || amountNumber === 0
-        ? ""
-        : amountNumber.toFixed(2)
-        
+    shortcutAmount = formatAmount(shortcutAmount)
+
     setFormData((prev) => ({
       ...prev,
       type: shortcut.type,
@@ -440,6 +471,7 @@ const TransactionEdit = () => {
               label="Libellé"
               value={formData.label}
               onChange={handleChange("label")}
+              onBlur={handleLabelBlur}
               type="text"
               clearField={true}
               copy={false}

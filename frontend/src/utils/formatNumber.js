@@ -1,22 +1,57 @@
+// Round on the absolute value so negatives round symmetrically
+// ("+ 0" turns -0 into 0)
+const round2 = (n) =>
+  Math.sign(n) * (Math.round((Math.abs(n) + Number.EPSILON) * 100) / 100) + 0
+
 /**
- * Converts a string to a formatted amount.
- * If the input is not a string or cannot be converted to a number, it returns null
- * @param {String} str
- * @returns {Number|null} The formatted number or null if conversion fails
+ * Converts a string or a number to a number rounded to 2 decimals.
+ * Accepts "," or "." as decimal separator, ignores spaces (including
+ * non-breaking ones) and currency symbols. Returns null if conversion fails.
+ * @param {string|number} value
+ * @returns {number|null}
  * @example
- * stringToAmount("1,234.56") // returns 1234.56
- * stringToAmount("abc") // returns null
- * stringToAmount("  1234.56  ") // returns 1234.56
- * stringToAmount("1,234") // returns 1234
+ * entityToAmount("1234.5")      // 1234.5
+ * entityToAmount("1 234,56 €")  // 1234.56
+ * entityToAmount("1,234.56")    // 1234.56
+ * entityToAmount("12,5")        // 12.5
+ * entityToAmount("-12.345")     // -12.35
+ * entityToAmount(12.345)        // 12.35
+ * entityToAmount("abc")         // null
+ * entityToAmount("")            // null
  */
-export const stringToAmount = (str) => {
-  if (typeof str !== "string") return null
+export const entityToAmount = (value) => {
+  // Numbers: only reject NaN / Infinity
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? round2(value) : null
+  }
+  if (typeof value !== "string") return null
 
-  const value = str.trim().replace(",", ".")
-  const number = parseFloat(value)
+  // Keep only digits, separators and minus sign
+  let str = value.replace(/[\s\u00a0\u202f]/g, "").replace(/[^\d.,-]/g, "")
+  if (!/\d/.test(str)) return null
 
-  const result = isNaN(number) ? null : number
-  return result
+  // The last separator is the decimal one, any other is a thousands separator
+  const decimalIndex = Math.max(str.lastIndexOf(","), str.lastIndexOf("."))
+  if (decimalIndex !== -1) {
+    const intPart = str.slice(0, decimalIndex).replace(/[.,]/g, "")
+    str = `${intPart}.${str.slice(decimalIndex + 1)}`
+  }
+
+  const number = Number(str)
+  return Number.isNaN(number) ? null : round2(number)
+}
+
+/**
+ * Formats a string or number as a monetary amount with 2 decimal places.
+ * Returns an empty string if the value is null or cannot be converted to a number.
+ * @param {string|number} value 
+ * @returns {string} A string representation of the amount with 2 decimal places, or an empty string if the value is null or cannot be converted to a number.
+ * @example
+ * formatAmount("1234.5")      // "1234.50"
+ */
+export const formatAmount = (value)=>{
+  const amount=entityToAmount(value)
+  return !amount ? "" : amount.toFixed(2)
 }
 
 /**
