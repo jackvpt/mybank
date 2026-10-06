@@ -1,7 +1,7 @@
 @use "../../styles/utils/variables" as *;
 @use "../../styles/utils/mixins" as *;
 
-.container-login {
+.container__login {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -14,8 +14,15 @@
     align-items: center;
     justify-content: center;
     min-width: 300px;
-    gap: 1.5rem;
+    gap: 1rem;
+  }
 
-
+  &--error {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width: 100%;
+    height: 30px;
+    color:red;
   }
 }

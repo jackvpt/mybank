@@ -16,8 +16,8 @@ const Footer = () => {
 
   /** Log out the current user */
   const handleLogOut = () => {
-    localStorage.removeItem("token")
-    sessionStorage.removeItem("token")
+    localStorage.removeItem("mybank_token")
+    sessionStorage.removeItem("mybank_token")
     dispatch({ type: "user/clearUser" })
     dispatch({ type: "parameters/reset" })
     navigate("/login")

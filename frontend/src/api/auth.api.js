@@ -84,7 +84,7 @@ export const updatePassword = async ({ currentPassword, newPassword }) => {
   try {
     // Retrieve token from localStorage or sessionStorage
     const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token")
+      localStorage.getItem("mybank_token") || sessionStorage.getItem("mybank_token")
 
     /**
      * Make the PUT request to update the password.

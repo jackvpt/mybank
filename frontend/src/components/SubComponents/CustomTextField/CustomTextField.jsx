@@ -9,60 +9,67 @@ const CustomTextField = ({
   value,
   onChange,
   type = "text",
-  error,
+  error = false,
   helperText = "",
   disabled = false,
   clearField = true,
-  copy = true,
+  copy = false,
+  floating = false,
 }) => {
   const [focused, setFocused] = useState(false)
 
-  const isFilled = value && value.length > 0
+  const isFilled = String(value ?? "").length > 0
 
   return (
-    <div
-      className={`container__customtextfield 
+    <div className="container__customtextfield">
+      {label && !floating && <label htmlFor={id}>{label}</label>}
+      <div
+        className={`container__customtextfield--textfield 
         ${focused ? "focused" : ""}
         ${isFilled ? "filled" : ""}
         ${error ? "error" : ""}
         ${disabled ? "disabled" : ""}
+        ${floating ? "floating" : ""}
       `}
-    >
-      <label htmlFor={id}>{label}</label>
-      <div className="container__customtextfield--input">
-        <div className="container__customtextfield--input--copy-btn">
-          {copy && isFilled && !disabled && (
+      >
+        <div className="container__customtextfield--textfield--input">
+          {copy && (
+            <div className="container__customtextfield--textfield--input--copy-btn">
+              {copy && isFilled && !disabled && (
+                <button
+                  type="button"
+                  onClick={() => navigator.clipboard.writeText(String(value))}
+                >
+                  <FontAwesomeIcon icon={faCopy} />
+                </button>
+              )}
+            </div>
+          )}
+          <div className="container__customtextfield--textfield--field">
+            <input
+              id={id}
+              type={type}
+              value={value ?? ""}
+              disabled={disabled}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              onChange={onChange}
+            />
+            {floating && <label htmlFor={id}>{label}</label>}
+          </div>
+          {clearField && isFilled && !disabled && (
             <button
               type="button"
-              onClick={() => navigator.clipboard.writeText(value)}
-              disabled={disabled}
+              className="container__customtextfield--textfield--clear-btn"
+              onClick={() => onChange({ target: { id, name: id, value: "" } })}
             >
-              <FontAwesomeIcon icon={faCopy} />
+              <FontAwesomeIcon icon={faCircleXmark} />
             </button>
           )}
-        </div>
-        <input
-          id={id}
-          type={type}
-          value={value}
-          disabled={disabled}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          onChange={onChange}
-        />
-        {clearField && isFilled && !disabled && (
-          <button
-            type="button"
-            className="container__customfield--clear-btn"
-            onClick={() => onChange({ target: { value: "" } })}
-            disabled={disabled || !isFilled}
-          >
-            <FontAwesomeIcon icon={faCircleXmark} />
-          </button>
-        )}
 
-        {helperText && <span className="helper">{helperText}</span>}
-      </div>{" "}
+          {helperText && <span className="helper">{helperText}</span>}
+        </div>
+      </div>
     </div>
   )
 }

@@ -442,6 +442,7 @@ const TransactionEdit = () => {
             type="text"
             clearField={true}
             copy={false}
+            floating={true}
           />
 
           {/* 🗂️ CATEGORY SELECT */}
@@ -495,6 +496,7 @@ const TransactionEdit = () => {
             type="text"
             clearField={true}
             copy={false}
+            floating={true}
           />
 
           {/* 🗑️ DELETE BUTTON */}

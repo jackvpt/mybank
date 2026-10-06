@@ -14,8 +14,11 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material"
 import { useLogin } from "../../hooks/useLogin"
 
+// Custom functions
+import { messageConverter } from "../../utils/messageConverter"
+
 const Login = () => {
-  const loginMutation = useLogin()
+  const { mutate: loginMutation, error } = useLogin()
 
   const [formData, setFormData] = useState({
     email: "",
@@ -47,15 +50,17 @@ const Login = () => {
     e.preventDefault()
     setSubmitted(true)
     if (!isValidEmail(formData.email)) return
-    loginMutation.mutate({
+    loginMutation({
       email: formData.email,
       password: formData.password,
       remember: formData.rememberMe,
     })
   }
 
+  console.log("error", error?.message)
+
   return (
-    <section className="container-login">
+    <section className="container__login">
       <form onSubmit={handleSubmit} noValidate>
         {/* Email Field */}
         <FormControl
@@ -106,6 +111,11 @@ const Login = () => {
             label="Mot de passe"
           />
         </FormControl>
+
+        {/** Error Message */}
+        <div className="container__login--error">
+          {error && <p>{messageConverter(error.message)}</p>}
+        </div>
 
         {/** Remember Me Checkbox */}
         <FormControlLabel
