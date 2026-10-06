@@ -39,10 +39,20 @@
   &__arrow {
     position: absolute;
     right: 7px;
-    top: calc(50% - 12px);
+    top: 50%;
+    margin-top: -12px;
+    display: flex;
+    width: 24px;
+    height: 24px;
     color: rgba(0, 0, 0, 0.54);
     pointer-events: none;
-    transition: transform 0.2s;
+    transition: transform 0.3s;
+
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
   }
 
   &__arrow.is-open {

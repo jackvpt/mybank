@@ -8,6 +8,7 @@ const CustomTextField = ({
   label,
   value,
   onChange,
+  onBlur,
   type = "text",
   error = false,
   helperText = "",
@@ -52,7 +53,10 @@ const CustomTextField = ({
               value={value ?? ""}
               disabled={disabled}
               onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
+              onBlur={(e) => {
+                setFocused(false)
+                onBlur?.(e)
+              }}
               onChange={onChange}
             />
             {floating && <label htmlFor={id}>{label}</label>}

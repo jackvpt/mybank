@@ -24,7 +24,6 @@ import {
   DialogTitle,
   FormControl,
   InputLabel,
-  ListSubheader,
   MenuItem,
   Select,
   TextField,
@@ -212,6 +211,23 @@ const TransactionEdit = () => {
   }
 
   /**
+   * Format the amount field to two decimal places on blur, and ensure it is a valid number.
+   * If the user entered a negative number, it will be preserved.
+   * If the user entered an invalid number, the field will be cleared.
+   * This ensures that the amount is always stored in a consistent format.
+   * The absolute value is calculated later when building the payload for the API.
+   */
+  const handleAmountBlur = () => {
+    const raw = String(formData.amount ?? "")
+    const negative = raw.startsWith("-")
+    const n = parseFloat(raw.replace("-", "").replace(",", "."))
+    setField(
+      "amount",
+      Number.isNaN(n) || n === 0 ? "" : `${negative ? "-" : ""}${n.toFixed(2)}`,
+    )
+  }
+
+  /**
    * Build the payload sent to the API from the form data.
    * `amount`, `debit` and `credit` are derived here from the type,
    * so they can never be out of sync with the form.
@@ -231,12 +247,6 @@ const TransactionEdit = () => {
     return newTransaction.toPayload()
   }
 
-  // 🔢 Format the amount with two decimals when leaving the field
-  const handleAmountBlur = () => {
-    const num = Math.abs(parseFloat(formData.amount))
-    if (Number.isFinite(num)) setField("amount", num.toFixed(2))
-  }
-
   // ⚡ Fill the form from a shortcut button
   const handleShortcutClick = (shortcut) => {
     let shortcutAmount = shortcut.amount
@@ -254,6 +264,12 @@ const TransactionEdit = () => {
       shortcutAmount = lastTransaction ? lastTransaction.amount : 0
     }
 
+    const amountNumber = Number(shortcutAmount ?? 0)
+    shortcutAmount =
+      Number.isNaN(amountNumber) || amountNumber === 0
+        ? ""
+        : amountNumber.toFixed(2)
+        
     setFormData((prev) => ({
       ...prev,
       type: shortcut.type,
@@ -419,17 +435,15 @@ const TransactionEdit = () => {
 
           {/* 🔤 LABEL (generated automatically for transfers) */}
           {!isTransfer && (
-            <TextField
+            <CustomTextField
+              id="label"
               label="Libellé"
-              name="label"
               value={formData.label}
               onChange={handleChange("label")}
-              placeholder="Courses"
-              required
-              fullWidth
-              variant="outlined"
-              size="small"
-              sx={{ width: "auto", minWidth: 350 }}
+              type="text"
+              clearField={true}
+              copy={false}
+              floating={true}
             />
           )}
 
@@ -437,8 +451,13 @@ const TransactionEdit = () => {
           <CustomTextField
             id="amount"
             label="Montant"
-            value={String(formData.amount ?? "").replace("-", "")}
+            value={
+              formData.amount === 0
+                ? ""
+                : String(formData.amount ?? "").replace("-", "")
+            }
             onChange={handleChange("amount")}
+            onBlur={handleAmountBlur}
             type="text"
             clearField={true}
             copy={false}
@@ -450,14 +469,11 @@ const TransactionEdit = () => {
             <CustomSelect
               label="Catégorie"
               value={formData.category ?? ""}
-              onChange={(value) =>
+              onChange={(value) => {
+                setField("category", value)
                 // Changing the category invalidates the sub-category
-                setFormData((prev) => ({
-                  ...prev,
-                  category: value,
-                  subCategory: "",
-                }))
-              }
+                setField("subCategory", "")
+              }}
               options={categoriesByType.map((category) => ({
                 value: category.name,
                 label: category.name,
@@ -468,22 +484,16 @@ const TransactionEdit = () => {
           {/* 🗃️ SUB-CATEGORY SELECT */}
           {!isTransfer && (
             <FormControl fullWidth size="small" sx={SELECT_SX}>
-              <InputLabel id="subCategory-label">Sous catégorie</InputLabel>
-              <Select
-                labelId="subCategory-label"
-                id="subCategory"
-                name="subCategory"
-                value={formData.subCategory ?? ""}
-                onChange={handleChange("subCategory")}
+              <CustomSelect
                 label="Sous catégorie"
+                value={formData.subCategory ?? ""}
+                onChange={(value) => setField("subCategory", value)}
                 disabled={!formData.category}
-              >
-                {subCategories.map((sub) => (
-                  <MenuItem key={sub} value={sub}>
-                    {sub}
-                  </MenuItem>
-                ))}
-              </Select>
+                options={subCategories.map((subcategory) => ({
+                  value: subcategory,
+                  label: subcategory,
+                }))}
+              />
             </FormControl>
           )}
 
