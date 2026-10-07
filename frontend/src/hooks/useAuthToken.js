@@ -60,7 +60,7 @@ const query = useQuery({
 // ✅ Replaces onSuccess
 useEffect(() => {
   if (query.data) {
-    dispatch(setUser(new UserModel(query.data.user)))
+    dispatch(setUser(new UserModel(query.data.user).toPlain()))
   }
 }, [query.data, dispatch])
 

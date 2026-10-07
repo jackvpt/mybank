@@ -2,7 +2,14 @@
 import "./TransactionEdit.scss"
 
 // ⚛️ React
-import { useCallback, useEffect, useMemo, useState } from "react"
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 
 // 🏪 Redux
 import { useDispatch, useSelector } from "react-redux"
@@ -120,6 +127,10 @@ const TransactionEdit = () => {
 
   const [formData, setFormData] = useState(getInitialFormData)
 
+  const labelInputRef = useRef(null)
+  const skipCompletion = useRef(false) // true right after Backspace/Delete
+  const pendingSelection = useRef(null) // [start, end] to select after render
+
   // 🔁 Sync the form with the selection:
   // one selected row -> load it, otherwise (or after a data refresh) -> empty form.
   // This is also what resets the form after a transaction is added.
@@ -193,6 +204,23 @@ const TransactionEdit = () => {
   }
 
   /**
+   * Get a list of all unique labels from the transactions, sorted by frequency.
+   * @returns {string[]} The list of unique labels.
+   */
+  const labelOptions = useMemo(() => {
+    const counts = new Map() // key: lowercase label -> { label, n }
+    for (const transaction of transactions) {
+      const label = transaction.label?.trim()
+      if (!label) continue
+      const key = label.toLowerCase()
+      const entry = counts.get(key)
+      if (entry) entry.n += 1
+      else counts.set(key, { label: label, n: 1 })
+    }
+    return [...counts.values()].sort((a, b) => b.n - a.n).map((e) => e.label)
+  }, [transactions])
+
+  /**
    * Find the last transaction with the same label on the current account.
    * This is used to pre-fill the amount field when the user clicks on a shortcut button.
    * It is case-insensitive and ignores leading/trailing whitespace.
@@ -240,6 +268,58 @@ const TransactionEdit = () => {
 
     setField(name, value)
   }
+
+  const handleLabelChange = (e) => {
+    const typed = e.target.value
+    const input = labelInputRef.current
+
+    // Complete only when typing at the end of the text, not during IME composition
+    const canComplete =
+      !skipCompletion.current &&
+      !e.nativeEvent?.isComposing &&
+      typed.length > 0 &&
+      input?.selectionStart === typed.length
+    skipCompletion.current = false
+
+    if (canComplete) {
+      const lower = typed.toLowerCase()
+      // labelOptions is sorted by frequency: the most used match wins
+      const match = labelOptions.find(
+        (l) => l.length > typed.length && l.toLowerCase().startsWith(lower),
+      )
+      if (match) {
+        // Keep what the user typed, append the rest of the suggestion
+        const completed = typed + match.slice(typed.length)
+        pendingSelection.current = [typed.length, completed.length]
+        handleChange("label")({ target: { value: completed } })
+        return
+      }
+    }
+    handleChange("label")(e)
+  }
+
+  const handleLabelKeyDown = (e) => {
+    skipCompletion.current = e.key === "Backspace" || e.key === "Delete"
+
+    // Escape drops the suggested part and keeps what was typed
+    if (e.key === "Escape") {
+      const input = e.currentTarget
+      if (input.selectionStart !== input.selectionEnd) {
+        e.stopPropagation()
+        handleChange("label")({
+          target: { value: input.value.slice(0, input.selectionStart) },
+        })
+      }
+    }
+  }
+
+  // Select the suggested part once React has rendered the completed value
+  useLayoutEffect(() => {
+    if (pendingSelection.current && labelInputRef.current) {
+      labelInputRef.current.setSelectionRange(...pendingSelection.current)
+    }
+    pendingSelection.current = null
+  })
 
   /**
    * Format the amount field to two decimal places on blur, and ensure it is a valid number.
@@ -470,8 +550,13 @@ const TransactionEdit = () => {
               id="label"
               label="Libellé"
               value={formData.label}
-              onChange={handleChange("label")}
+              onChange={handleLabelChange}
               onBlur={handleLabelBlur}
+              inputProps={{
+                ref: labelInputRef,
+                onKeyDown: handleLabelKeyDown,
+                autoComplete: "off",
+              }}
               type="text"
               clearField={true}
               copy={false}

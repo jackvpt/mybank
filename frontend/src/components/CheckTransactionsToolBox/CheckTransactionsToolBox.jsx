@@ -14,7 +14,7 @@ import {
   setCheckingFinalAmount,
   setCheckingInitialAmount,
 } from "../../store/features/parametersSlice"
-import { stringToAmount } from "../../utils/formatNumber"
+import { entityToAmount } from "../../utils/formatNumber"
 import {
   Alert,
   Button,
@@ -103,7 +103,7 @@ const CheckTransactionsToolBox = () => {
           onFocus={(e) => e.target.select()}
           onChange={(e) => setCheckInitialAmount(e.target.value)}
           onBlur={(e) => {
-            const formattedValue = stringToAmount(e.target.value)
+            const formattedValue = entityToAmount(e.target.value)
             setCheckInitialAmount(formattedValue.toFixed(2))
             dispatch(setCheckingInitialAmount(formattedValue))
           }}
@@ -119,7 +119,7 @@ const CheckTransactionsToolBox = () => {
           value={checkFinalAmount}
           onChange={(e) => setCheckFinalAmount(e.target.value)}
           onBlur={(e) => {
-            const formattedValue = stringToAmount(e.target.value)
+            const formattedValue = entityToAmount(e.target.value)
             setCheckFinalAmount(formattedValue.toFixed(2))
             dispatch(setCheckingFinalAmount(formattedValue))
           }}

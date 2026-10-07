@@ -45,4 +45,21 @@ export default class UserModel {
     /** @type {Date} */
     this.updatedAt = new Date(data.updatedAt)
   }
+
+  /**
+   * Converts the user object to a plain object.
+   *
+   * @returns {Object} A plain object representing the user.
+   */
+  toPlain() {
+    return {
+      id: this.id,
+      firstName: this.firstName,
+      lastName: this.lastName,
+      fullName: this.fullName,
+      email: this.email,
+      role: this.role,
+      lastConnection: this.lastConnection,
+    }
+  }
 }

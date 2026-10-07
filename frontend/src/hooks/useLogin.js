@@ -33,9 +33,7 @@ export function useLogin() {
       } catch (err) {
         // No answer from server (network error, server down, CORS issue, etc.)
         if (!err.response) {
-          throw new Error(
-            "Network error: Could not reach the server.",
-          )
+          throw new Error("Network error: Could not reach the server.")
         }
         if (err.response.status === 401) {
           throw new Error("Email or password incorrect.")
@@ -59,7 +57,7 @@ export function useLogin() {
     },
     onSuccess: (data) => {
       console.log("✅ Login success", data.user)
-      dispatch(setUser(new UserModel(data.user)))
+      dispatch(setUser(new UserModel(data.user).toPlain()))
       navigate("/dashboard", { replace: true }) // Redirection after login
     },
     onError: (error) => {
