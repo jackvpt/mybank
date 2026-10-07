@@ -550,13 +550,9 @@ const TransactionEdit = () => {
               id="label"
               label="Libellé"
               value={formData.label}
-              onChange={handleLabelChange}
+              onChange={handleChange("label")}
               onBlur={handleLabelBlur}
-              inputProps={{
-                ref: labelInputRef,
-                onKeyDown: handleLabelKeyDown,
-                autoComplete: "off",
-              }}
+              suggestions={labelOptions}
               type="text"
               clearField={true}
               copy={false}
