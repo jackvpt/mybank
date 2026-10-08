@@ -16,25 +16,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { clearSelectedTransactionIds } from "../../store/features/parametersSlice"
 
 // 📅 Date picker
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import { isValid } from "date-fns"
-import { fr } from "date-fns/locale"
-
-// 🧱 MUI components
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-} from "@mui/material"
 
 // 🪝 Hooks
 import {
@@ -54,6 +36,7 @@ import { shortcuts } from "../../data/transactionEditShortCuts"
 import CustomDatePicker from "../SubComponents/CustomDatePicker/CustomDatePicker"
 import CustomSelect from "../SubComponents/CustomSelect/CustomSelect"
 import CustomButton from "../SubComponents/CustomButton/CustomButton"
+import CustomDialog from "../SubComponents/CustomDialog/CustomDialog"
 
 // 📦 Models
 import TransactionModel from "../../models/TransactionModel"
@@ -128,7 +111,6 @@ const TransactionEdit = () => {
   const [formData, setFormData] = useState(getInitialFormData)
 
   const labelInputRef = useRef(null)
-  const skipCompletion = useRef(false) // true right after Backspace/Delete
   const pendingSelection = useRef(null) // [start, end] to select after render
 
   // 🔁 Sync the form with the selection:
@@ -267,50 +249,6 @@ const TransactionEdit = () => {
       value = e.target.value.replace(",", ".").replace(/[^0-9.]/g, "")
 
     setField(name, value)
-  }
-
-  const handleLabelChange = (e) => {
-    const typed = e.target.value
-    const input = labelInputRef.current
-
-    // Complete only when typing at the end of the text, not during IME composition
-    const canComplete =
-      !skipCompletion.current &&
-      !e.nativeEvent?.isComposing &&
-      typed.length > 0 &&
-      input?.selectionStart === typed.length
-    skipCompletion.current = false
-
-    if (canComplete) {
-      const lower = typed.toLowerCase()
-      // labelOptions is sorted by frequency: the most used match wins
-      const match = labelOptions.find(
-        (l) => l.length > typed.length && l.toLowerCase().startsWith(lower),
-      )
-      if (match) {
-        // Keep what the user typed, append the rest of the suggestion
-        const completed = typed + match.slice(typed.length)
-        pendingSelection.current = [typed.length, completed.length]
-        handleChange("label")({ target: { value: completed } })
-        return
-      }
-    }
-    handleChange("label")(e)
-  }
-
-  const handleLabelKeyDown = (e) => {
-    skipCompletion.current = e.key === "Backspace" || e.key === "Delete"
-
-    // Escape drops the suggested part and keeps what was typed
-    if (e.key === "Escape") {
-      const input = e.currentTarget
-      if (input.selectionStart !== input.selectionEnd) {
-        e.stopPropagation()
-        handleChange("label")({
-          target: { value: input.value.slice(0, input.selectionStart) },
-        })
-      }
-    }
   }
 
   // Select the suggested part once React has rendered the completed value
@@ -462,230 +400,214 @@ const TransactionEdit = () => {
 
   return (
     <section className="container-transaction-edit">
-      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
-        {/* ⚡ SHORTCUTS */}
-        <div className="container-transaction-edit-shortcuts">
-          {shortcuts.map((shortcut) => (
-            <button
-              className="shortcut-button"
-              key={shortcut.text}
-              type="button"
-              onClick={() => handleShortcutClick(shortcut)}
-            >
-              {shortcut.text}
-            </button>
-          ))}
-        </div>
-
-        <form onSubmit={(e) => e.preventDefault()}>
-          {/* 📅 DATE PICKER */}
-          <CustomDatePicker
-            label="Date"
-            value={formData.date}
-            onChange={(newValue) => setField("date", newValue)}
-            format="dd/MM/yyyy"
-          />
-
-          {/* 🏷️ TYPE SELECT */}
-          <FormControl
-            fullWidth
-            variant="outlined"
-            required
-            size="small"
-            sx={SELECT_SX}
+      {/* ⚡ SHORTCUTS */}
+      <div className="container-transaction-edit-shortcuts">
+        {shortcuts.map((shortcut) => (
+          <button
+            className="shortcut-button"
+            key={shortcut.text}
+            type="button"
+            onClick={() => handleShortcutClick(shortcut)}
           >
-            <CustomSelect
-              label="Type"
-              value={formData.type}
-              onChange={(value) => setField("type", value)}
-              options={transactionTypes.map(({ name, text }) => ({
-                value: name,
-                label: text,
-              }))}
-            />
-          </FormControl>
+            {shortcut.text}
+          </button>
+        ))}
+      </div>
 
-          {/* 🧾 CHECK NUMBER */}
-          {formData.type === "check" && (
-            <TextField
-              type="text"
-              label="N° chèque"
-              value={formData.checkNumber}
-              onChange={handleChange("checkNumber")}
-              size="small"
-              sx={{ width: 120 }}
-            />
-          )}
+      <form onSubmit={(e) => e.preventDefault()}>
+        {/* 📅 DATE PICKER */}
+        <CustomDatePicker
+          label="Date"
+          value={formData.date}
+          onChange={(newValue) => setField("date", newValue)}
+          format="dd/MM/yyyy"
+        />
 
-          {/* 🏦 DESTINATION SELECT */}
-          {isTransfer && (
-            <FormControl
-              fullWidth
-              variant="outlined"
-              required
-              size="small"
-              sx={SELECT_SX}
-            >
-              <InputLabel id="destination-label">Destination</InputLabel>
-              <Select
-                labelId="destination-label"
-                id="destination"
-                name="destination"
-                value={formData.destination}
-                onChange={handleChange("destination")}
-                label="Destination"
-              >
-                {destinationAccounts.map((account) => (
-                  <MenuItem key={account._id} value={account.name}>
-                    {account.name} - {account.bankAbbreviation}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
+        {/* 🏷️ TYPE SELECT */}
 
-          {/* 🔤 LABEL (generated automatically for transfers) */}
-          {!isTransfer && (
-            <CustomTextField
-              id="label"
-              label="Libellé"
-              value={formData.label}
-              onChange={handleChange("label")}
-              onBlur={handleLabelBlur}
-              suggestions={labelOptions}
-              type="text"
-              clearField={true}
-              copy={false}
-              floating={true}
-            />
-          )}
+        <CustomSelect
+          label="Type"
+          value={formData.type}
+          onChange={(value) => setField("type", value)}
+          options={transactionTypes.map(({ name, text }) => ({
+            value: name,
+            label: text,
+          }))}
+        />
 
-          {/* 💶 AMOUNT */}
+        {/* 🧾 CHECK NUMBER */}
+        {formData.type === "check" && (
           <CustomTextField
-            id="amount"
-            label="Montant"
-            value={
-              formData.amount === 0
-                ? ""
-                : String(formData.amount ?? "").replace("-", "")
-            }
-            onChange={handleChange("amount")}
-            onBlur={handleAmountBlur}
+            id="checkNumber"
+            label="N° chèque"
+            value={formData.checkNumber}
+            onChange={handleChange("checkNumber")}
+            clearField={true}
+            copy={false}
+            floating={true}
+          />
+        )}
+
+        {/* 🏦 DESTINATION SELECT */}
+        {isTransfer && (
+          // <FormControl
+          //   fullWidth
+          //   variant="outlined"
+          //   required
+          //   size="small"
+          //   sx={SELECT_SX}
+          // >
+          //   <InputLabel id="destination-label">Destination</InputLabel>
+          //   <Select
+          //     labelId="destination-label"
+          //     id="destination"
+          //     name="destination"
+          //     value={formData.destination}
+          //     onChange={handleChange("destination")}
+          //     label="Destination"
+          //   >
+          //     {destinationAccounts.map((account) => (
+          //       <MenuItem key={account._id} value={account.name}>
+          //         {account.name} - {account.bankAbbreviation}
+          //       </MenuItem>
+          //     ))}
+          //   </Select>
+          // </FormControl>
+
+          <CustomSelect
+            label="Destination"
+            value={formData.destination ?? ""}
+            onChange={handleChange("destination")}
+            options={destinationAccounts.map((account) => ({
+              value: account.name,
+              label: account.bankAbbreviation,
+            }))}
+          />
+        )}
+
+        {/* 🔤 LABEL (generated automatically for transfers) */}
+        {!isTransfer && (
+          <CustomTextField
+            id="label"
+            label="Libellé"
+            value={formData.label}
+            onChange={handleChange("label")}
+            onBlur={handleLabelBlur}
+            suggestions={labelOptions}
             type="text"
             clearField={true}
             copy={false}
             floating={true}
           />
+        )}
 
-          {/* 🗂️ CATEGORY SELECT */}
-          {!isTransfer && (
-            <CustomSelect
-              label="Catégorie"
-              value={formData.category ?? ""}
-              onChange={(value) => {
-                setField("category", value)
-                // Changing the category invalidates the sub-category
-                setField("subCategory", "")
-              }}
-              options={categoriesByType.map((category) => ({
-                value: category.name,
-                label: category.name,
-              }))}
-            />
-          )}
+        {/* 💶 AMOUNT */}
+        <CustomTextField
+          id="amount"
+          label="Montant"
+          value={
+            formData.amount === 0
+              ? ""
+              : String(formData.amount ?? "").replace("-", "")
+          }
+          onChange={handleChange("amount")}
+          onBlur={handleAmountBlur}
+          type="text"
+          clearField={true}
+          copy={false}
+          floating={true}
+        />
 
-          {/* 🗃️ SUB-CATEGORY SELECT */}
-          {!isTransfer && (
-            <FormControl fullWidth size="small" sx={SELECT_SX}>
-              <CustomSelect
-                label="Sous catégorie"
-                value={formData.subCategory ?? ""}
-                onChange={(value) => setField("subCategory", value)}
-                disabled={!formData.category}
-                options={subCategories.map((subcategory) => ({
-                  value: subcategory,
-                  label: subcategory,
-                }))}
-              />
-            </FormControl>
-          )}
-
-          {/* 📝 NOTES */}
-          <CustomTextField
-            id="notes"
-            label="Notes"
-            value={formData.notes}
-            onChange={handleChange("notes")}
-            type="text"
-            clearField={true}
-            copy={false}
-            floating={true}
-          />
-
-          {/* 🗑️ DELETE BUTTON */}
-          <CustomButton
-            action="delete"
-            loading={isDeleting}
-            disabled={selectedTransactionIds.length === 0}
-            onClick={() => handleOpenConfirm(selectedTransactionIds)}
-          />
-
-          {/* ✏️ MODIFY BUTTON */}
-          <CustomButton
-            action="update"
-            loading={isUpdating}
-            disabled={formHasErrors || selectedTransactionIds.length !== 1}
-            onClick={handleUpdateTransaction}
-          />
-
-          {/* ➕ ADD BUTTON */}
-          <CustomButton
-            action="create"
-            loading={isCreating}
-            disabled={formHasErrors}
-            onClick={handleAddTransaction}
-          />
-
-          {/* 🔄 RESET BUTTON */}
-          <CustomButton
-            action="reset"
-            onClick={() => {
-              setFormData(getInitialFormData())
-              dispatch(clearSelectedTransactionIds())
+        {/* 🗂️ CATEGORY SELECT */}
+        {!isTransfer && (
+          <CustomSelect
+            label="Catégorie"
+            value={formData.category ?? ""}
+            onChange={(value) => {
+              setField("category", value)
+              // Changing the category invalidates the sub-category
+              setField("subCategory", "")
             }}
+            options={categoriesByType.map((category) => ({
+              value: category.name,
+              label: category.name,
+            }))}
           />
-        </form>
-      </LocalizationProvider>
+        )}
+
+        {/* 🗃️ SUB-CATEGORY SELECT */}
+        {!isTransfer && (
+          <CustomSelect
+            label="Sous catégorie"
+            value={formData.subCategory ?? ""}
+            onChange={(value) => setField("subCategory", value)}
+            disabled={!formData.category}
+            options={subCategories.map((subcategory) => ({
+              value: subcategory,
+              label: subcategory,
+            }))}
+          />
+        )}
+
+        {/* 📝 NOTES */}
+        <CustomTextField
+          id="notes"
+          label="Notes"
+          value={formData.notes}
+          onChange={handleChange("notes")}
+          type="text"
+          clearField={true}
+          copy={false}
+          floating={true}
+        />
+
+        {/* 🗑️ DELETE BUTTON */}
+        <CustomButton
+          action="delete"
+          loading={isDeleting}
+          disabled={selectedTransactionIds.length === 0}
+          onClick={() => handleOpenConfirm(selectedTransactionIds)}
+        />
+
+        {/* ✏️ MODIFY BUTTON */}
+        <CustomButton
+          action="update"
+          loading={isUpdating}
+          disabled={formHasErrors || selectedTransactionIds.length !== 1}
+          onClick={handleUpdateTransaction}
+        />
+
+        {/* ➕ ADD BUTTON */}
+        <CustomButton
+          action="create"
+          loading={isCreating}
+          disabled={formHasErrors}
+          onClick={handleAddTransaction}
+        />
+
+        {/* 🔄 RESET BUTTON */}
+        <CustomButton
+          action="reset"
+          onClick={() => {
+            setFormData(getInitialFormData())
+            dispatch(clearSelectedTransactionIds())
+          }}
+        />
+      </form>
 
       {/* ⚠️ Delete confirmation dialog */}
-      <Dialog
+      <CustomDialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        aria-labelledby="confirm-dialog-title"
+        onConfirm={handleConfirmDelete}
+        title="Confirmer la suppression"
+        confirmLabel="Supprimer"
+        danger
       >
-        <DialogTitle id="confirm-dialog-title">
-          Confirmer la suppression
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {transactionsToDelete.length === 1
-              ? "Êtes-vous sûr de vouloir supprimer cette transaction ? Cette action est irréversible."
-              : `Êtes-vous sûr de vouloir supprimer ces ${transactionsToDelete.length} transactions ? Cette action est irréversible.`}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmOpen(false)} color="primary">
-            Annuler
-          </Button>
-          <Button
-            onClick={handleConfirmDelete}
-            color="error"
-            variant="contained"
-          >
-            Supprimer
-          </Button>
-        </DialogActions>
-      </Dialog>
+        {transactionsToDelete.length === 1
+          ? "Êtes-vous sûr de vouloir supprimer cette transaction ? Cette action est irréversible."
+          : `Êtes-vous sûr de vouloir supprimer ces ${transactionsToDelete.length} transactions ? Cette action est irréversible.`}
+      </CustomDialog>
     </section>
   )
 }

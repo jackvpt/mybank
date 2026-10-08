@@ -1,0 +1,119 @@
+.container__customDialog {
+  &-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    animation: dialog-fade 150ms ease-out;
+  }
+
+  &-paper {
+    min-width: 280px;
+    max-width: 444px;
+    width: calc(100% - 64px);
+    background: #fff;
+    color: rgba(0, 0, 0, 0.87);
+    border-radius: 4px;
+    box-shadow:
+      0 11px 15px -7px rgba(0, 0, 0, 0.2),
+      0 24px 38px 3px rgba(0, 0, 0, 0.14),
+      0 9px 46px 8px rgba(0, 0, 0, 0.12);
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+    animation: dialog-pop 150ms ease-out;
+  }
+
+  &-title {
+    margin: 0;
+    padding: 16px 24px;
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+
+  &-content {
+    padding: 0 24px 20px;
+    font-size: 0.9rem;
+    color: rgba(0, 0, 0, 0.6);
+    line-height: 1.5;
+  }
+
+  &-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  &-btn {
+    min-width: 64px;
+    padding: 6px 16px;
+    border: 0;
+    border-radius: 4px;
+    font: 500 0.875rem/1.75 inherit;
+    letter-spacing: 0.02857em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      background-color 250ms,
+      box-shadow 250ms;
+  }
+
+  &-btn-text {
+    background: transparent;
+    color: #1976d2;
+    font-size: 0.9rem;
+  }
+
+  &-btn-text:hover {
+    background: rgba(25, 118, 210, 0.04);
+  }
+
+  &-btn-contained {
+    background: #1976d2;
+    color: #fff;
+    font-size:0.9rem;
+    box-shadow:
+      0 3px 1px -2px rgba(0, 0, 0, 0.2),
+      0 2px 2px 0 rgba(0, 0, 0, 0.14),
+      0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  }
+
+  &-btn-contained:hover {
+    background: #1565c0;
+  }
+
+  &-btn-contained.danger {
+    background: #d32f2f;
+  }
+
+  &-btn-contained.danger:hover {
+    background: #c62828;
+  }
+
+  &-btn:focus-visible {
+    outline: 2px solid #1976d2;
+    outline-offset: 2px;
+  }
+}
+
+@keyframes dialog-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialog-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
