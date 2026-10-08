@@ -16,9 +16,9 @@ import ListAddIcon from "@mui/icons-material/PlaylistAdd"
 import { useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
-  fetchAllRecurringTransactions,
+  getAllRecurringTransactions,
   updateRecurringTransaction,
-} from "../../api/recurringTransactions"
+} from "../../api/recurringTransactions.api"
 import { createTransaction } from "../../api/transactions.api"
 import { setIsRecurringEditWindowVisible } from "../../store/features/parametersSlice"
 
@@ -30,7 +30,7 @@ const RecurringToolBar = () => {
     error: recurringTransactionsError,
   } = useQuery({
     queryKey: ["recurringTransactions"],
-    queryFn: () => fetchAllRecurringTransactions(),
+    queryFn: () => getAllRecurringTransactions(),
   })
 
   const dispatch = useDispatch()

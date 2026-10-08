@@ -8,13 +8,12 @@ import {
 
 // 🔌 API calls
 import {
-  getAllTransactions,
-  createTransaction,
-  updateTransaction,
-  deleteTransaction,
-  deleteTransactions,
-  validateTransactions,
-} from "../api/transactions.api"
+  getAllRecurringTransactions,
+  createRecurringTransaction,
+  updateRecurringTransaction,
+  deleteRecurringTransaction,
+  deleteRecurringTransactions,
+} from "../api/recurringTransactions.api"
 
 // 🧬 Models
 import RecurringTransactionModel from "../models/RecurringTransactionModel"
@@ -99,7 +98,7 @@ const useMutationWithNotification = (config) => {
 // ----------------------------
 // Get all recurring transactions
 // ----------------------------
-export const useGetAllTransactions = ({ enabled = true } = {}) => {
+export const useGetAllRecurringTransactions = ({ enabled = true } = {}) => {
   return useQuery({
     queryKey: ["recurringTransactions"],
     queryFn: async () => {

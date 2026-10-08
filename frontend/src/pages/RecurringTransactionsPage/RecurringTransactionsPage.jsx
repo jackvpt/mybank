@@ -1,6 +1,5 @@
 import "./RecurringTransactionsPage.scss"
-import { fetchAllRecurringTransactions } from "../../api/recurringTransactions"
-import { useQuery } from "@tanstack/react-query"
+import { useGetAllRecurringTransactions } from "../../hooks/useRecurringTransactions"
 import {
   createTheme,
   Paper,
@@ -76,17 +75,12 @@ const RecurringTransactions = () => {
     { id: "notes", label: "Notes", show: !isMobileScreen },
   ]
 
-  // Fetch recurring transactions using React Query
+  // Get recurring transactions using React Query
   const {
     data: recurringTransactions = [],
     isLoading: isLoadingRecurringTransactions,
     error: recurringTransactionsError,
-  } = useQuery({
-    queryKey: ["recurringTransactions"],
-    queryFn: () => fetchAllRecurringTransactions(),
-    refetchInterval: 60000, // Every 60 seconds
-    refetchOnWindowFocus: true,
-  })
+  } = useGetAllRecurringTransactions({ enabled: true })
 
   const [order, setOrder] = useState("desc")
   const [orderBy, setOrderBy] = useState("date")

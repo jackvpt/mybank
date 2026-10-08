@@ -1,7 +1,7 @@
-// CSS
+// 🎨 Styles
 import "./RecurringTransactionEdit.scss"
 
-// React imports
+// ⚛️ React
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 
@@ -39,10 +39,10 @@ import { getAllBankAccounts } from "../../api/bankAccounts.api"
 import {
   deleteRecurringTransaction,
   deleteRecurringTransactions,
-  fetchAllRecurringTransactions,
-  postRecurringTransaction,
+  getAllRecurringTransactions,
+  createRecurringTransaction,
   updateRecurringTransaction,
-} from "../../api/recurringTransactions"
+} from "../../api/recurringTransactions.api"
 import { useGetAllCategories } from "../../hooks/useCategories"
 import { fr } from "date-fns/locale"
 
@@ -79,7 +79,7 @@ const RecurringTransactionEdit = () => {
    * It uses React Query's useMutation hook to handle the mutation.
    **/
   const addMutation = useMutation({
-    mutationFn: postRecurringTransaction,
+    mutationFn: createRecurringTransaction,
     onSuccess: () => {
       queryClient.invalidateQueries("recurringTransactions")
       setToastMessage("Transaction récurrente ajoutée")
@@ -157,7 +157,7 @@ const RecurringTransactionEdit = () => {
     error: recurringTransactionsError,
   } = useQuery({
     queryKey: ["recurringTransactions"],
-    queryFn: () => fetchAllRecurringTransactions(),
+    queryFn: () => getAllRecurringTransactions(),
   })
 
   const transactionTypes = settings ? settings.types : []

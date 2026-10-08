@@ -1,32 +1,43 @@
-import RecurringTransactionModel from "../models/RecurringTransactionModel"
+// 📡 HTTP client
 import axios from "axios"
 
-// Data
+import RecurringTransactionModel from "../models/RecurringTransactionModel"
+
+// 🔗 Config
 import { COMMON_API_URL } from "./common_api_url"
 
 // Base URL for authentication-related endpoints
 const BASE_URL = `${COMMON_API_URL}/recurringtransactions`
 
+// Create an Axios instance for easier configuration
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+})
+
 /**
- * Fetches all recurring transactions from the API.
- * @returns {Promise<RecurringTransactionModel[]>}
+ * Gets all recurring transactions from the API.
+ * @returns {Promise<Object[]>} raw recurring transaction objects
  */
-export const fetchAllRecurringTransactions = async () => {
+export const getAllRecurringTransactions = async () => {
   try {
-    const { data } = await axios.get(BASE_URL)
-    return data.map((recurringTransaction) => new RecurringTransactionModel(recurringTransaction))
+    const { data } = await api.get()
+    return data
   } catch (error) {
     console.error("Error fetching all recurring transactions:", error.message)
     throw error
   }
 }
 
+
 /**
- * Posts a new recurring transaction to the API.
+ * Creates a new recurring transaction to the API.
  * @param {Object} transactionData
  * @returns {Promise<RecurringTransactionModel>}
  */
-export const postRecurringTransaction = async (recurringTransactionData) => {
+export const createRecurringTransaction = async (recurringTransactionData) => {
   try {
     const { data } = await axios.post(BASE_URL, recurringTransactionData)
     return new RecurringTransactionModel(data)

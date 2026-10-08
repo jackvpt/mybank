@@ -10,7 +10,7 @@ import { useGetAllSettings } from "./useSettings"
 import { useGetAllCategories } from "./useCategories"
 
 // 🌐 API
-import { fetchAllRecurringTransactions } from "../api/recurringTransactions"
+import { getAllRecurringTransactions } from "../api/recurringTransactions.api"
 
 /**
  * useAppData
@@ -31,7 +31,7 @@ export const useAppData = ({ enabled = true } = {}) => {
 
   useQuery({
     queryKey: ["recurringTransactions"],
-    queryFn: fetchAllRecurringTransactions,
+    queryFn: getAllRecurringTransactions,
     enabled,
   })
 
