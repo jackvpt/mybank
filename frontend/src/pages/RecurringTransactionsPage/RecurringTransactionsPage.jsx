@@ -1,5 +1,24 @@
+// 🎨 Styles
 import "./RecurringTransactionsPage.scss"
+
+// ⚛️ React
+import { useState } from "react"
+
+// 🏪 Redux
+import { useDispatch, useSelector } from "react-redux"
+
+// 🪝 Hooks
 import { useGetAllRecurringTransactions } from "../../hooks/useRecurringTransactions"
+import { useGetAllSettings } from "../../hooks/useSettings"
+
+// 🏗️ Redux slices
+import {
+  addSelectedRecurringTransactionId,
+  removeSelectedRecurringTransactionId,
+  setSelectedRecurringTransactionIds,
+} from "../../store/features/parametersSlice"
+
+// 🧱 MUI components
 import {
   createTheme,
   Paper,
@@ -13,17 +32,10 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material"
-import { useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
-import RecurringTransactionEdit from "../../components/RecurringTransactionEdit/RecurringTransactionEdit"
-import {
-  addSelectedRecurringTransactionId,
-  removeSelectedRecurringTransactionId,
-  setSelectedRecurringTransactionIds,
-} from "../../store/features/parametersSlice"
-import RecurringToolBar from "../../components/RecurringToolBar/RecurringToolBar"
 
-import { useGetAllSettings } from "../../hooks/useSettings"
+// 🧩 Components
+import RecurringTransactionEdit from "../../components/RecurringTransactionEdit/RecurringTransactionEdit"
+import RecurringToolBar from "../../components/RecurringToolBar/RecurringToolBar"
 import Loader from "../../components/Loader/Loader"
 
 /**
@@ -31,7 +43,7 @@ import Loader from "../../components/Loader/Loader"
  * It allows filtering by date and sorting by various columns.
  * @returns {JSX.Element} Transactions component
  */
-const RecurringTransactions = () => {
+const RecurringTransactionsPage = () => {
   const dispatch = useDispatch()
 
   // Get all settings using the custom hook
@@ -80,7 +92,7 @@ const RecurringTransactions = () => {
     data: recurringTransactions = [],
     isLoading: isLoadingRecurringTransactions,
     error: recurringTransactionsError,
-  } = useGetAllRecurringTransactions({ enabled: true })
+  } = useGetAllRecurringTransactions()
 
   const [order, setOrder] = useState("desc")
   const [orderBy, setOrderBy] = useState("date")
@@ -292,4 +304,4 @@ const RecurringTransactions = () => {
   )
 }
 
-export default RecurringTransactions
+export default RecurringTransactionsPage

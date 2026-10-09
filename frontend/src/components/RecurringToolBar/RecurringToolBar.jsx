@@ -14,13 +14,11 @@ import EditIcon from "@mui/icons-material/Edit"
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth"
 import ListAddIcon from "@mui/icons-material/PlaylistAdd"
 import { useState } from "react"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import {
-  getAllRecurringTransactions,
-  updateRecurringTransaction,
-} from "../../api/recurringTransactions.api"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { updateRecurringTransaction } from "../../api/recurringTransactions.api"
 import { createTransaction } from "../../api/transactions.api"
 import { setIsRecurringEditWindowVisible } from "../../store/features/parametersSlice"
+import { useGetAllRecurringTransactions } from "../../hooks/useRecurringTransactions"
 
 const RecurringToolBar = () => {
   // Fetch recurring transactions using React Query
@@ -28,14 +26,11 @@ const RecurringToolBar = () => {
     data: recurringTransactions = [],
     isLoading: isLoadingRecurringTransactions,
     error: recurringTransactionsError,
-  } = useQuery({
-    queryKey: ["recurringTransactions"],
-    queryFn: () => getAllRecurringTransactions(),
-  })
+  } = useGetAllRecurringTransactions()
 
   const dispatch = useDispatch()
   const isRecurringEditWindowVisible = useSelector(
-    (state) => state.parameters.isRecurringEditWindowVisible
+    (state) => state.parameters.isRecurringEditWindowVisible,
   )
 
   const queryClient = useQueryClient()
@@ -62,7 +57,7 @@ const RecurringToolBar = () => {
       setToastMessage(
         `${results.length} transaction${results.length > 1 ? "s" : ""} ajoutée${
           results.length > 1 ? "s" : ""
-        }`
+        }`,
       )
       setToastOpen(true)
     },
@@ -132,7 +127,7 @@ const RecurringToolBar = () => {
         const updatedTransaction = {
           ...transaction,
           date: new Date(
-            transactionDate.setMonth(transactionDate.getMonth() + 1)
+            transactionDate.setMonth(transactionDate.getMonth() + 1),
           ),
         }
 
@@ -255,7 +250,7 @@ const RecurringToolBar = () => {
         selected={isRecurringEditWindowVisible}
         onChange={() =>
           dispatch(
-            setIsRecurringEditWindowVisible(!isRecurringEditWindowVisible)
+            setIsRecurringEditWindowVisible(!isRecurringEditWindowVisible),
           )
         }
         className={`toggle-edit-btn ${

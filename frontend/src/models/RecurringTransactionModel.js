@@ -17,7 +17,7 @@ export default class RecurringTransactionModel {
    * @param {string} [data.destination] - Destination of the transfer, if applicable.
    * @param {string} [data.periodicity=""] - Periodicity of the transaction (e.g. "monthly", "weekly").
    */
-  constructor(data) {
+  constructor(data = {}) {
     /** @type {string} */
     this.id = data._id
 
@@ -63,8 +63,8 @@ export default class RecurringTransactionModel {
       this.debit > 0
         ? `-${this.debit.toFixed(2)}€`
         : this.credit > 0
-        ? `+${this.credit.toFixed(2)}€`
-        : "0.00€"
+          ? `+${this.credit.toFixed(2)}€`
+          : "0.00€"
 
     /** @type {string } */
     this.destination = data.destination

@@ -6,6 +6,11 @@ import { useState, useEffect, useRef, useMemo } from "react"
 
 // 🏪 Redux
 import { useDispatch, useSelector } from "react-redux"
+
+// 🪝 Hooks
+import { useGetAllTransactions } from "../../hooks/useTransactions"
+
+// 🏗️ Redux slices
 import {
   addSelectedTransactionId,
   removeSelectedTransactionId,
@@ -37,9 +42,6 @@ import {
 import TransactionsToolBar from "../../components/TransactionsToolBar/TransactionsToolBar"
 import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
 import Loader from "../../components/Loader/Loader"
-
-// 🪝 Hooks
-import { useGetAllTransactions } from "../../hooks/useTransactions"
 
 // 📱 Screens narrower than 768px use the compact layout
 const MOBILE_QUERY = "(max-width:767.95px)"
@@ -145,9 +147,9 @@ const TransactionsPage = () => {
 
   // 🌐 Data
   const {
+    data: transactionsData = [],
     isLoading: isLoadingTransactions,
     error: errorTransactions,
-    data: transactionsData,
   } = useGetAllTransactions()
 
   // 💰 Transactions of the selected account, with a running balance.

@@ -39,12 +39,12 @@ import { getAllBankAccounts } from "../../api/bankAccounts.api"
 import {
   deleteRecurringTransaction,
   deleteRecurringTransactions,
-  getAllRecurringTransactions,
   createRecurringTransaction,
   updateRecurringTransaction,
 } from "../../api/recurringTransactions.api"
 import { useGetAllCategories } from "../../hooks/useCategories"
 import { fr } from "date-fns/locale"
+import { useGetAllRecurringTransactions } from "../../hooks/useRecurringTransactions"
 
 const RecurringTransactionEdit = () => {
   const queryClient = useQueryClient()
@@ -155,10 +155,7 @@ const RecurringTransactionEdit = () => {
     data: recurringTransactions = [],
     isLoading: isLoadingRecurringTransactions,
     error: recurringTransactionsError,
-  } = useQuery({
-    queryKey: ["recurringTransactions"],
-    queryFn: () => getAllRecurringTransactions(),
-  })
+  } = useGetAllRecurringTransactions({ enabled: true })
 
   const transactionTypes = settings ? settings.types : []
 

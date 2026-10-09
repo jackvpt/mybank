@@ -1,16 +1,9 @@
-// src/hooks/useAppData.js
-
-// 🔄 React Query
-import { useQuery } from "@tanstack/react-query"
-
 // 🪝 Hooks
 import { useGetAllBankAccounts } from "./useBankAccounts"
 import { useGetAllTransactions } from "./useTransactions"
+import { useGetAllRecurringTransactions } from "./useRecurringTransactions"
 import { useGetAllSettings } from "./useSettings"
 import { useGetAllCategories } from "./useCategories"
-
-// 🌐 API
-import { getAllRecurringTransactions } from "../api/recurringTransactions.api"
 
 /**
  * useAppData
@@ -28,15 +21,10 @@ import { getAllRecurringTransactions } from "../api/recurringTransactions.api"
 export const useAppData = ({ enabled = true } = {}) => {
   const accounts = useGetAllBankAccounts({ enabled })
   const transactions = useGetAllTransactions({ enabled })
-
-  useQuery({
-    queryKey: ["recurringTransactions"],
-    queryFn: getAllRecurringTransactions,
-    enabled,
-  })
+  const recurringTransactions = useGetAllRecurringTransactions({ enabled })
 
   useGetAllSettings({ enabled })
   useGetAllCategories({ enabled })
 
-  return { accounts, transactions }
+  return { accounts, transactions, recurringTransactions }
 }
