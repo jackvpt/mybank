@@ -1,8 +1,6 @@
 // 📡 HTTP client
 import axios from "axios"
 
-import RecurringTransactionModel from "../models/RecurringTransactionModel"
-
 // 🔗 Config
 import { COMMON_API_URL } from "./common_api_url"
 
@@ -31,7 +29,6 @@ export const getAllRecurringTransactions = async () => {
   }
 }
 
-
 /**
  * Creates a new recurring transaction to the API.
  * @param {Object} transactionData
@@ -39,8 +36,8 @@ export const getAllRecurringTransactions = async () => {
  */
 export const createRecurringTransaction = async (recurringTransactionData) => {
   try {
-    const { data } = await axios.post(BASE_URL, recurringTransactionData)
-    return new RecurringTransactionModel(data)
+    const { data } = await api.post("", recurringTransactionData)
+    return data
   } catch (error) {
     console.error("Error posting recurring transaction:", error.message)
     throw error
@@ -55,8 +52,8 @@ export const createRecurringTransaction = async (recurringTransactionData) => {
  */
 export const updateRecurringTransaction = async ({ id, updatedData }) => {
   try {
-    const { data } = await axios.put(`${BASE_URL}/${id}`, updatedData)
-    return new RecurringTransactionModel(data)
+    const { data } = await api.put(`${id}`, updatedData)
+    return data
   } catch (error) {
     console.error("Error updating recurring transaction:", error.message)
     throw error
@@ -71,24 +68,33 @@ export const updateRecurringTransaction = async ({ id, updatedData }) => {
  */
 export const deleteRecurringTransaction = async (id) => {
   try {
-    const response = await axios.delete(`${BASE_URL}/${id}`);
-    return response.data;
+    const { data } = await api.delete(`${id}`)
+    return data
   } catch (error) {
-    console.error("Error deleting recurring transaction :", error.message);
-    throw error;
+    console.error("Error deleting recurring transaction :", error.message)
+    throw error
   }
-};
+}
 
+/**
+ * Deletes multiple recurring transactions by their IDs.
+ * @param {string[]} recurringTransactionsIds - An array of recurring transaction IDs to delete.
+ * @returns {Promise<Object>} - The response data from the API.
+ * @throws {Error} - Throws an error if the request fails or if the input is invalid.
+ */
 export const deleteRecurringTransactions = async (recurringTransactionsIds) => {
-  if (!Array.isArray(recurringTransactionsIds) || recurringTransactionsIds.length === 0) {
+  if (
+    !Array.isArray(recurringTransactionsIds) ||
+    recurringTransactionsIds.length === 0
+  ) {
     throw new Error("Aucune transaction à supprimer.")
   }
 
   try {
-    const response = await axios.post(`${BASE_URL}/bulk-delete`, {
+    const { data } = await api.post("/bulk-delete", {
       ids: recurringTransactionsIds,
     })
-    return response.data
+    return data
   } catch (error) {
     console.error("Error deleting transaction :", error.message)
     throw error

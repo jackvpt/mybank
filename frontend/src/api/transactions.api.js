@@ -29,7 +29,7 @@ export const getAllTransactions = async () => {
 }
 
 /**
- * Posts a new transaction to the API.
+ * Creates a new transaction to the API.
  * @param {Object} transactionData
  * @returns {Promise<Object>} raw created transaction
  */
@@ -67,7 +67,8 @@ export const updateTransaction = async ({ id, updatedData }) => {
  */
 export const deleteTransaction = async (id) => {
   try {
-    return (await api.delete(`${id}`)).data
+    const { data } = await api.delete(`${id}`)
+    return data
   } catch (error) {
     console.error("Error deleting transaction :", error.message)
     throw error
@@ -86,10 +87,10 @@ export const deleteTransactions = async (transactionsIds) => {
   }
 
   try {
-    const response = await api.post("/bulk-delete", {
+    const { data } = await api.post("/bulk-delete", {
       ids: transactionsIds,
     })
-    return response.data
+    return data
   } catch (error) {
     console.error("Error deleting transaction :", error.message)
     throw error

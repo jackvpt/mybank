@@ -6,7 +6,8 @@ export default class RecurringTransactionModel {
    * Creates an instance of RecurringTransactionModel.
    *
    * @param {Object} data - The transaction data.
-   * @param {string} data.account - The account involved in the transaction.
+   * @param {string} data.accountId - The ID of the account involved in the transaction.
+   * @param {string} data.accountName - The name of the account involved in the transaction.
    * @param {string|Date} data.date - The date of the transaction (ISO string or Date object).
    * @param {string} data.type - The type of transaction (e.g. "card", "check", "transfer", "auto debit").
    * @param {string} data.label - The transaction label or description.
@@ -22,7 +23,10 @@ export default class RecurringTransactionModel {
     this.id = data._id
 
     /** @type {string} */
-    this.account = data.account
+    this.accountId = data.accountId
+
+    /** @type {string} */
+    this.accountName = data.accountName
 
     /** @type {Date} */
     this.date = new Date(data.date)

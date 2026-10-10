@@ -273,9 +273,9 @@ const TransactionsPage = () => {
   if (errorTransactions) return <p>Erreur : {errorTransactions.message}</p>
 
   return (
-    <section className="container-transactions">
+    <section className="container__transactions">
       {/* 🛠️ Header: account name, toolbar and date filter */}
-      <div className="container-transactions__tools">
+      <div className="container__transactions__tools">
         <h1>{bankAccountName}</h1>
         <div className="toggle-tools">
           <TransactionsToolBar />

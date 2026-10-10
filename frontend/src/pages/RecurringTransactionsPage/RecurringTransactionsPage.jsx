@@ -53,6 +53,13 @@ const RecurringTransactionsPage = () => {
     error: settingsError,
   } = useGetAllSettings()
 
+  // Get recurring transactions using custom hook
+  const {
+    data: recurringTransactions = [],
+    isLoading: isLoadingRecurringTransactions,
+    error: recurringTransactionsError,
+  } = useGetAllRecurringTransactions()
+
   const isRecurringEditWindowVisible = useSelector(
     (state) => state.parameters.isRecurringEditWindowVisible,
   )
@@ -78,7 +85,7 @@ const RecurringTransactionsPage = () => {
   // Define which columns should be visible based on screen size
   const visibleColumns = [
     { id: "date", label: "Echéance", show: true },
-    { id: "account", label: "Compte", show: true },
+    { id: "accountName", label: "Compte", show: true },
     { id: "type", label: "Type", show: true },
     { id: "label", label: "Libellé", show: true },
     { id: "debit", label: "Débit", show: !isMobileScreen },
@@ -86,13 +93,6 @@ const RecurringTransactionsPage = () => {
     { id: "periodicity", label: "Périodicité", show: true },
     { id: "notes", label: "Notes", show: !isMobileScreen },
   ]
-
-  // Get recurring transactions using React Query
-  const {
-    data: recurringTransactions = [],
-    isLoading: isLoadingRecurringTransactions,
-    error: recurringTransactionsError,
-  } = useGetAllRecurringTransactions()
 
   const [order, setOrder] = useState("desc")
   const [orderBy, setOrderBy] = useState("date")
@@ -174,8 +174,9 @@ const RecurringTransactionsPage = () => {
     const text = periodicities.find((p) => p.name === periodicity)?.text
     return text
   }
+
   /**
-   * Convert periodicity to text based on settings.
+   * Convert type to text based on settings.
    * @param {string} type
    * @returns {string} Text representation of the periodicity
    */
@@ -186,8 +187,8 @@ const RecurringTransactionsPage = () => {
   }
 
   return (
-    <section className="container-recurringTransactions">
-      <div className="container-recurringTransactions__tools">
+    <section className="container__recurringTransactions">
+      <div className="container__recurringTransactions__tools">
         <RecurringToolBar />
       </div>
       {recurringTransactions && (
@@ -254,36 +255,42 @@ const RecurringTransactionsPage = () => {
               </TableHead>
               {/* Table body */}
               <TableBody>
-                {sortedRecurringTransactions.map((tx, index) => (
+                {sortedRecurringTransactions.map((transaction, index) => (
                   <TableRow
-                    key={tx.id}
-                    onClick={(e) => handleRowClick(e, tx, index)}
+                    key={transaction.id}
+                    onClick={(e) => handleRowClick(e, transaction, index)}
                     className={`transaction-row ${
-                      selectedRecurringTransactionIds.includes(tx.id)
+                      selectedRecurringTransactionIds.includes(transaction.id)
                         ? "rowSelected"
                         : ""
                     }
-                    ${tx.date < new Date() ? "rowOutdated" : ""}
+                    ${transaction.date < new Date() ? "rowOutdated" : ""}
                     `}
                   >
                     <TableCell align="center">
-                      {new Date(tx.date).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell align="center">{tx.account}</TableCell>
-                    <TableCell align="center">
-                      {convertTypeToText(tx.type)}
-                    </TableCell>
-                    <TableCell align="center">{tx.label}</TableCell>
-                    <TableCell align="center">
-                      {tx.debit ? tx.debit.toFixed(2) + " €" : "-"}
+                      {new Date(transaction.date).toLocaleDateString()}
                     </TableCell>
                     <TableCell align="center">
-                      {tx.credit ? tx.credit.toFixed(2) + " €" : "-"}
+                      {transaction.accountName}
                     </TableCell>
                     <TableCell align="center">
-                      {convertPeriodicityToText(tx.periodicity)}
+                      {convertTypeToText(transaction.type)}
                     </TableCell>
-                    <TableCell align="center">{tx.notes}</TableCell>
+                    <TableCell align="center">{transaction.label}</TableCell>
+                    <TableCell align="center">
+                      {transaction.debit
+                        ? transaction.debit.toFixed(2) + " €"
+                        : "-"}
+                    </TableCell>
+                    <TableCell align="center">
+                      {transaction.credit
+                        ? transaction.credit.toFixed(2) + " €"
+                        : "-"}
+                    </TableCell>
+                    <TableCell align="center">
+                      {convertPeriodicityToText(transaction.periodicity)}
+                    </TableCell>
+                    <TableCell align="center">{transaction.notes}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
