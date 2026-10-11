@@ -24,7 +24,7 @@
       background-color: $primary-color-1;
       color: $text-color-1;
       padding-right: 2rem;
-      width: 250px;
+      width: var(--textfield-width, 250px);
     }
 
     label {
@@ -120,10 +120,6 @@
 
     /* floating label */
     &.floating {
-      .container__customtextfield--field {
-        position: relative;
-      }
-
       label {
         position: absolute;
         left: 0.5rem;

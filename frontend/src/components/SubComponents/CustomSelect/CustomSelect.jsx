@@ -26,8 +26,7 @@ const CustomSelect = ({
   onChange,
   options = [],
   disabled = false,
-  className = "",
-  style,
+  size,
 }) => {
   const [open, setOpen] = useState(false)
   const [focused, setFocused] = useState(false)
@@ -91,17 +90,23 @@ const CustomSelect = ({
     }
   }
 
+    // Width override: number -> px, string -> used as is (exposed as a CSS variable)
+  const rootStyle =
+    size != null
+      ? { "width": typeof size === "number" ? `${size}px` : size }
+      : undefined
+
   return (
-    <div className={`customSelect ${className}`.trim()} style={style}>
+    <div className="container__customSelect" style={rootStyle}>
       <div
-        className={`customSelect__field ${focused || open ? "is-focused" : ""} ${disabled ? "is-disabled" : ""}`}
+        className={`container__customSelect--field ${focused || open ? "is-focused" : ""} ${disabled ? "is-disabled" : ""}`}
       >
         <button
           type="button"
           role="combobox"
           aria-haspopup="listbox"
           aria-expanded={open}
-          className="customSelect__trigger"
+          className="container__customSelect--trigger"
           disabled={disabled}
           onClick={() => (open ? setOpen(false) : openList())}
           onKeyDown={handleKeyDown}
@@ -113,13 +118,13 @@ const CustomSelect = ({
         >
           {selected?.label ?? "\u200b"}
         </button>
-        <span className={`customSelect__arrow ${open ? "is-open" : ""}`}>
+        <span className={`container__customSelect--arrow ${open ? "is-open" : ""}`}>
           <Chevron />
         </span>
-        <label className={`customSelect__label ${shrunk ? "is-shrunk" : ""}`}>
+        <label className={`container__customSelect--label ${shrunk ? "is-shrunk" : ""}`}>
           {label}
         </label>
-        <fieldset className="customSelect__outline" aria-hidden="true">
+        <fieldset className="container__customSelect--outline" aria-hidden="true">
           <legend className={shrunk ? "is-shrunk" : ""}>
             <span>{label}</span>
           </legend>
@@ -130,7 +135,7 @@ const CustomSelect = ({
         <ul
           ref={listRef}
           role="listbox"
-          className="customSelect__list"
+          className="container__customSelect--list"
           // Prevents the list from stealing focus when clicking on an option (otherwise the blur event on the button would close the list before the click event on the option is processed)
           onMouseDown={(e) => e.preventDefault()}
         >
@@ -139,7 +144,7 @@ const CustomSelect = ({
               key={String(option.value)}
               role="option"
               aria-selected={index === selectedIndex}
-              className={`customSelect__option ${index === selectedIndex ? "is-selected" : ""} ${index === active ? "is-active" : ""}`}
+              className={`container__customSelect--option ${index === selectedIndex ? "is-selected" : ""} ${index === active ? "is-active" : ""}`}
               onMouseEnter={() => setActive(index)}
               onClick={() => choose(option)}
             >

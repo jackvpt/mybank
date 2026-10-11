@@ -114,13 +114,13 @@ const CustomDatePicker = ({
   })
 
   return (
-    <div ref={rootRef} className={`datepicker ${className}`.trim()} style={style}>
+    <div ref={rootRef} className={`container__datepicker ${className}`.trim()} style={style}>
       <div
-        className={`datepicker__field ${focused || open ? "is-focused" : ""} ${disabled ? "is-disabled" : ""}`}
+        className={`container__datepicker--field ${focused || open ? "is-focused" : ""} ${disabled ? "is-disabled" : ""}`}
       >
-        <label className="datepicker__label">{label}</label>
+        <label className="container__datepicker--label">{label}</label>
         <input
-          className="datepicker__input"
+          className="container__datepicker--input"
           type="text"
           inputMode="numeric"
           placeholder="jj/mm/aaaa"
@@ -132,14 +132,14 @@ const CustomDatePicker = ({
         />
         <button
           type="button"
-          className="datepicker__toggle"
+          className="container__datepicker--toggle"
           onClick={toggle}
           disabled={disabled}
           aria-label="Choisir la date"
         >
           <Icon d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z" />
         </button>
-        <fieldset className="datepicker__outline" aria-hidden="true">
+        <fieldset className="container__datepicker--outline" aria-hidden="true">
           <legend>
             <span>{label}</span>
           </legend>
@@ -147,20 +147,20 @@ const CustomDatePicker = ({
       </div>
 
       {open && (
-        <div className="datepicker__popover" role="dialog" aria-label="Calendrier">
-          <div className="datepicker__header">
+        <div className="container__datepicker--popover" role="dialog" aria-label="Calendrier">
+          <div className="container__datepicker--header">
             <button
               type="button"
-              className="datepicker__nav"
+              className="container__datepicker--nav"
               onClick={() => setView(new Date(year, month - 1, 1))}
               aria-label="Mois précédent"
             >
               <Icon d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
             </button>
-            <span className="datepicker__month">{monthLabel}</span>
+            <span className="container__datepicker--month">{monthLabel}</span>
             <button
               type="button"
-              className="datepicker__nav"
+              className="container__datepicker--nav"
               onClick={() => setView(new Date(year, month + 1, 1))}
               aria-label="Mois suivant"
             >
@@ -168,9 +168,9 @@ const CustomDatePicker = ({
             </button>
           </div>
 
-          <div className="datepicker__grid">
+          <div className="container__datepicker--grid">
             {DAYS.map((day, index) => (
-              <span key={index} className="datepicker__dow">
+              <span key={index} className="container__datepicker--dow">
                 {day}
               </span>
             ))}
@@ -179,7 +179,7 @@ const CustomDatePicker = ({
                 <button
                   type="button"
                   key={index}
-                  className={`datepicker__day ${sameDay(day, value) ? "is-selected" : ""} ${sameDay(day, today) ? "is-today" : ""}`}
+                  className={`container__datepicker--day ${sameDay(day, value) ? "is-selected" : ""} ${sameDay(day, today) ? "is-today" : ""}`}
                   onClick={() => {
                     onChange(day)
                     setOpen(false)

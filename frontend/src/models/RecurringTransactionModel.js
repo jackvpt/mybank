@@ -1,3 +1,7 @@
+/** Transaction types that require an extra field. Adapt to the values stored in DB. */
+const TYPE_CHECK = "check"
+const TYPE_TRANSFER = "transfer"
+
 /**
  * Represents a banking recurring transaction.
  */
@@ -13,10 +17,9 @@ export default class RecurringTransactionModel {
    * @param {string} data.label - The transaction label or description.
    * @param {string} data.category - The main category of the transaction.
    * @param {string} [data.subCategory] - A more specific sub-category (optional).
-   * @param {number} [data.debit=0] - The debit amount (money going out).
-   * @param {number} [data.credit=0] - The credit amount (money coming in).
+   * @param {number} data.amount - The transaction amount (negative = debit, positive = credit).
    * @param {string} [data.destination] - Destination of the transfer, if applicable.
-   * @param {string} [data.periodicity=""] - Periodicity of the transaction (e.g. "monthly", "weekly").
+   * @param {string} [data.periodicity] - Periodicity of the transaction (e.g. "monthly", "weekly").
    */
   constructor(data = {}) {
     /** @type {string} */
@@ -54,13 +57,10 @@ export default class RecurringTransactionModel {
     this.subCategory = data.subCategory
 
     /** @type {number} */
-    this.debit = data.debit ?? 0
+    this.amount = Number(data.amount)
 
     /** @type {number} */
-    this.credit = data.credit ?? 0
-
-    /** @type {number} */
-    this.amount = data.debit > 0 ? data.debit : this.credit
+    this.amount = Number(data.amount)
 
     /** @type {string} */
     this.amountSummary =
@@ -78,5 +78,72 @@ export default class RecurringTransactionModel {
 
     /** @type {string} */
     this.notes = data.notes || ""
+  }
+
+  /** @returns {number} Display only (debit column): absolute amount when negative, else 0. */
+  get debit() {
+    return this.amount < 0 ? Math.abs(this.amount) : 0
+  }
+
+  /** @returns {number} Display only (credit column): amount when positive, else 0. */
+  get credit() {
+    return this.amount > 0 ? this.amount : 0
+  }
+
+  /** @returns {boolean} True if the date is a real date. */
+  get hasValidDate() {
+    return !Number.isNaN(this.date.getTime())
+  }
+
+  /**
+   * Returns the names of the invalid fields (empty array if valid).
+   *
+   * @returns {string[]}
+   */
+  getErrors() {
+    const errors = []
+    if (!this.accountId) errors.push("accountId")
+    if (!this.accountName) errors.push("accountName")
+    if (!this.hasValidDate) errors.push("date")
+    if (!this.type) errors.push("type")
+    if (!this.label?.trim()) errors.push("label")
+    if (!Number.isFinite(this.amount) || this.amount === 0)
+      errors.push("amount")
+    if (this.type === TYPE_CHECK && !this.checkNumber)
+      errors.push("checkNumber")
+    if (this.type === TYPE_TRANSFER && !this.destination)
+      errors.push("destination")
+    return errors
+  }
+
+  /**
+   * @returns {boolean} True if the transaction can be submitted.
+   */
+  isValid() {
+    return this.getErrors().length === 0
+  }
+
+  /**
+   * Builds the plain object sent to the API (create or update).
+   * `id` is excluded (it goes in the URL), derived display fields are excluded,
+   * and `debit` / `credit` are included to match the Mongoose schema.
+   *
+   * @returns {Object}
+   */
+  toPayload() {
+    return {
+      accountId: this.accountId,
+      accountName: this.accountName,
+      date: this.hasValidDate ? this.date.toISOString() : null,
+      type: this.type,
+      checkNumber: this.type === TYPE_CHECK ? this.checkNumber : undefined,
+      label: this.label?.trim(),
+      category: this.category,
+      subCategory: this.subCategory || undefined,
+      amount: this.amount,
+      destination: this.type === TYPE_TRANSFER ? this.destination : undefined,
+      periodicity: this.periodicity || undefined,
+      notes: this.notes,
+    }
   }
 }

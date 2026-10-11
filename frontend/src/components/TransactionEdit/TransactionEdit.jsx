@@ -391,7 +391,6 @@ const TransactionEdit = () => {
     if (transactionsToDelete.length === 0) return
 
     deleteTransactions(transactionsToDelete, {
-      // The deleted ids would otherwise stay selected in the store
       onSuccess: () => dispatch(clearSelectedTransactionIds()),
     })
     setConfirmOpen(false)
@@ -433,6 +432,7 @@ const TransactionEdit = () => {
             value: name,
             label: text,
           }))}
+          size={250}
         />
 
         {/* 🧾 CHECK NUMBER */}
@@ -450,30 +450,6 @@ const TransactionEdit = () => {
 
         {/* 🏦 DESTINATION SELECT */}
         {isTransfer && (
-          // <FormControl
-          //   fullWidth
-          //   variant="outlined"
-          //   required
-          //   size="small"
-          //   sx={SELECT_SX}
-          // >
-          //   <InputLabel id="destination-label">Destination</InputLabel>
-          //   <Select
-          //     labelId="destination-label"
-          //     id="destination"
-          //     name="destination"
-          //     value={formData.destination}
-          //     onChange={handleChange("destination")}
-          //     label="Destination"
-          //   >
-          //     {destinationAccounts.map((account) => (
-          //       <MenuItem key={account._id} value={account.name}>
-          //         {account.name} - {account.bankAbbreviation}
-          //       </MenuItem>
-          //     ))}
-          //   </Select>
-          // </FormControl>
-
           <CustomSelect
             label="Destination"
             value={formData.destination ?? ""}
@@ -516,6 +492,7 @@ const TransactionEdit = () => {
           clearField={true}
           copy={false}
           floating={true}
+          size={120}
         />
 
         {/* 🗂️ CATEGORY SELECT */}
@@ -532,6 +509,7 @@ const TransactionEdit = () => {
               value: category.name,
               label: category.name,
             }))}
+            size={220}
           />
         )}
 
@@ -546,6 +524,7 @@ const TransactionEdit = () => {
               value: subcategory,
               label: subcategory,
             }))}
+            size={220}
           />
         )}
 
@@ -559,6 +538,7 @@ const TransactionEdit = () => {
           clearField={true}
           copy={false}
           floating={true}
+          size={200}
         />
 
         {/* 🗑️ DELETE BUTTON */}

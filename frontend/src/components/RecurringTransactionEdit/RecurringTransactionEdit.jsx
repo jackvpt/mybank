@@ -2,715 +2,490 @@
 import "./RecurringTransactionEdit.scss"
 
 // ⚛️ React
-import { useEffect, useState } from "react"
-import { useSelector } from "react-redux"
+import { useEffect, useMemo, useState } from "react"
 
-// DEV imports
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
-import { frFR } from "@mui/x-date-pickers/locales"
+// 🏪 Redux
+import { useDispatch, useSelector } from "react-redux"
+import { clearSelectedRecurringTransactionIds } from "../../store/features/parametersSlice"
 
-import {
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Snackbar,
-  Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  createTheme,
-  ThemeProvider,
-  Divider,
-  CircularProgress,
-} from "@mui/material"
+// 📅 Date picker
+import { isValid } from "date-fns"
 
-import { Delete, AddCircle, ChangeCircle } from "@mui/icons-material"
-
-/** API imports */
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+// 🪝 Hooks
 import { useGetAllSettings } from "../../hooks/useSettings"
-import { getAllBankAccounts } from "../../api/bankAccounts.api"
-import {
-  deleteRecurringTransaction,
-  deleteRecurringTransactions,
-  createRecurringTransaction,
-  updateRecurringTransaction,
-} from "../../api/recurringTransactions.api"
 import { useGetAllCategories } from "../../hooks/useCategories"
-import { fr } from "date-fns/locale"
-import { useGetAllRecurringTransactions } from "../../hooks/useRecurringTransactions"
+import { useGetAllBankAccounts } from "../../hooks/useBankAccounts"
+import {
+  useCreateRecurringTransaction,
+  useDeleteRecurringTransactions,
+  useGetAllRecurringTransactions,
+  useUpdateRecurringTransaction,
+} from "../../hooks/useRecurringTransactions"
 
+// 📦 Models
+import RecurringTransactionModel from "../../models/RecurringTransactionModel"
+
+// 🧮 Functions
+import { formatAmount } from "../../utils/formatNumber"
+
+// 🧩 Components
+import CustomTextField from "../SubComponents/CustomTextField/CustomTextField"
+import CustomButton from "../SubComponents/CustomButton/CustomButton"
+import CustomDatePicker from "../SubComponents/CustomDatePicker/CustomDatePicker"
+import CustomSelect from "../SubComponents/CustomSelect/CustomSelect"
+import CustomDialog from "../SubComponents/CustomDialog/CustomDialog"
+
+/**
+ * Empty form values. Defined outside the component so the reference is
+ * stable (usable in effect dependencies without useCallback).
+ * The default date is the first day of next month.
+ *
+ * @returns {object} Initial form data
+ */
+const getInitialFormData = () => {
+  const date = new Date()
+  date.setMonth(date.getMonth() + 1)
+  date.setDate(1)
+
+  return {
+    date,
+    accountName: "",
+    type: "autodebit",
+    checkNumber: "",
+    destination: "",
+    label: "",
+    amount: 0,
+    category: "",
+    subCategory: "",
+    periodicity: "monthly",
+    notes: "",
+  }
+}
+
+/**
+ * Recurring transaction form: create, modify or delete recurring transactions.
+ * Edits the recurring transaction when exactly one row is selected in the table.
+ *
+ * @component
+ * @returns {JSX.Element} Rendered RecurringTransactionEdit component
+ */
 const RecurringTransactionEdit = () => {
-  const queryClient = useQueryClient()
+  const dispatch = useDispatch()
 
-  const [toastOpen, setToastOpen] = useState(false)
-  const [toastMessage, setToastMessage] = useState("")
+  // 🗑️ Delete confirmation dialog
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [recurringTransactionsToDelete, setRecurringTransactionsToDelete] =
     useState([])
 
-  const theme = createTheme({}, frFR)
+  // 🏪 Redux state
+  const selectedRecurringTransactionIds = useSelector(
+    (state) => state.parameters.selectedRecurringTransactionIds,
+  )
 
+  // 🔄 Mutations (toasts and query invalidation are handled
+  // inside useRecurringTransactions via useMutationWithNotification)
+  const { mutate: createRecurringTransaction, isPending: isCreating } =
+    useCreateRecurringTransaction()
+  const { mutate: updateRecurringTransaction, isPending: isUpdating } =
+    useUpdateRecurringTransaction()
+  const { mutate: deleteRecurringTransactions, isPending: isDeleting } =
+    useDeleteRecurringTransactions()
+
+  // 🌐 Data (safe defaults while queries are loading)
+  const { data: settings } = useGetAllSettings()
+  const transactionTypes = settings?.types ?? []
+  const periodicities = settings?.periodicities ?? []
+  const { data: transactionsCategories = [] } = useGetAllCategories()
+  const { data: bankAccounts = [] } = useGetAllBankAccounts()
+  const { data: recurringTransactions = [] } = useGetAllRecurringTransactions()
+
+  // 📝 Form state
+  const [formData, setFormData] = useState(getInitialFormData)
+
+  // 🔁 Sync the form with the selection:
+  // one selected row -> load it, otherwise (or after a data refresh) -> empty form.
+  // This is also what resets the form after a recurring transaction is added.
+  useEffect(() => {
+    const selected =
+      selectedRecurringTransactionIds.length === 1
+        ? recurringTransactions.find(
+            (recurringTransaction) =>
+              recurringTransaction.id === selectedRecurringTransactionIds[0],
+          )
+        : null
+
+    setFormData(
+      selected
+        ? {
+            ...selected,
+            date: new Date(selected.date),
+            amount: formatAmount(selected.amount),
+            category: selected.category ?? "",
+            subCategory: selected.subCategory ?? "",
+            type: selected.type ?? "autodebit",
+          }
+        : getInitialFormData(),
+    )
+  }, [selectedRecurringTransactionIds, recurringTransactions])
+
+  // 🧠 Derived data
+  const isTransfer = formData.type === "transfer"
+
+  // "debit" or "credit", depending on the selected type
+  const debitOrCredit = transactionTypes.find(
+    (type) => type.name === formData.type,
+  )?.category
+
+  // Categories of the selected type
+  const categoriesByType = useMemo(
+    () =>
+      transactionsCategories.filter(
+        (category) => category.type === debitOrCredit,
+      ),
+    [transactionsCategories, debitOrCredit],
+  )
+
+  // Sub-categories of the selected category
+  const subCategories = useMemo(
+    () =>
+      transactionsCategories.find(
+        (category) => category.name === formData.category,
+      )?.subcategories ?? [],
+    [transactionsCategories, formData.category],
+  )
+
+  // Transfer destinations: every account except the selected one
+  const destinationAccounts = useMemo(
+    () =>
+      bankAccounts.filter((account) => account.name !== formData.accountName),
+    [bankAccounts, formData.accountName],
+  )
+
+  /**
+   * Signed amount: negative for debits, positive for credits,
+   * whatever sign the user typed in the form.
+   * @returns {number} The signed amount.
+   */
+  const signedAmount = () => {
+    const abs = Math.abs(Number(formData.amount))
+    return debitOrCredit === "debit" ? -abs : abs
+  }
+
+  // ✅ Validation (computed once per render, used by the buttons and handlers)
+  const formHasErrors =
+    !isValid(formData.date) ||
+    !formData.accountName ||
+    !Number.isFinite(signedAmount()) ||
+    signedAmount() === 0 ||
+    (isTransfer && !formData.destination) ||
+    (formData.type === "check" && !formData.checkNumber) ||
+    (!isTransfer && !formData.label.trim())
+
+  // ✍️ Form helpers
+  const setField = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleChange = (name) => (e) => {
+    let value = e.target.value
+
+    if (name === "amount")
+      value = value.replace(",", ".").replace(/[^0-9.]/g, "")
+
+    setField(name, value)
+  }
+
+  /**
+   * Format the amount field to two decimal places on blur.
+   * The sign is applied later, when building the payload for the API.
+   */
+  const handleAmountBlur = () => {
+    setField("amount", formatAmount(String(formData.amount ?? "")))
+  }
+
+  /**
+   * Build the payload sent to the API from the form data.
+   * Returns null when the model is invalid, so handlers can bail out.
+   *
+   * @param {object} [overrides] - Fields to override
+   * @returns {object|null}
+   */
+  const buildPayload = (overrides = {}) => {
+    const accountId = bankAccounts.find(
+      (account) => account.name === formData.accountName,
+    )?.id
+
+    const recurringTransaction = new RecurringTransactionModel({
+      ...formData,
+      accountId,
+      ...overrides,
+    })
+
+    if (!recurringTransaction.isValid) {
+      console.error(
+        "Recurring transaction is not valid",
+        recurringTransaction.getErrors(),
+      )
+      return null
+    }
+
+    return recurringTransaction.toPayload()
+  }
+
+  // ➕ Create the recurring transaction
+  // (transfers have no label field: it is generated from the destination)
+  const handleCreateTransaction = () => {
+    if (formHasErrors) return
+
+    const payload = buildPayload({
+      amount: signedAmount(),
+      ...(isTransfer && { label: `Virement vers ${formData.destination}` }),
+    })
+    if (!payload) return
+
+    createRecurringTransaction(payload)
+  }
+
+  // ✏️ Update the selected recurring transaction (button enabled only with exactly one selected)
+  const handleUpdateTransaction = () => {
+    if (formHasErrors) return
+
+    const payload = buildPayload({
+      amount: signedAmount(),
+      ...(isTransfer && { label: `Virement vers ${formData.destination}` }),
+    })
+    if (!payload) return
+
+    updateRecurringTransaction({
+      id: selectedRecurringTransactionIds[0],
+      updatedData: payload,
+    })
+  }
+
+  // 🗑️ Delete flow: open the dialog, then confirm
   const handleOpenConfirm = (ids) => {
     setRecurringTransactionsToDelete(ids)
     setConfirmOpen(true)
   }
 
   const handleConfirmDelete = () => {
-    if (recurringTransactionsToDelete.length > 0) {
-      deleteMutation.mutate(recurringTransactionsToDelete)
-      setConfirmOpen(false)
-      setRecurringTransactionsToDelete([])
-    }
+    if (recurringTransactionsToDelete.length === 0) return
+
+    deleteRecurringTransactions(recurringTransactionsToDelete, {
+      onSuccess: () => dispatch(clearSelectedRecurringTransactionIds()),
+    })
+    setConfirmOpen(false)
+    setRecurringTransactionsToDelete([])
   }
-
-  const selectedRecurringTransactionIds = useSelector(
-    (state) => state.parameters.selectedRecurringTransactionIds,
-  )
-
-  /**
-   * Mutation to post a new recurringtransaction.
-   * It uses React Query's useMutation hook to handle the mutation.
-   **/
-  const addMutation = useMutation({
-    mutationFn: createRecurringTransaction,
-    onSuccess: () => {
-      queryClient.invalidateQueries("recurringTransactions")
-      setToastMessage("Transaction récurrente ajoutée")
-      setToastOpen(true)
-    },
-    onError: (error) => {
-      console.error("Erreur lors de la soumission :", error)
-    },
-  })
-
-  const updateMutation = useMutation({
-    mutationFn: updateRecurringTransaction,
-    onSuccess: () => {
-      queryClient.invalidateQueries("recurringTransactions")
-      setToastMessage("Transaction récurrente modifiée")
-      setToastOpen(true)
-    },
-    onError: (error) => {
-      console.error("Erreur lors de la modification :", error)
-    },
-  })
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteRecurringTransactions,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries("recurringTransactions")
-      setToastMessage(
-        `${data.deletedCount} transaction(s) récurrente(s) supprimée(s)`,
-      )
-      setToastOpen(true)
-    },
-    onError: (error) => {
-      console.error("Erreur lors de la suppression :", error)
-    },
-  })
-
-  /**
-   * Handles the closing of the toast notification.
-   * @param {Event} event - The event that triggered the close.
-   * @param {string} reason - The reason for closing the toast (e.g., "clickaway").
-   */
-  const handleToastClose = (event, reason) => {
-    if (reason === "clickaway") return
-    setToastOpen(false)
-  }
-
-  // Fetch settings using React Query
-  const {
-    data: settings,
-    isLoading: isLoadingSettings,
-    error: settingsError,
-  } = useGetAllSettings({ enabled: true })
-
-  // Fetch categories
-  const {
-    data: transactionsCategories = [],
-    isLoading: isLoadingCategories,
-    error: categoriesError,
-  } = useGetAllCategories()
-
-  // Fetch bank accounts using React Query
-  const {
-    data: bankAccounts,
-    isLoading: isLoadingBankAccounts,
-    error: bankAccountsError,
-  } = useQuery({
-    queryKey: ["bankAccounts"],
-    queryFn: getAllBankAccounts,
-  })
-
-  // Fetch recurring transactions using React Query
-  const {
-    data: recurringTransactions = [],
-    isLoading: isLoadingRecurringTransactions,
-    error: recurringTransactionsError,
-  } = useGetAllRecurringTransactions({ enabled: true })
-
-  const transactionTypes = settings ? settings.types : []
-
-  const initialFormData = {
-    date: (() => {
-      const d = new Date()
-      d.setMonth(d.getMonth() + 1)
-      d.setDate(1)
-      return d
-    })(),
-    account: "",
-    type: "autodebit",
-    checkNumber: "",
-    label: "",
-    category: "",
-    subCategory: "",
-    amount: 0,
-    debit: 0,
-    credit: 0,
-    status: "",
-    destination: "",
-    periodicity: "monthly",
-    notes: "",
-  }
-  const [formData, setFormData] = useState(initialFormData)
-
-  const periodicities = settings?.periodicities
-
-  useEffect(() => {
-    if (selectedRecurringTransactionIds.length === 1) {
-      const selected = recurringTransactions.find(
-        (recurringTransaction) =>
-          recurringTransaction.id === selectedRecurringTransactionIds[0],
-      )
-
-      if (selected) {
-        setFormData({
-          ...selected,
-          date: new Date(selected.date),
-          category: selected.category ?? "",
-          subCategory: selected.subCategory ?? "",
-          type: selected.type ?? "card",
-        })
-      }
-    } else {
-      setFormData(initialFormData)
-    }
-  }, [selectedRecurringTransactionIds])
-
-  /**
-   * Handles the modification of a transaction.
-   * It checks for form errors and if none are found,
-   * it calls the updateMutation to update the transaction.
-   * @param {Event} e - The event object.
-   * @returns {void}
-   */
-  const handleModifyTransaction = (e) => {
-    e.preventDefault()
-    if (!formHasErrors()) {
-      updateMutation.mutate({
-        id: selectedRecurringTransactionIds,
-        updatedData: formData,
-      })
-    }
-  }
-
-  /**
-   * Add the transaction.
-   * @param {Event} e
-   */
-  const handleAddTransaction = (e) => {
-    e.preventDefault()
-    if (!formHasErrors()) {
-      if (formData.type === "transfer") {
-        setFormData((prev) => ({
-          ...prev,
-          label: `Virement vers ${formData.destination}`,
-        }))
-      }
-      console.log("formData :>> ", formData)
-      addMutation.mutate(formData)
-    }
-  }
-
-  /**
-   * Handles the blur event for the debit field.
-   * If the debit value is not empty and is a valid number,
-   * it formats the value to two decimal places.
-   * @returns {void}
-   * @param {string} field
-   */
-  const handleAmountBlur = () => {
-    const value = formData.amount.replace(",", ".")
-    if (value !== "" && !isNaN(Number(value))) {
-      const formatted = parseFloat(value).toFixed(2)
-      formData.amount = formatted
-      if (formData.type === "directdeposit") {
-        setFormData((prev) => ({ ...prev, debit: "", credit: formatted }))
-      } else {
-        setFormData((prev) => ({ ...prev, debit: formatted, credit: "" }))
-      }
-    }
-  }
-
-  /**
-   * Checks if the form has errors.
-   * @returns {boolean} Returns true if the form has errors, false otherwise.
-   */
-  const formHasErrors = () => {
-    return (
-      (formData.type === "transfer" && formData.destination === "") ||
-      (formData.type === "check" && formData.checkNumber === "") ||
-      formData.amount === 0 ||
-      formData.amount === "" ||
-      isNaN(formData.amount) ||
-      (formData.type !== "transfer" && formData.label === "")
-    )
-  }
-
-  if (
-    isLoadingSettings ||
-    isLoadingBankAccounts ||
-    isLoadingCategories ||
-    isLoadingRecurringTransactions
-  )
-    return <p>Loading data...</p>
-  if (
-    settingsError ||
-    bankAccountsError ||
-    categoriesError ||
-    recurringTransactionsError
-  )
-    return (
-      <p>
-        Error loading data: {settingsError.message || bankAccountsError.message}
-      </p>
-    )
 
   return (
     <section className="container-transaction-edit">
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <form>
-          {/* DATE PICKER */}
-          <ThemeProvider theme={theme}>
-            <LocalizationProvider
-              dateAdapter={AdapterDateFns}
-              adapterLocale={fr}
-            >
-              <DatePicker
-                label="Date"
-                value={formData.date}
-                onChange={(newValue) =>
-                  setFormData((prev) => ({ ...prev, date: newValue }))
-                }
-                format="dd/MM/yyyy"
-                sx={{ width: "auto", minWidth: 150, maxWidth: 180 }}
-                slotProps={{
-                  textField: {
-                    size: "small",
-                  },
-                }}
-              />
-            </LocalizationProvider>
-          </ThemeProvider>
+      <form onSubmit={(e) => e.preventDefault()}>
+        {/* 📅 DATE PICKER */}
+        <CustomDatePicker
+          label="Date"
+          value={formData.date}
+          onChange={(newValue) => setField("date", newValue)}
+          format="dd/MM/yyyy"
+        />
 
-          {/* BANK ACCOUNT SELECT */}
-          <FormControl
-            fullWidth
-            variant="outlined"
-            required
-            size="small"
-            sx={{ width: "auto", minWidth: 240 }}
-          >
-            <InputLabel id="account-label">Compte</InputLabel>
-            <Select
-              labelId="account-label"
-              id="account"
-              name="account"
-              value={formData.account ?? ""}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  account: e.target.value,
-                }))
-              }
-              label="Compte"
-            >
-              {bankAccounts.map((account) => (
-                <MenuItem key={account._id} value={account.name}>
-                  {account.name} - {account.bankAbbreviation}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+        {/* 🏦 BANK ACCOUNT SELECT */}
+        <CustomSelect
+          label="Compte"
+          value={formData.accountName ?? ""}
+          onChange={(value) => setField("accountName", value)}
+          options={bankAccounts.map(({ name }) => ({
+            value: name,
+            label: name,
+          }))}
+          size={180}
+        />
 
-          {/* TYPE SELECT */}
-          <FormControl
-            fullWidth
-            variant="outlined"
-            required
-            size="small"
-            sx={{ width: "auto", minWidth: 240 }}
-          >
-            <InputLabel id="type-label">Type</InputLabel>
-            <Select
-              labelId="type-label"
-              id="type"
-              name="type"
-              value={formData.type ?? ""}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, type: e.target.value }))
-              }
-              label="Type"
-            >
-              {transactionTypes.map((type) => (
-                <MenuItem key={type.name} value={type.name}>
-                  {type.text}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+        {/* 🏷️ TYPE SELECT */}
+        <CustomSelect
+          label="Type"
+          value={formData.type}
+          onChange={(value) =>
+            // A category belongs to a debit/credit family: reset it with the type
+            setFormData((prev) => ({
+              ...prev,
+              type: value,
+              category: "",
+              subCategory: "",
+            }))
+          }
+          options={transactionTypes.map(({ name, text }) => ({
+            value: name,
+            label: text,
+          }))}
+          size={250}
+        />
 
-          {/* CHECK NUMBER */}
-          {formData.type === "check" && (
-            <TextField
-              type="text"
-              label="N° chèque"
-              value={formData.checkNumber}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  checkNumber: e.target.value,
-                }))
-              }
-              size="small"
-              sx={{ width: 120 }}
-            />
-          )}
-
-          {/* DESTINATION SELECT */}
-          {formData.type === "transfer" && (
-            <FormControl
-              fullWidth
-              variant="outlined"
-              required
-              size="small"
-              sx={{ width: "auto", minWidth: 240 }}
-            >
-              <InputLabel id="destination-label">Destination</InputLabel>
-              <Select
-                labelId="destination-label"
-                id="destination"
-                name="destination"
-                value={formData.destination}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    destination: e.target.value,
-                  }))
-                }
-                label="Destination"
-              >
-                {bankAccounts.map((account) => (
-                  <MenuItem key={account._id} value={account.name}>
-                    {account.name} - {account.bankAbbreviation}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-
-          {/* LABEL */}
-          {formData.type !== "transfer" && (
-            <TextField
-              label="Libellé"
-              name="label"
-              value={formData.label}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, label: e.target.value }))
-              }
-              placeholder="Courses"
-              required
-              fullWidth
-              variant="outlined"
-              size="small"
-              sx={{ width: "auto", minWidth: 350 }}
-            />
-          )}
-
-          {/* AMOUNT */}
-          <TextField
-            type="text"
-            label="Montant"
-            value={Number(formData.amount).toFixed(2)}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                amount: e.target.value,
-              }))
-            }
-            onBlur={() => handleAmountBlur()}
-            placeholder="0.00"
-            size="small"
-            sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
+        {/* 🧾 CHECK NUMBER */}
+        {formData.type === "check" && (
+          <CustomTextField
+            id="checkNumber"
+            label="N° chèque"
+            value={formData.checkNumber}
+            onChange={handleChange("checkNumber")}
+            clearField={true}
+            copy={false}
+            floating={true}
           />
+        )}
 
-          {/* CATEGORIES SELECT */}
-          {formData.type !== "transfer" && (
-            <FormControl
-              fullWidth
-              size="small"
-              sx={{ width: "auto", minWidth: 240 }}
-            >
-              <InputLabel>Catégorie</InputLabel>
-              <Select
-                labelId="category-label"
-                id="category"
-                name="category"
-                value={formData.category ?? ""}
-                onChange={(e) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    category: e.target.value,
-                    subCategory: "",
-                  }))
-                }}
-                label="Catégorie"
-              >
-                {transactionsCategories.map((category, index) => {
-                  const prevCategory = transactionsCategories[index - 1]
-                  const showDivider =
-                    index > 0 && category.type !== prevCategory.type
-                  return [
-                    showDivider && <Divider key={`divider-${category.name}`} />,
-                    <MenuItem key={category.name} value={category.name}>
-                      {category.name}
-                    </MenuItem>,
-                  ]
-                })}
-              </Select>
-            </FormControl>
-          )}
-
-          {/* SUB-CATEGORIES SELECT */}
-          {formData.type !== "transfer" && (
-            <FormControl
-              fullWidth
-              size="small"
-              sx={{ width: "auto", minWidth: 240 }}
-            >
-              <InputLabel id="subCategory-label">Sous catégorie</InputLabel>
-              <Select
-                labelId="subCategory-label"
-                id="subCategory"
-                name="subCategory"
-                value={formData.subCategory ?? ""}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    subCategory: e.target.value,
-                  }))
-                }
-                label="Sous catégorie"
-                disabled={!formData.category}
-              >
-                {transactionsCategories
-                  .filter((category) => category.name === formData.category)
-                  .flatMap((category) =>
-                    category.subcategories?.map((sub) => (
-                      <MenuItem key={`${category.name}-${sub}`} value={sub}>
-                        {sub}
-                      </MenuItem>
-                    )),
-                  )}
-              </Select>
-            </FormControl>
-          )}
-
-          {/* PERIODICITY SELECT */}
-          <FormControl
-            fullWidth
-            size="small"
-            sx={{ width: "auto", minWidth: 240 }}
-          >
-            <InputLabel id="periodicity-label">Périodicité</InputLabel>
-            <Select
-              labelId="periodicity-label"
-              id="periodicity"
-              name="periodicity"
-              value={formData.periodicity ?? ""}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  periodicity: e.target.value,
-                }))
-              }
-              label="Périodicité"
-            >
-              {periodicities.map((periodicity) => {
-                return (
-                  <MenuItem key={periodicity.name} value={periodicity.name}>
-                    {periodicity.text}
-                  </MenuItem>
-                )
-              })}
-            </Select>
-          </FormControl>
-
-          {/* NOTES */}
-          <TextField
-            type="text"
-            label="Notes"
-            value={formData.notes}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                notes: e.target.value,
-              }))
-            }
-            size="small"
-            sx={{ minWidth: 200 }}
+        {/* 🔀 DESTINATION SELECT */}
+        {isTransfer && (
+          <CustomSelect
+            label="Destination"
+            value={formData.destination ?? ""}
+            onChange={(value) => setField("destination", value)}
+            options={destinationAccounts.map((account) => ({
+              value: account.name,
+              label: account.bankAbbreviation,
+            }))}
           />
+        )}
 
-          {/* DELETE TRANSACTION BUTTON */}
-          <Button
-            variant="contained"
-            startIcon={!deleteRecurringTransaction.isPending ? <Delete /> : ""}
-            disabled={selectedRecurringTransactionIds.length === 0}
-            onClick={() => handleOpenConfirm(selectedRecurringTransactionIds)}
-            sx={{
-              minWidth: 100,
-              backgroundColor: "red",
-              color: "#fff",
-              "&:hover": {
-                backgroundColor: "darkred",
-              },
-              textTransform: "none",
-              fontWeight: 600,
-              px: 3,
-              py: 1,
-              borderRadius: 1,
-              boxShadow: 3,
+        {/* 🔤 LABEL (generated automatically for transfers) */}
+        {!isTransfer && (
+          <CustomTextField
+            id="label"
+            label="Libellé"
+            value={formData.label}
+            onChange={handleChange("label")}
+            type="text"
+            clearField={true}
+            copy={false}
+            floating={true}
+          />
+        )}
+
+        {/* 💶 AMOUNT */}
+        <CustomTextField
+          id="amount"
+          label="Montant"
+          value={
+            formData.amount === 0
+              ? ""
+              : String(formData.amount ?? "").replace("-", "")
+          }
+          onChange={handleChange("amount")}
+          onBlur={handleAmountBlur}
+          type="text"
+          clearField={true}
+          copy={false}
+          floating={true}
+          size={120}
+        />
+
+        {/* 🗂️ CATEGORY SELECT */}
+        {!isTransfer && (
+          <CustomSelect
+            label="Catégorie"
+            value={formData.category ?? ""}
+            onChange={(value) => {
+              setField("category", value)
+              // Changing the category invalidates the sub-category
+              setField("subCategory", "")
             }}
-          >
-            {deleteRecurringTransaction.isPending ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Supprimer"
-            )}{" "}
-          </Button>
+            options={categoriesByType.map((category) => ({
+              value: category.name,
+              label: category.name,
+            }))}
+            size={220}
+          />
+        )}
 
-          {/* MODIFY TRANSACTION BUTTON */}
-          <Button
-            variant="contained"
-            startIcon={
-              !updateRecurringTransaction.isPending ? <ChangeCircle /> : ""
-            }
-            disabled={formHasErrors()}
-            onClick={handleModifyTransaction}
-            sx={{
-              minWidth: 100,
-              backgroundColor: "#1976d2",
-              color: "#fff",
-              "&:hover": {
-                backgroundColor: "#1565c0",
-              },
-              textTransform: "none",
-              fontWeight: 600,
-              px: 3,
-              py: 1,
-              borderRadius: 1,
-              boxShadow: 3,
-            }}
-          >
-            {updateRecurringTransaction.isPending ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Modifier"
-            )}{" "}
-          </Button>
+        {/* 🗃️ SUB-CATEGORY SELECT */}
+        {!isTransfer && (
+          <CustomSelect
+            label="Sous catégorie"
+            value={formData.subCategory ?? ""}
+            onChange={(value) => setField("subCategory", value)}
+            disabled={!formData.category}
+            options={subCategories.map((subcategory) => ({
+              value: subcategory,
+              label: subcategory,
+            }))}
+            size={220}
+          />
+        )}
 
-          {/* ADD TRANSACTION BUTTON */}
-          <Button
-            variant="contained"
-            startIcon={!addMutation.isPending ? <AddCircle /> : ""}
-            disabled={formHasErrors()}
-            onClick={handleAddTransaction}
-            sx={{
-              minWidth: 100,
-              backgroundColor: "green",
-              color: "#fff",
-              "&:hover": {
-                backgroundColor: "darkgreen",
-              },
-              textTransform: "none",
-              fontWeight: 600,
-              px: 3,
-              py: 1,
-              borderRadius: 1,
-              boxShadow: 3,
-            }}
-          >
-            {addMutation.isPending ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Ajouter"
-            )}{" "}
-          </Button>
-        </form>
-      </LocalizationProvider>
+        {/* 🔁 PERIODICITY SELECT */}
+        <CustomSelect
+          label="Périodicité"
+          value={formData.periodicity ?? ""}
+          onChange={(value) => setField("periodicity", value)}
+          options={periodicities.map((periodicity) => ({
+            value: periodicity.name,
+            label: periodicity.text,
+          }))}
+          size={150}
+        />
 
-      {/* Toast notification for success messages */}
-      <Snackbar
-        open={toastOpen}
-        autoHideDuration={3000}
-        onClose={handleToastClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleToastClose}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
-          {toastMessage}
-        </Alert>
-      </Snackbar>
+        {/* 📝 NOTES */}
+        <CustomTextField
+          id="notes"
+          label="Notes"
+          value={formData.notes}
+          onChange={handleChange("notes")}
+          type="text"
+          clearField={true}
+          copy={false}
+          floating={true}
+          size={200}
+        />
 
-      {/** Modal Dialog Box */}
-      <Dialog
+        {/* 🗑️ DELETE BUTTON */}
+        <CustomButton
+          action="delete"
+          loading={isDeleting}
+          disabled={selectedRecurringTransactionIds.length === 0}
+          onClick={() => handleOpenConfirm(selectedRecurringTransactionIds)}
+        />
+
+        {/* ✏️ MODIFY BUTTON */}
+        <CustomButton
+          action="update"
+          loading={isUpdating}
+          disabled={
+            formHasErrors || selectedRecurringTransactionIds.length !== 1
+          }
+          onClick={handleUpdateTransaction}
+        />
+
+        {/* ➕ ADD BUTTON */}
+        <CustomButton
+          action="create"
+          loading={isCreating}
+          disabled={formHasErrors}
+          onClick={handleCreateTransaction}
+        />
+
+        {/* 🔄 RESET BUTTON */}
+        <CustomButton
+          action="reset"
+          onClick={() => {
+            setFormData(getInitialFormData())
+            dispatch(clearSelectedRecurringTransactionIds())
+          }}
+        />
+      </form>
+
+      {/* ⚠️ Delete confirmation dialog */}
+      <CustomDialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        aria-labelledby="confirm-dialog-title"
+        onConfirm={handleConfirmDelete}
+        title="Confirmer la suppression"
+        confirmLabel="Supprimer"
+        danger
       >
-        <DialogTitle id="confirm-dialog-title">
-          Confirmer la suppression
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Êtes-vous sûr de vouloir supprimer cette transaction ? Cette action
-            est irréversible.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmOpen(false)} color="primary">
-            Annuler
-          </Button>
-          <Button
-            onClick={handleConfirmDelete}
-            color="error"
-            variant="contained"
-          >
-            Supprimer
-          </Button>
-        </DialogActions>
-      </Dialog>
+        {recurringTransactionsToDelete.length === 1
+          ? "Êtes-vous sûr de vouloir supprimer cette transaction ? Cette action est irréversible."
+          : `Êtes-vous sûr de vouloir supprimer ces ${recurringTransactionsToDelete.length} transactions ? Cette action est irréversible.`}
+      </CustomDialog>
     </section>
   )
 }

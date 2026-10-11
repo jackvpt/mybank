@@ -1,5 +1,10 @@
-import { useLayoutEffect, useRef, useState } from "react"
+// 🎨 Styles
 import "./CustomTextField.scss"
+
+// ⚛️ React
+import { useLayoutEffect, useRef, useState } from "react"
+
+// 🖋️ Icons
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCircleXmark, faCopy } from "@fortawesome/free-solid-svg-icons"
 
@@ -27,6 +32,8 @@ import { faCircleXmark, faCopy } from "@fortawesome/free-solid-svg-icons"
  * @param {boolean}  [props.clearField=true] - Show a clear button when the field is filled.
  * @param {boolean}  [props.copy=false] - Show a copy-to-clipboard button when the field is filled.
  * @param {boolean}  [props.floating=false] - Use a floating label instead of a static one.
+ * @param {number|string} [props.size] - Width of the component. A number is read
+ *   as pixels, a string is used as is ("50%", "20rem"). Default: width from the SCSS.
  * @param {Object}   [props.inputProps={}] - Extra props spread on the native <input>.
  * @param {string[]|null} [props.suggestions=null] - Enables inline autocompletion when provided.
  *   Order matters: the first suggestion starting with the typed text wins
@@ -45,6 +52,7 @@ const CustomTextField = ({
   clearField = true,
   copy = false,
   floating = false,
+  size,
   inputProps = {},
   suggestions = null,
 }) => {
@@ -101,13 +109,15 @@ const CustomTextField = ({
     if (shouldComplete) {
       const lower = typed.toLowerCase()
       const match = suggestions.find(
-        (s) => s.length > typed.length && s.toLowerCase().startsWith(lower)
+        (s) => s.length > typed.length && s.toLowerCase().startsWith(lower),
       )
       if (match) {
         // Keep the user's casing and append the rest of the suggestion
         const completed = typed + match.slice(typed.length)
         pendingSelection.current = [typed.length, completed.length]
-        onChange?.({ target: { id, name: e.target.name || id, value: completed } })
+        onChange?.({
+          target: { id, name: e.target.name || id, value: completed },
+        })
         return
       }
     }
@@ -126,7 +136,11 @@ const CustomTextField = ({
       if (input.selectionStart !== input.selectionEnd) {
         e.stopPropagation()
         onChange?.({
-          target: { id, name: id, value: input.value.slice(0, input.selectionStart) },
+          target: {
+            id,
+            name: id,
+            value: input.value.slice(0, input.selectionStart),
+          },
         })
       }
     }
@@ -163,8 +177,14 @@ const CustomTextField = ({
     .filter(Boolean)
     .join(" ")
 
+  // Width override: number -> px, string -> used as is (exposed as a CSS variable)
+  const rootStyle =
+    size != null
+      ? { "--textfield-width": typeof size === "number" ? `${size}px` : size }
+      : undefined
+
   return (
-    <div className="container__customtextfield">
+    <div className="container__customtextfield" style={rootStyle}>
       {/* Static label, displayed above the field */}
       {label && !floating && <label htmlFor={id}>{label}</label>}
 
@@ -194,8 +214,9 @@ const CustomTextField = ({
               disabled={disabled}
               aria-invalid={error || undefined}
               aria-describedby={
-                [inputProps["aria-describedby"], helperId].filter(Boolean).join(" ") ||
-                undefined
+                [inputProps["aria-describedby"], helperId]
+                  .filter(Boolean)
+                  .join(" ") || undefined
               }
               onFocus={(e) => {
                 setFocused(true)

@@ -3,10 +3,12 @@ const mongoose = require("mongoose")
 
 /** Create a mongoose Schema */
 const recurringTransactionSchema = mongoose.Schema({
-  account: { type: String, required: true },
+  accountId: { type: String, required: true },
+  accountName: { type: String, required: true },
   date: { type: Date, required: true },
   type: { type: String, required: true },
   checkNumber: { type: String, required: false },
+  amount: { type: Number, required: true },
   debit: { type: Number, required: false },
   credit: { type: Number, required: false },
   label: { type: String, required: true },
@@ -20,5 +22,5 @@ const recurringTransactionSchema = mongoose.Schema({
 /** Model methods converts Schema in usable model */
 module.exports = mongoose.model(
   "RecurringTransaction",
-  recurringTransactionSchema
+  recurringTransactionSchema,
 ) /** 'RecurringTransaction' is the collection name which becomes 'RecurringTransactions' */

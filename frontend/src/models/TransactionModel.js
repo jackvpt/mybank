@@ -22,7 +22,7 @@ export default class TransactionModel {
    * @param {string} data.label - The transaction label or description.
    * @param {string} data.category - The main category of the transaction.
    * @param {string} [data.subCategory] - A more specific sub-category (optional).
-   * @param {number|string} data.amount - The transaction amount (negative = debit, positive = credit).
+   * @param {number} data.amount - The transaction amount (negative = debit, positive = credit).
    * @param {string|null} [data.status] - Status of the transaction (null, "pointed", "validated").
    * @param {string} [data.destination] - Destination of the transfer, if applicable.
    * @param {string} [data.notes] - Free-text notes attached to the transaction.

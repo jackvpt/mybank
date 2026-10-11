@@ -1,10 +1,9 @@
-.customSelect {
+.container__customSelect {
   --sel-primary: #1976d2; /* à aligner sur ton thème */
   position: relative;
-  width: auto;
-  min-width: 150px;
+  min-width:120px;
 
-  &__field {
+  &--field {
     position: relative;
     display: flex;
     align-items: center;
@@ -13,7 +12,7 @@
     box-sizing: border-box;
   }
 
-  &__trigger {
+  &--trigger {
     flex: 1;
     min-width: 0;
     height: 100%;
@@ -31,12 +30,12 @@
     text-overflow: ellipsis;
   }
 
-  &__trigger:disabled {
+  &--trigger:disabled {
     cursor: default;
     color: rgba(0, 0, 0, 0.38);
   }
 
-  &__arrow {
+  &--arrow {
     position: absolute;
     right: 7px;
     top: 50%;
@@ -55,15 +54,15 @@
     }
   }
 
-  &__arrow.is-open {
+  &--arrow.is-open {
     transform: rotate(180deg);
   }
-  &__field.is-disabled &__arrow {
+  &--field.is-disabled &--arrow {
     color: rgba(0, 0, 0, 0.26);
   }
 
   /* label : dans le champ si vide, réduit sur la bordure sinon */
-  &__label {
+  &--label {
     position: absolute;
     top: 0;
     left: 0;
@@ -78,18 +77,18 @@
       transform 0.2s,
       color 0.2s;
   }
-  &__label.is-shrunk {
+  &--label.is-shrunk {
     transform: translate(14px, -9px) scale(0.75);
   }
-  &__field.is-focused &__label {
+  &--field.is-focused &--label {
     color: var(--sel-primary);
   }
-  &__field.is-disabled &__label {
+  &--field.is-disabled &--label {
     color: rgba(0, 0, 0, 0.38);
   }
 
   /* Border + corner */
-  &__outline {
+  &--outline {
     position: absolute;
     inset: -5px 0 0 0;
     margin: 0;
@@ -100,7 +99,7 @@
     min-width: 0;
   }
 
-  &__outline legend {
+  &--outline legend {
     float: unset;
     width: auto;
     max-width: 0.01px; /* pas d'encoche tant que le label est dans le champ */
@@ -112,26 +111,26 @@
     transition: max-width 0.2s;
   }
 
-  &__outline legend.is-shrunk {
+  &--outline legend.is-shrunk {
     max-width: 100%;
   }
-  &__outline legend span {
+  &--outline legend span {
     padding: 0 5px;
     display: inline-block;
   }
 
-  &__field:hover &__outline {
+  &--field:hover &--outline {
     border-color: rgba(0, 0, 0, 0.87);
   }
-  &__field.is-focused &__outline {
+  &--field.is-focused &--outline {
     border: 2px solid var(--sel-primary);
   }
-  &__field.is-disabled &__outline {
+  &--field.is-disabled &--outline {
     border-color: rgba(0, 0, 0, 0.12);
   }
 
   /* liste */
-  &__list {
+  &--list {
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
@@ -151,7 +150,7 @@
       0 3px 14px 2px rgba(0, 0, 0, 0.12);
   }
 
-  &__option {
+  &--option {
     padding: 6px 16px;
     min-height: 36px;
     display: flex;
@@ -161,13 +160,13 @@
     cursor: pointer;
   }
 
-  &__option.is-active {
+  &--option.is-active {
     background: rgba(0, 0, 0, 0.04);
   }
-  &__option.is-selected {
+  &--option.is-selected {
     background: color-mix(in srgb, var(--sel-primary), transparent 92%);
   }
-  &__option.is-selected.is-active {
+  &--option.is-selected.is-active {
     background: color-mix(in srgb, var(--sel-primary), transparent 84%);
   }
 }

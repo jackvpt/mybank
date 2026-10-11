@@ -5,7 +5,7 @@ import { useQuery, keepPreviousData } from "@tanstack/react-query"
 import { getAllBankAccounts } from "../api/bankAccounts.api"
 
 // 🧬 Models
-import TransactionModel from "../models/TransactionModel"
+import BankAccountModel from "../models/BankAccountModel"
 
 // ----------------------------
 // Get all bank accounts
@@ -18,7 +18,7 @@ export const useGetAllBankAccounts = ({ enabled = true } = {}) => {
       // Model conversion lives here: the API layer returns raw data,
       // this hook is responsible for turning it into domain objects.
       return bankAccounts.map(
-        (bankAccount) => new TransactionModel(bankAccount),
+        (bankAccount) => new BankAccountModel(bankAccount),
       )
     },
 
