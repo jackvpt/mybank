@@ -1,8 +1,8 @@
 @use "../../styles/utils/variables" as *;
 @use "../../styles/utils/mixins" as *;
 
-.container-transaction-edit {
-  form {
+.container__transactionEdit {
+  &--form {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -13,7 +13,7 @@
     gap: 10px;
   }
 
-  &-shortcuts {
+  &--shortcuts {
     display: flex;
     flex-direction: row;
     justify-content: space-between;

@@ -398,9 +398,9 @@ const TransactionEdit = () => {
   }
 
   return (
-    <section className="container-transaction-edit">
+    <section className="container__transactionEdit">
       {/* ⚡ SHORTCUTS */}
-      <div className="container-transaction-edit-shortcuts">
+      <div className="container__transactionEdit--shortcuts">
         {shortcuts.map((shortcut) => (
           <button
             className="shortcut-button"
@@ -413,7 +413,7 @@ const TransactionEdit = () => {
         ))}
       </div>
 
-      <form onSubmit={(e) => e.preventDefault()}>
+      <div className="container__transactionEdit--form">
         {/* 📅 DATE PICKER */}
         <CustomDatePicker
           label="Date"
@@ -573,7 +573,7 @@ const TransactionEdit = () => {
             dispatch(clearSelectedTransactionIds())
           }}
         />
-      </form>
+      </div>
 
       {/* ⚠️ Delete confirmation dialog */}
       <CustomDialog

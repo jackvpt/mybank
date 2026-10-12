@@ -279,8 +279,8 @@ const RecurringTransactionEdit = () => {
   }
 
   return (
-    <section className="container-transaction-edit">
-      <form onSubmit={(e) => e.preventDefault()}>
+    <section className="container__transactionEdit">
+      <div className="container__transactionEdit--form">
         {/* 📅 DATE PICKER */}
         <CustomDatePicker
           label="Date"
@@ -471,7 +471,7 @@ const RecurringTransactionEdit = () => {
             dispatch(clearSelectedRecurringTransactionIds())
           }}
         />
-      </form>
+      </div>
 
       {/* ⚠️ Delete confirmation dialog */}
       <CustomDialog

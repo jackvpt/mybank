@@ -1,8 +1,8 @@
 @use "../../styles/utils/variables" as *;
 @use "../../styles/utils/mixins" as *;
 
-.container-recurringTransaction-edit {
-  form {
+.container__recurringTransactionEdit {
+  &--form {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
