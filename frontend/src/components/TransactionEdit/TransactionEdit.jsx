@@ -37,6 +37,7 @@ import CustomDatePicker from "../SubComponents/CustomDatePicker/CustomDatePicker
 import CustomSelect from "../SubComponents/CustomSelect/CustomSelect"
 import CustomButton from "../SubComponents/CustomButton/CustomButton"
 import CustomDialog from "../SubComponents/CustomDialog/CustomDialog"
+import CustomButtonsSet from "../CustomButtonsSet/CustomButtonsSet"
 
 // 📦 Models
 import TransactionModel from "../../models/TransactionModel"
@@ -330,7 +331,7 @@ const TransactionEdit = () => {
   }
 
   // ➕ Create the transaction (a transfer creates a debit and a credit)
-  const handleAddTransaction = () => {
+  const handleCreateTransaction = () => {
     if (formHasErrors) return
 
     if (isTransfer) {
@@ -396,6 +397,37 @@ const TransactionEdit = () => {
     setConfirmOpen(false)
     setTransactionsToDelete([])
   }
+
+  const handleReset = () => {
+    setFormData(getInitialFormData())
+    dispatch(clearSelectedTransactionIds())
+  }
+
+  // Internal Data
+  const customButtons = [
+    {
+      action: "delete",
+      loading: isDeleting,
+      disabled: selectedTransactionIds.length === 0,
+      onClick: () => handleOpenConfirm(selectedTransactionIds),
+    },
+    {
+      action: "update",
+      loading: isUpdating,
+      disabled: formHasErrors || selectedTransactionIds.length !== 1,
+      onClick: handleUpdateTransaction,
+    },
+    {
+      action: "create",
+      loading: isCreating,
+      disabled: formHasErrors,
+      onClick: handleCreateTransaction,
+    },
+    {
+      action: "reset",
+      onClick: handleReset,
+    },
+  ]
 
   return (
     <section className="container__transactionEdit">
@@ -541,38 +573,8 @@ const TransactionEdit = () => {
           size={200}
         />
 
-        {/* 🗑️ DELETE BUTTON */}
-        <CustomButton
-          action="delete"
-          loading={isDeleting}
-          disabled={selectedTransactionIds.length === 0}
-          onClick={() => handleOpenConfirm(selectedTransactionIds)}
-        />
-
-        {/* ✏️ MODIFY BUTTON */}
-        <CustomButton
-          action="update"
-          loading={isUpdating}
-          disabled={formHasErrors || selectedTransactionIds.length !== 1}
-          onClick={handleUpdateTransaction}
-        />
-
-        {/* ➕ ADD BUTTON */}
-        <CustomButton
-          action="create"
-          loading={isCreating}
-          disabled={formHasErrors}
-          onClick={handleAddTransaction}
-        />
-
-        {/* 🔄 RESET BUTTON */}
-        <CustomButton
-          action="reset"
-          onClick={() => {
-            setFormData(getInitialFormData())
-            dispatch(clearSelectedTransactionIds())
-          }}
-        />
+        {/* Custom Buttons Set with Create, Update, Delete, and Reset */}
+        <CustomButtonsSet buttons={customButtons} />
       </div>
 
       {/* ⚠️ Delete confirmation dialog */}

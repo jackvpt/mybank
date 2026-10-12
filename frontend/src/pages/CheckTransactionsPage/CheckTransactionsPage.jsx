@@ -64,7 +64,7 @@ const CheckTransactions = () => {
       console.error("Erreur lors de la modification :", error)
     },
   })
-
+ // 🏪 Redux state
   const bankAccountName = useSelector(
     (state) => state.parameters.bankAccount.name,
   )

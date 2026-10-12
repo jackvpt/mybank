@@ -34,6 +34,7 @@ import CustomButton from "../SubComponents/CustomButton/CustomButton"
 import CustomDatePicker from "../SubComponents/CustomDatePicker/CustomDatePicker"
 import CustomSelect from "../SubComponents/CustomSelect/CustomSelect"
 import CustomDialog from "../SubComponents/CustomDialog/CustomDialog"
+import CustomButtonsSet from "../CustomButtonsSet/CustomButtonsSet"
 
 /**
  * Empty form values. Defined outside the component so the reference is
@@ -278,6 +279,37 @@ const RecurringTransactionEdit = () => {
     setRecurringTransactionsToDelete([])
   }
 
+  const handleReset = () => {
+    setFormData(getInitialFormData())
+    dispatch(clearSelectedRecurringTransactionIds())
+  }
+
+  // Internal Data
+  const customButtons = [
+    {
+      action: "delete",
+      loading: isDeleting,
+      disabled: selectedRecurringTransactionIds.length === 0,
+      onClick: () => handleOpenConfirm(selectedRecurringTransactionIds),
+    },
+    {
+      action: "update",
+      loading: isUpdating,
+      disabled: formHasErrors || selectedRecurringTransactionIds.length !== 1,
+      onClick: handleUpdateTransaction,
+    },
+    {
+      action: "create",
+      loading: isCreating,
+      disabled: formHasErrors,
+      onClick: handleCreateTransaction,
+    },
+    {
+      action: "reset",
+      onClick: handleReset,
+    },
+  ]
+
   return (
     <section className="container__transactionEdit">
       <div className="container__transactionEdit--form">
@@ -437,40 +469,8 @@ const RecurringTransactionEdit = () => {
           size={200}
         />
 
-        {/* 🗑️ DELETE BUTTON */}
-        <CustomButton
-          action="delete"
-          loading={isDeleting}
-          disabled={selectedRecurringTransactionIds.length === 0}
-          onClick={() => handleOpenConfirm(selectedRecurringTransactionIds)}
-        />
-
-        {/* ✏️ MODIFY BUTTON */}
-        <CustomButton
-          action="update"
-          loading={isUpdating}
-          disabled={
-            formHasErrors || selectedRecurringTransactionIds.length !== 1
-          }
-          onClick={handleUpdateTransaction}
-        />
-
-        {/* ➕ ADD BUTTON */}
-        <CustomButton
-          action="create"
-          loading={isCreating}
-          disabled={formHasErrors}
-          onClick={handleCreateTransaction}
-        />
-
-        {/* 🔄 RESET BUTTON */}
-        <CustomButton
-          action="reset"
-          onClick={() => {
-            setFormData(getInitialFormData())
-            dispatch(clearSelectedRecurringTransactionIds())
-          }}
-        />
+        {/* Custom Buttons Set with Create, Update, Delete, and Reset */}
+        <CustomButtonsSet buttons={customButtons} />
       </div>
 
       {/* ⚠️ Delete confirmation dialog */}
