@@ -114,7 +114,6 @@
 
     /* disabled */
     &.disabled input {
-      background-color: $primary-color-3;
       cursor: not-allowed;
     }
 
@@ -145,10 +144,6 @@
 
       &.error label {
         color: #d32f2f;
-      }
-
-      &.disabled label {
-        background-color: $primary-color-3;
       }
     }
   }

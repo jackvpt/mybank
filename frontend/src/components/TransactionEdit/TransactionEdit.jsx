@@ -32,10 +32,9 @@ import { useGetAllBankAccounts } from "../../hooks/useBankAccounts"
 // 📦 Data for the shortcut buttons
 import { shortcuts } from "../../data/transactionEditShortCuts"
 
-// Components
+// 🧩 Components
 import CustomDatePicker from "../SubComponents/CustomDatePicker/CustomDatePicker"
 import CustomSelect from "../SubComponents/CustomSelect/CustomSelect"
-import CustomButton from "../SubComponents/CustomButton/CustomButton"
 import CustomDialog from "../SubComponents/CustomDialog/CustomDialog"
 import CustomButtonsSet from "../CustomButtonsSet/CustomButtonsSet"
 
@@ -455,7 +454,6 @@ const TransactionEdit = () => {
         />
 
         {/* 🏷️ TYPE SELECT */}
-
         <CustomSelect
           label="Type"
           value={formData.type}

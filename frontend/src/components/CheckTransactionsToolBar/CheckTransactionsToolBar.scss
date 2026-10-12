@@ -1,2 +1,9 @@
 @use "../../styles/base/buttons" as *;
 
+.container__checkTransactions--toolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}

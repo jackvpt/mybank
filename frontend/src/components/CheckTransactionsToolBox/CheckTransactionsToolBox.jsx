@@ -1,20 +1,21 @@
-// CSS
+// 🎨 Styles
 import "./CheckTransactionsToolBox.scss"
 
-// React imports
+// ⚛️ React
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 // DEV imports
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
-import { fr } from "date-fns/locale"
 import {
   setCheckingCurrentAmount,
   setCheckingFinalAmount,
   setCheckingInitialAmount,
 } from "../../store/features/parametersSlice"
-import { entityToAmount } from "../../utils/formatNumber"
+
+// 🧮 Functions
+import { entityToAmount, formatAmount } from "../../utils/formatNumber"
+
+// 🧱 MUI components
 import {
   Alert,
   Button,
@@ -24,7 +25,11 @@ import {
 } from "@mui/material"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { validateTransactions } from "../../api/transactions.api"
-import { ChangeCircle } from "@mui/icons-material"
+
+// 🧩 Components
+import CustomDatePicker from "../SubComponents/CustomDatePicker/CustomDatePicker"
+import CustomTextField from "../SubComponents/CustomTextField/CustomTextField"
+import CustomButton from "../SubComponents/CustomButton/CustomButton"
 
 const CheckTransactionsToolBox = () => {
   const queryClient = useQueryClient()
@@ -34,9 +39,13 @@ const CheckTransactionsToolBox = () => {
   const [toastOpen, setToastOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState("")
 
+  // 🏪 Redux state
   const bankAccountName = useSelector((state) => state.parameters.bankAccount)
   const noneTransactionChecked = useSelector(
-    (state) => state.parameters.checking.noneTransactionChecked
+    (state) => state.parameters.checking.noneTransactionChecked,
+  )
+  const stateCheckDate = new Date(
+    useSelector((state) => state.parameters.checking.date),
   )
 
   const validateMutation = useMutation({
@@ -51,17 +60,16 @@ const CheckTransactionsToolBox = () => {
     },
   })
 
-  const [checkDate, setCheckDate] = useState(
-    useSelector((state) => state.parameters.checking.date)
-  )
+  const [checkDate, setCheckDate] = useState(stateCheckDate)
+
   const [checkInitialAmount, setCheckInitialAmount] = useState(
-    useSelector((state) => state.parameters.checking.initialAmount).toFixed(2)
+    useSelector((state) => state.parameters.checking.initialAmount).toFixed(2),
   )
   const [checkFinalAmount, setCheckFinalAmount] = useState(
-    useSelector((state) => state.parameters.checking.finalAmount).toFixed(2)
+    useSelector((state) => state.parameters.checking.finalAmount).toFixed(2),
   )
   const checkCurrentAmount = useSelector(
-    (state) => state.parameters.checking.currentAmount
+    (state) => state.parameters.checking.currentAmount,
   ).toFixed(2)
 
   const handleValidateCheck = (e) => {
@@ -76,107 +84,89 @@ const CheckTransactionsToolBox = () => {
   }
 
   return (
-    <div className="container-checkTransactions__table__summary">
+    <div className="container__checkTransactionsToolbox">
       {/* DATE PICKER */}
-      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
-        <DatePicker
-          label="Date du relevé"
-          value={checkDate}
-          onChange={(newValue) => {
-            setCheckDate(newValue)
-            dispatch(setCheckDate(newValue))
-          }}
-          format="dd/MM/yyyy"
-          sx={{ width: "auto", minWidth: 150, maxWidth: 180 }}
-          slotProps={{
-            textField: {
-              size: "small",
-            },
-          }}
-        />
+      <CustomDatePicker
+        label="Date du relevé"
+        value={checkDate}
+        onChange={(newValue) => {
+          setCheckDate(newValue)
+          dispatch(setCheckDate(newValue))
+        }}
+        format="dd/MM/yyyy"
+      />
 
-        {/* INITIAL AMOUNT */}
-        <TextField
-          type="text"
-          label="Solde initial"
-          value={checkInitialAmount}
-          onFocus={(e) => e.target.select()}
-          onChange={(e) => setCheckInitialAmount(e.target.value)}
-          onBlur={(e) => {
-            const formattedValue = entityToAmount(e.target.value)
-            setCheckInitialAmount(formattedValue.toFixed(2))
-            dispatch(setCheckingInitialAmount(formattedValue))
-          }}
-          placeholder="0.00"
-          size="small"
-          sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
-        />
+      {/* INITIAL AMOUNT */}
+      <CustomTextField
+        id="checkInitialAmount"
+        label="Solde initial"
+        value={
+          checkInitialAmount === 0
+            ? ""
+            : String(checkInitialAmount ?? "").replace("-", "")
+        }
+        onChange={(e) => setCheckInitialAmount(e.target.value)}
+        onBlur={(e) => setCheckInitialAmount(formatAmount(e.target.value))}
+        clearField={true}
+        copy={false}
+        floating={true}
+        size={150}
+      />
 
-        {/* FINAL AMOUNT */}
-        <TextField
-          type="text"
-          label="Solde final"
-          value={checkFinalAmount}
-          onChange={(e) => setCheckFinalAmount(e.target.value)}
-          onBlur={(e) => {
-            const formattedValue = entityToAmount(e.target.value)
-            setCheckFinalAmount(formattedValue.toFixed(2))
-            dispatch(setCheckingFinalAmount(formattedValue))
-          }}
-          placeholder="0.00"
-          size="small"
-          sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
-        />
+      {/* FINAL AMOUNT */}
+      <CustomTextField
+        id="checkFinalAmount"
+        label="Solde final"
+        value={
+          checkFinalAmount === 0
+            ? ""
+            : String(checkFinalAmount ?? "").replace("-", "")
+        }
+        onChange={(e) => setCheckFinalAmount(e.target.value)}
+        onBlur={(e) => setCheckFinalAmount(formatAmount(e.target.value))}
+        clearField={true}
+        copy={false}
+        floating={true}
+        size={150}
+      />
 
-        {/* CURRENT AMOUNT */}
-        <TextField
-          type="text"
-          label="Solde actuel"
-          disabled
-          value={checkCurrentAmount}
-          placeholder="0.00"
-          size="small"
-          sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
-        />
+      {/* CURRENT AMOUNT */}
+      <CustomTextField
+        id="checkCurrentAmount"
+        label="Solde actuel"
+        value={
+          checkCurrentAmount === 0
+            ? ""
+            : String(checkCurrentAmount ?? "").replace("-", "")
+        }
+        clearField={false}
+        copy={false}
+        floating={true}
+        disabled={true}
+        size={150}
+      />
 
-        {/* DIFFERENCE AMOUNT */}
-        <TextField
-          type="text"
-          label="Différence"
-          disabled
-          value={(checkCurrentAmount - checkFinalAmount).toFixed(2)}
-          placeholder="0.00"
-          size="small"
-          sx={{ width: "auto", maxWidth: 120, minWidth: 120 }}
-        />
+      {/* DIFFERENCE AMOUNT */}
+      <CustomTextField
+        id="checkDifference"
+        label="Différence"
+        value={(checkCurrentAmount - checkFinalAmount).toFixed(2)}
+        clearField={false}
+        copy={false}
+        floating={true}
+        disabled={true}
+        size={150}
+      />
 
-        {/* VALIDATION BUTTON */}
-        <Button
-          variant="contained"
-          disabled={checkCurrentAmount !== checkFinalAmount || noneTransactionChecked}
-          onClick={handleValidateCheck}
-          sx={{
-            minWidth: 140,
-            backgroundColor: "#1976d2",
-            color: "#fff",
-            "&:hover": {
-              backgroundColor: "#1565c0",
-            },
-            textTransform: "none",
-            fontWeight: 600,
-            px: 3,
-            py: 1,
-            borderRadius: 1,
-            boxShadow: 3,
-          }}
-        >
-          {validateMutation.isPending ? (
-            <CircularProgress size={24} color="inherit" />
-          ) : (
-            "Valider le relevé"
-          )}
-        </Button>
-      </LocalizationProvider>
+      {/* VALIDATION BUTTON */}
+      <CustomButton
+        action="none"
+        onClick={handleValidateCheck}
+        disabled={
+          checkCurrentAmount !== checkFinalAmount || noneTransactionChecked
+        }
+        children="Valider"
+      />
 
       {/* Toast notification for success messages */}
       <Snackbar

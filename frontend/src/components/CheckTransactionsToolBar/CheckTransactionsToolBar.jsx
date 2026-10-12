@@ -10,7 +10,7 @@ const CheckTransactionsToolBar = () => {
     (state) => state.parameters.isCheckTransactionsEditWindowVisible
   )
   return (
-    <section className="container-toolbar">
+    <section className="container__checkTransactions--toolbar">
       <ToggleButton
         value="edit"
         selected={isCheckTransactionsEditWindowVisible}

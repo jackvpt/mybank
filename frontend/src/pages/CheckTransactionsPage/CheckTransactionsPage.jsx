@@ -167,16 +167,16 @@ const CheckTransactionsPage = () => {
   updateCheckCurrentAmount()
 
   return (
-    <section className="container-checkTransactions">
-      <div className="container-checkTransactions__tools">
+    <section className="container__checkTransactions">
+      <div className="container__checkTransactions--tools">
         <h1>{bankAccountName}</h1>
         <div className="toggle-tools">
           <CheckTransactionsToolBar />
         </div>
       </div>
-      <div className="container-checkTransactions__table">
+      <div className="container__checkTransactions--table">
         <CheckTransactionsToolBox />
-        <div className="container-checkTransactions__table__transactions">
+        <div className="container__checkTransactions--table--transactions">
           {isCheckTransactionsEditWindowVisible && <CheckTransactionEdit />}
 
           <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>

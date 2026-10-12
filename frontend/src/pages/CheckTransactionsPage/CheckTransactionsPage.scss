@@ -17,14 +17,14 @@
   min-height: 0;
 }
 
-.container-checkTransactions {
+.container__checkTransactions {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
   height: 100%;
 
-  &__tools {
+  &--tools {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -87,7 +87,7 @@
     border: 1px solid $primary-color-2;
   }
 
-  &__table {
+  &--table {
     display: flex;
     flex-direction: row;
     gap: 10px;
@@ -95,14 +95,14 @@
     min-height: 0;
     height: 100%;
 
-    &__summary {
+    &--summary {
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
       gap: 10px;
     }
 
-    &__transactions {
+    &--transactions {
       display: flex;
       flex-direction: column;
       flex: 1;

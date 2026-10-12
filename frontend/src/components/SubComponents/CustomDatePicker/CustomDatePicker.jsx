@@ -114,7 +114,11 @@ const CustomDatePicker = ({
   })
 
   return (
-    <div ref={rootRef} className={`container__datepicker ${className}`.trim()} style={style}>
+    <div
+      ref={rootRef}
+      className={`container__datepicker ${className}`.trim()}
+      style={style}
+    >
       <div
         className={`container__datepicker--field ${focused || open ? "is-focused" : ""} ${disabled ? "is-disabled" : ""}`}
       >
@@ -147,7 +151,11 @@ const CustomDatePicker = ({
       </div>
 
       {open && (
-        <div className="container__datepicker--popover" role="dialog" aria-label="Calendrier">
+        <div
+          className="container__datepicker--popover"
+          role="dialog"
+          aria-label="Calendrier"
+        >
           <div className="container__datepicker--header">
             <button
               type="button"
