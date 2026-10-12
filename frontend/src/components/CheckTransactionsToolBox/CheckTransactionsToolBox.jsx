@@ -6,41 +6,21 @@ import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 // DEV imports
-import {
-  setCheckingCurrentAmount,
-  setCheckingFinalAmount,
-  setCheckingInitialAmount,
-} from "../../store/features/parametersSlice"
+import { setCheckingCurrentAmount } from "../../store/features/parametersSlice"
 
 // 🧮 Functions
-import { entityToAmount, formatAmount } from "../../utils/formatNumber"
-
-// 🧱 MUI components
-import {
-  Alert,
-  Button,
-  CircularProgress,
-  Snackbar,
-  TextField,
-} from "@mui/material"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { validateTransactions } from "../../api/transactions.api"
+import { formatAmount } from "../../utils/formatNumber"
 
 // 🧩 Components
 import CustomDatePicker from "../SubComponents/CustomDatePicker/CustomDatePicker"
 import CustomTextField from "../SubComponents/CustomTextField/CustomTextField"
 import CustomButton from "../SubComponents/CustomButton/CustomButton"
+import { useValidateTransactions } from "../../hooks/useTransactions"
 
 const CheckTransactionsToolBox = () => {
-  const queryClient = useQueryClient()
-
   const dispatch = useDispatch()
 
-  const [toastOpen, setToastOpen] = useState(false)
-  const [toastMessage, setToastMessage] = useState("")
-
   // 🏪 Redux state
-  const bankAccountName = useSelector((state) => state.parameters.bankAccount)
   const noneTransactionChecked = useSelector(
     (state) => state.parameters.checking.noneTransactionChecked,
   )
@@ -48,17 +28,7 @@ const CheckTransactionsToolBox = () => {
     useSelector((state) => state.parameters.checking.date),
   )
 
-  const validateMutation = useMutation({
-    mutationFn: validateTransactions,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries(["transactions", bankAccountName])
-      setToastMessage(`${data.modifiedCount} transaction(s) validée(s)`)
-      setToastOpen(true)
-    },
-    onError: (error) => {
-      console.error("Erreur lors de la suppression :", error.message)
-    },
-  })
+  const validateMutation = useValidateTransactions()
 
   const [checkDate, setCheckDate] = useState(stateCheckDate)
 
@@ -72,15 +42,10 @@ const CheckTransactionsToolBox = () => {
     (state) => state.parameters.checking.currentAmount,
   ).toFixed(2)
 
-  const handleValidateCheck = (e) => {
-    e.preventDefault()
-    validateMutation.mutate()
-    setCheckingCurrentAmount(0)
-  }
-
-  const handleToastClose = (event, reason) => {
-    if (reason === "clickaway") return
-    setToastOpen(false)
+  const handleValidateCheck = () => {
+    validateMutation.mutate(undefined, {
+      onSuccess: () => setCheckingCurrentAmount(0),
+    })
   }
 
   return (
@@ -100,11 +65,7 @@ const CheckTransactionsToolBox = () => {
       <CustomTextField
         id="checkInitialAmount"
         label="Solde initial"
-        value={
-          checkInitialAmount === 0
-            ? ""
-            : String(checkInitialAmount ?? "").replace("-", "")
-        }
+        value={checkInitialAmount}
         onChange={(e) => setCheckInitialAmount(e.target.value)}
         onBlur={(e) => setCheckInitialAmount(formatAmount(e.target.value))}
         clearField={true}
@@ -117,11 +78,7 @@ const CheckTransactionsToolBox = () => {
       <CustomTextField
         id="checkFinalAmount"
         label="Solde final"
-        value={
-          checkFinalAmount === 0
-            ? ""
-            : String(checkFinalAmount ?? "").replace("-", "")
-        }
+        value={checkFinalAmount}
         onChange={(e) => setCheckFinalAmount(e.target.value)}
         onBlur={(e) => setCheckFinalAmount(formatAmount(e.target.value))}
         clearField={true}
@@ -134,11 +91,7 @@ const CheckTransactionsToolBox = () => {
       <CustomTextField
         id="checkCurrentAmount"
         label="Solde actuel"
-        value={
-          checkCurrentAmount === 0
-            ? ""
-            : String(checkCurrentAmount ?? "").replace("-", "")
-        }
+        value={checkCurrentAmount}
         clearField={false}
         copy={false}
         floating={true}
@@ -167,22 +120,6 @@ const CheckTransactionsToolBox = () => {
         }
         children="Valider"
       />
-
-      {/* Toast notification for success messages */}
-      <Snackbar
-        open={toastOpen}
-        autoHideDuration={3000}
-        onClose={handleToastClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleToastClose}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
-          {toastMessage}
-        </Alert>
-      </Snackbar>
     </div>
   )
 }
