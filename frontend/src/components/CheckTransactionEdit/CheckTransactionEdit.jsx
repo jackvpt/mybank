@@ -163,7 +163,7 @@ const CheckTransactionEdit = () => {
     enabled: !!bankAccountName,
   })
 
-  const transactionTypes = settings ? settings[0].types : []
+ const transactionTypes = settings?.types ?? []
 
   const initialFormData = {
     date: new Date(),
@@ -279,25 +279,6 @@ const CheckTransactionEdit = () => {
       (formData.type !== "transfer" && formData.label === "")
     )
   }
-
-  if (
-    isLoadingSettings ||
-    isLoadingBankAccounts ||
-    isLoadingCategories ||
-    isLoadingTransactions
-  )
-    return <p>Loading data...</p>
-  if (
-    settingsError ||
-    bankAccountsError ||
-    categoriesError ||
-    transactionsError
-  )
-    return (
-      <p>
-        Error loading data: {settingsError.message || bankAccountsError.message}
-      </p>
-    )
 
   return (
     <section className="container-transaction-edit">

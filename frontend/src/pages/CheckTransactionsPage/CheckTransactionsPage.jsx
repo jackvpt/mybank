@@ -1,11 +1,13 @@
+// 🎨 Styles
 import "./CheckTransactionsPage.scss"
-import { useState, useMemo } from "react"
-import { useDispatch, useSelector } from "react-redux"
-import { useMutation,  useQueryClient } from "@tanstack/react-query"
-// DEV imports
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 
+// ⚛️ React
+import { useState, useMemo } from "react"
+
+// 🏪 Redux
+import { useDispatch, useSelector } from "react-redux"
+
+// 🧱 MUI components
 import {
   Box,
   createTheme,
@@ -17,23 +19,28 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
-  TextField,
   Typography,
   useMediaQuery,
 } from "@mui/material"
 
-import { updateTransaction } from "../../api/transactions.api"
-import CheckTransactionsToolBar from "../../components/CheckTransactionsToolBar/CheckTransactionsToolBar"
-import CheckTransactionEdit from "../../components/CheckTransactionEdit/CheckTransactionEdit"
+// 🏗️ Redux slices
 import {
   setCheckingCurrentAmount,
   setNoneTransactionChecked,
   setSelectedCheckTransactionIds,
 } from "../../store/features/parametersSlice"
-import CheckTransactionsToolBox from "../../components/CheckTransactionsToolBox/CheckTransactionsToolBox"
 
-import { useGetAllTransactions } from "../../hooks/useTransactions"
+// 🧩 Components
+import CheckTransactionsToolBar from "../../components/CheckTransactionsToolBar/CheckTransactionsToolBar"
+import CheckTransactionEdit from "../../components/CheckTransactionEdit/CheckTransactionEdit"
+import CheckTransactionsToolBox from "../../components/CheckTransactionsToolBox/CheckTransactionsToolBox"
 import Loader from "../../components/Loader/Loader"
+
+// 🪝 Hooks
+import {
+  useGetAllTransactions,
+  useUpdateTransaction,
+} from "../../hooks/useTransactions"
 
 const theme = createTheme({
   breakpoints: { values: { tablet: 768 } },
@@ -47,35 +54,33 @@ const visibleColumnsConfig = (isMobile) => [
   { id: "status", label: "État", show: !isMobile },
 ]
 
-const CheckTransactions = () => {
-  const queryClient = useQueryClient()
+const CheckTransactionsPage = () => {
   const dispatch = useDispatch()
 
+  // 🏪 Redux state
   const checkInitialAmount = useSelector(
     (state) => state.parameters.checking.initialAmount,
   )
-
-  const updateMutation = useMutation({
-    mutationFn: updateTransaction,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["transactions", bankAccountName])
-    },
-    onError: (error) => {
-      console.error("Erreur lors de la modification :", error)
-    },
-  })
- // 🏪 Redux state
   const bankAccountName = useSelector(
     (state) => state.parameters.bankAccount.name,
   )
   const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
-
   const selectedCheckTransactionIds = useSelector(
     (state) => state.parameters.selectedCheckTransactionIds,
   )
+  const isCheckTransactionsEditWindowVisible = useSelector(
+    (state) => state.parameters.isCheckTransactionsEditWindowVisible,
+  )
+
+  // 🔄 Mutations (toasts and "transactions" query invalidation are handled
+  // inside useTransactions via useMutationWithNotification)
+  const { mutate: updateTransaction } = useUpdateTransaction()
+
+  // 📱 Responsive layout
   const isMobile = useMediaQuery(theme.breakpoints.down("tablet"))
   const visibleColumns = visibleColumnsConfig(isMobile)
 
+  // Local state
   const [order, setOrder] = useState("asc")
   const [orderBy, setOrderBy] = useState("date")
 
@@ -95,10 +100,6 @@ const CheckTransactions = () => {
 
   const unvalidatedTransactions = transactions.filter(
     (tx) => tx.status !== "validated",
-  )
-
-  const isCheckTransactionsEditWindowVisible = useSelector(
-    (state) => state.parameters.isCheckTransactionsEditWindowVisible,
   )
 
   // Sort transactions
@@ -129,7 +130,7 @@ const CheckTransactions = () => {
     const newStatus = transaction.status === "pointed" ? "" : "pointed"
     transaction.status = newStatus
 
-    updateMutation.mutate({
+    updateTransaction({
       id: transaction.id,
       updatedData: transaction,
     })
@@ -139,15 +140,15 @@ const CheckTransactions = () => {
 
   const updateCheckCurrentAmount = () => {
     const pointedTransactions = unvalidatedTransactions.filter(
-      (tx) => tx.status === "pointed",
+      (transaction) => transaction.status === "pointed",
     )
 
     const totalDebit = pointedTransactions.reduce(
-      (sum, tx) => sum + (tx.debit || 0),
+      (sum, transaction) => sum + (transaction.debit || 0),
       0,
     )
     const totalCredit = pointedTransactions.reduce(
-      (sum, tx) => sum + (tx.credit || 0),
+      (sum, transaction) => sum + (transaction.credit || 0),
       0,
     )
     const currentAmount =
@@ -293,4 +294,4 @@ const CheckTransactions = () => {
   )
 }
 
-export default CheckTransactions
+export default CheckTransactionsPage
