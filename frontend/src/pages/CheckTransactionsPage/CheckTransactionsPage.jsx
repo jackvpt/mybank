@@ -133,6 +133,7 @@ const CheckTransactionsPage = () => {
     updateTransaction({
       id: transaction.id,
       updatedData: transaction,
+      silent:true
     })
 
     updateCheckCurrentAmount()

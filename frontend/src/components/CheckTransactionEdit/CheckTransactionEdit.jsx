@@ -120,8 +120,6 @@ const CheckTransactionEdit = () => {
   // Fetch settings using React Query
   const {
     data: settings,
-    isLoading: isLoadingSettings,
-    error: settingsError,
   } = useQuery({
     queryKey: ["settings"],
     queryFn: () => getAllSettings(),
@@ -130,8 +128,6 @@ const CheckTransactionEdit = () => {
   // Fetch categories
   const {
     data: transactionsCategories = [],
-    isLoading: isLoadingCategories,
-    error: categoriesError,
   } = useGetAllCategories()
   const groupedTransactionsCategories = transactionsCategories.reduce(
     (acc, category) => {
@@ -145,8 +141,6 @@ const CheckTransactionEdit = () => {
   // Fetch bank accounts using React Query
   const {
     data: bankAccounts,
-    isLoading: isLoadingBankAccounts,
-    error: bankAccountsError,
   } = useQuery({
     queryKey: ["bankAccounts"],
     queryFn: getAllBankAccounts,
@@ -155,8 +149,6 @@ const CheckTransactionEdit = () => {
   // Fetch transactions using React Query
   const {
     data: transactions = [],
-    isLoading: isLoadingTransactions,
-    error: transactionsError,
   } = useQuery({
     queryKey: ["transactions", bankAccountName],
     queryFn: () => getTransactionsByAccountName(bankAccountName),

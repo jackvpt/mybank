@@ -1,10 +1,5 @@
 // 🔄 React Query
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  keepPreviousData,
-} from "@tanstack/react-query"
+import { useQuery, keepPreviousData } from "@tanstack/react-query"
 
 // 🔌 API calls
 import {
@@ -19,12 +14,12 @@ import {
 // 🧬 Models
 import TransactionModel from "../models/TransactionModel"
 
-// 🔔 Notifications
-import { useNotification } from "./NotificationProvider/useNotification"
+// 🔔 Shared mutation wrapper (notifications + cache invalidation)
+import { useMutationWithNotification } from "./NotificationProvider/useMutationWithNotification"
 
 // ⏱️ Query cache config
-const STALE_TIME = 10 * 60 * 1000 // Time before data is considered stale (no more fresh)
-const REFETCH_INTERVAL = 10 * 60 * 1000 // Time between automatic refetches (if the query is active in the viewport)
+const STALE_TIME = 10 * 60 * 1000 // Time before data is considered stale (no longer fresh)
+const REFETCH_INTERVAL = 10 * 60 * 1000 // Time between automatic refetches (while the query is active)
 
 const DEFAULT_QUERY_OPTIONS = {
   staleTime: STALE_TIME,
@@ -37,64 +32,25 @@ const DEFAULT_QUERY_OPTIONS = {
 }
 
 /**
- * Invalidates the "transactions" query, forcing a
- * refetch on next access. Centralized here so every mutation stays
- * consistent.
+ * Shared query function for every "transactions" query.
+ * The API layer returns raw data; model conversion lives here so that
+ * all consumers receive domain objects (TransactionModel instances).
  */
-const invalidateData = (client) => {
-  client.invalidateQueries({ queryKey: ["transactions"] })
+const fetchTransactions = async () => {
+  const transactions = await getAllTransactions()
+  return transactions.map((transaction) => new TransactionModel(transaction))
 }
 
 /**
- * useMutationWithNotification
- * ------------------------------------------------------------------
- * Wraps `useMutation` with three cross-cutting concerns so individual
- * hooks below don't have to repeat them:
+ * Domain-specific wrapper around the shared mutation hook.
+ * Every transaction mutation invalidates the ["transactions"] query on
+ * settle (prefix matching also covers any sub-keys).
  *
- * 1. Success notification (static string or a function of `data`).
- * 2. Error notification (falls back to a generic message).
- * 3. Automatic cache invalidation of data on
- *    settle, unless the caller explicitly opts out with `invalidate: false`.
- *
- * Any `onSuccess` / `onError` / `onSettled` passed in `config` still
- * runs — this wrapper calls them *after* its own logic.
+ * Notifications can be skipped per call by passing `silent: true` in the
+ * mutation variables, e.g. `updateTransaction({ id, updatedData, silent: true })`.
  */
-const useMutationWithNotification = (config) => {
-  const queryClient = useQueryClient()
-  const { notifySuccess, notifyError } = useNotification()
-
-  return useMutation({
-    ...config,
-
-    onSuccess: (data, variables, context) => {
-      if (config.successMessage) {
-        notifySuccess(
-          typeof config.successMessage === "function"
-            ? config.successMessage(data)
-            : config.successMessage,
-        )
-      }
-
-      config.onSuccess?.(data, variables, context)
-    },
-
-    onError: (error, variables, context) => {
-      const message =
-        error?.message || config.errorMessage || "Une erreur est survenue"
-
-      notifyError(message)
-      config.onError?.(error, variables, context)
-    },
-
-    onSettled: (data, error, variables, context) => {
-      if (config.invalidate !== false) {
-        invalidateData(queryClient)
-      }
-
-      config.onSettled?.(data, error, variables, context)
-    },
-  })
-}
+const useTransactionMutation = (config) =>
+  useMutationWithNotification({ invalidateKeys: [["transactions"]], ...config })
 
 // ----------------------------
 // Get all transactions
@@ -102,15 +58,7 @@ const useMutationWithNotification = (config) => {
 export const useGetAllTransactions = ({ enabled = true } = {}) => {
   return useQuery({
     queryKey: ["transactions"],
-    queryFn: async () => {
-      const transactions = await getAllTransactions()
-      // Model conversion lives here: the API layer returns raw data,
-      // this hook is responsible for turning it into domain objects.
-      return transactions.map(
-        (transaction) => new TransactionModel(transaction),
-      )
-    },
-
+    queryFn: fetchTransactions,
     enabled,
 
     ...DEFAULT_QUERY_OPTIONS,
@@ -120,18 +68,19 @@ export const useGetAllTransactions = ({ enabled = true } = {}) => {
 // ----------------------------
 // Get transactions by account name
 // ----------------------------
+// Shares the same cache entry as `useGetAllTransactions`: only one network
+// request is made, and `select` filters the cached data client-side.
 export const useGetTransactionsByAccountName = (
   accountName,
   { enabled = true } = {},
 ) => {
   return useQuery({
-    queryKey: ["transactions", "byAccountName", accountName],
-    queryFn: async () => {
-      const allTransactions = await getAllTransactions()
-      return allTransactions
-        .filter((transaction) => transaction.accountName === accountName)
-        .map((transaction) => new TransactionModel(transaction))
-    },
+    queryKey: ["transactions"],
+    queryFn: fetchTransactions,
+    select: (transactions) =>
+      transactions.filter(
+        (transaction) => transaction.accountName === accountName,
+      ),
 
     // Avoids firing with an empty/undefined accountName.
     enabled: enabled && !!accountName,
@@ -143,19 +92,18 @@ export const useGetTransactionsByAccountName = (
 // ----------------------------
 // Get transactions by account ID
 // ----------------------------
+// Same approach as above: shared cache entry + client-side filtering.
 export const useGetTransactionsByAccountId = (
   accountId,
   { enabled = true } = {},
 ) => {
   return useQuery({
-    queryKey: ["transactions", "byAccountId", accountId],
-    queryFn: async () => {
-      const allTransactions = await getAllTransactions()
-      return allTransactions
-        .filter((transaction) => transaction.accountId === accountId)
-        .map((transaction) => new TransactionModel(transaction))
-    },
+    queryKey: ["transactions"],
+    queryFn: fetchTransactions,
+    select: (transactions) =>
+      transactions.filter((transaction) => transaction.accountId === accountId),
 
+    // Avoids firing with an empty/undefined accountId.
     enabled: enabled && !!accountId,
 
     ...DEFAULT_QUERY_OPTIONS,
@@ -166,7 +114,7 @@ export const useGetTransactionsByAccountId = (
 // Create a new transaction
 // ----------------------------
 export const useCreateTransaction = () =>
-  useMutationWithNotification({
+  useTransactionMutation({
     mutationFn: async (transactionData) => {
       const created = await createTransaction(transactionData)
       return new TransactionModel(created)
@@ -179,7 +127,8 @@ export const useCreateTransaction = () =>
 // Update an existing transaction
 // ----------------------------
 export const useUpdateTransaction = () =>
-  useMutationWithNotification({
+  useTransactionMutation({
+    // Destructuring keeps extra variables (like `silent`) out of the API call.
     mutationFn: async ({ id, updatedData }) => {
       const updated = await updateTransaction({ id, updatedData })
       return new TransactionModel(updated)
@@ -192,7 +141,7 @@ export const useUpdateTransaction = () =>
 // Delete a single transaction
 // ----------------------------
 export const useDeleteTransaction = () =>
-  useMutationWithNotification({
+  useTransactionMutation({
     mutationFn: deleteTransaction,
     successMessage: "Transaction supprimée",
     errorMessage: "Erreur lors de la suppression",
@@ -202,7 +151,7 @@ export const useDeleteTransaction = () =>
 // Bulk delete transactions
 // ----------------------------
 export const useDeleteTransactions = () =>
-  useMutationWithNotification({
+  useTransactionMutation({
     mutationFn: deleteTransactions,
     successMessage: "Transactions supprimées",
     errorMessage: "Erreur lors de la suppression",
@@ -212,7 +161,7 @@ export const useDeleteTransactions = () =>
 // Validate transactions
 // ----------------------------
 export const useValidateTransactions = () =>
-  useMutationWithNotification({
+  useTransactionMutation({
     mutationFn: validateTransactions,
     successMessage: "Transactions validées",
     errorMessage: "Erreur lors de la validation",
