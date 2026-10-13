@@ -1,8 +1,10 @@
-// CSS
+// 🎨 Styles
 import "./CheckTransactionEdit.scss"
 
-// React imports
+// ⚛️ React
 import { useEffect, useState } from "react"
+
+// 🏪 Redux
 import { useSelector } from "react-redux"
 
 // DEV imports

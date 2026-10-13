@@ -27,12 +27,12 @@ import {
 import {
   setCheckingCurrentAmount,
   setNoneTransactionChecked,
-  setSelectedCheckTransactionIds,
+  setSelectedTransactionIds,
 } from "../../store/features/parametersSlice"
 
 // 🧩 Components
 import CheckTransactionsToolBar from "../../components/CheckTransactionsToolBar/CheckTransactionsToolBar"
-import CheckTransactionEdit from "../../components/CheckTransactionEdit/CheckTransactionEdit"
+import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
 import CheckTransactionsToolBox from "../../components/CheckTransactionsToolBox/CheckTransactionsToolBox"
 import Loader from "../../components/Loader/Loader"
 
@@ -65,8 +65,8 @@ const CheckTransactionsPage = () => {
     (state) => state.parameters.bankAccount.name,
   )
   const bankAccountId = useSelector((state) => state.parameters.bankAccount.id)
-  const selectedCheckTransactionIds = useSelector(
-    (state) => state.parameters.selectedCheckTransactionIds,
+  const selectedTransactionIds = useSelector(
+    (state) => state.parameters.selectedTransactionIds,
   )
   const isCheckTransactionsEditWindowVisible = useSelector(
     (state) => state.parameters.isCheckTransactionsEditWindowVisible,
@@ -122,8 +122,8 @@ const CheckTransactionsPage = () => {
     setOrderBy(property)
   }
 
-  const handleRowClick = (tx) => {
-    dispatch(setSelectedCheckTransactionIds([tx.id]))
+  const handleRowClick = (transaction) => {
+    dispatch(setSelectedTransactionIds([transaction.id]))
   }
 
   const handleCheckTransaction = (transaction) => {
@@ -177,7 +177,7 @@ const CheckTransactionsPage = () => {
       <div className="container__checkTransactions--table">
         <CheckTransactionsToolBox />
         <div className="container__checkTransactions--table--transactions">
-          {isCheckTransactionsEditWindowVisible && <CheckTransactionEdit />}
+          {isCheckTransactionsEditWindowVisible && <TransactionEdit />}
 
           <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
             <TableContainer
@@ -221,26 +221,26 @@ const CheckTransactionsPage = () => {
                 </TableHead>
 
                 <TableBody>
-                  {sortedTransactions.map((tx) => {
+                  {sortedTransactions.map((transaction) => {
                     return (
                       <TableRow
-                        onClick={() => handleRowClick(tx)}
-                        key={tx.id}
+                        onClick={() => handleRowClick(transaction)}
+                        key={transaction.id}
                         className={
-                          selectedCheckTransactionIds[0] === tx.id
+                          selectedTransactionIds[0] === transaction.id
                             ? "transaction-row rowSelected"
                             : "transaction-row"
                         }
                       >
                         <TableCell align="center">
-                          {new Date(tx.date).toLocaleDateString()}
+                          {new Date(transaction.date).toLocaleDateString()}
                         </TableCell>
-                        <TableCell>{tx.label}</TableCell>
+                        <TableCell>{transaction.label}</TableCell>
                         <TableCell align="right">
-                          {tx.debit ? tx.debit.toFixed(2) : ""}
+                          {transaction.debit ? transaction.debit.toFixed(2) : ""}
                         </TableCell>
                         <TableCell align="right">
-                          {tx.credit ? tx.credit.toFixed(2) : ""}
+                          {transaction.credit ? transaction.credit.toFixed(2) : ""}
                         </TableCell>
 
                         {visibleColumns.find(
@@ -249,7 +249,7 @@ const CheckTransactionsPage = () => {
                           <TableCell align="center">
                             <Box
                               className={
-                                tx.status === "pointed"
+                                transaction.status === "pointed"
                                   ? "check-transaction-pointed"
                                   : "check-transaction-notpointed"
                               }
@@ -258,9 +258,9 @@ const CheckTransactionsPage = () => {
                                 height: 14,
                                 borderRadius: "50%",
                                 backgroundColor:
-                                  tx.status === "validated"
+                                  transaction.status === "validated"
                                     ? "green"
-                                    : tx.status === "pointed"
+                                    : transaction.status === "pointed"
                                       ? "blue"
                                       : "white",
                                 border: "1px solid #ccc",
@@ -268,7 +268,7 @@ const CheckTransactionsPage = () => {
                               }}
                               onClick={(e) => {
                                 e.stopPropagation()
-                                handleCheckTransaction(tx)
+                                handleCheckTransaction(transaction)
                               }}
                             />
                           </TableCell>
