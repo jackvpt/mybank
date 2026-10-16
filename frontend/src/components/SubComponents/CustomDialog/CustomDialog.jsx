@@ -5,7 +5,7 @@ import "./CustomDialog.scss"
 import { useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
 
-export default function CustomDialog({
+const CustomDialog = ({
   open,
   onClose,
   onConfirm,
@@ -14,7 +14,7 @@ export default function CustomDialog({
   cancelLabel = "Annuler",
   confirmLabel = "Confirmer",
   danger = false,
-}) {
+}) => {
   const cancelRef = useRef(null)
 
   useEffect(() => {
@@ -65,3 +65,5 @@ export default function CustomDialog({
     document.body,
   )
 }
+
+export default CustomDialog

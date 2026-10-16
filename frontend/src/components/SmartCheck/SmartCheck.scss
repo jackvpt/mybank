@@ -1,0 +1,69 @@
+.container__smartCheck {
+  &--backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  &--dialog {
+    display: flex;
+    flex-direction: column;
+    width: 90vw;
+    height: 90vh;
+    height: 90dvh;
+    overflow: hidden; // le border-radius coupe aussi le header et le contenu
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  &--header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e5e5;
+
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+  }
+
+  &--close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background: #f0f0f0;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #1976d2;
+      outline-offset: 2px;
+    }
+  }
+
+  &--content {
+    flex: 1;
+    min-height: 0; // sans ça, overflow: auto ne fonctionne pas toujours dans un parent flex
+    overflow: auto;
+    padding: 1.5rem;
+  }
+}

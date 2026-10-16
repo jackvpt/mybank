@@ -1,0 +1,31 @@
+@use "../../../styles/utils/variables" as *;
+@use "../../../styles/utils/mixins" as *;
+
+.container__customToggleButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: $primary-color-3;
+  color: $text-color-1;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+
+  &:hover {
+    background-color: $primary-color-2;
+    color: $text-color-2;
+  }
+
+  &.active {
+    background-color: $primary-color-2;
+    color: $text-color-2;
+    border:1px solid $text-color-1;
+  }
+
+  &--text{
+      font-size: 0.8rem;
+  }
+}

@@ -1,33 +1,53 @@
+// 🎨 Styles
 import "./CheckTransactionsToolBar.scss"
+
+// ⚛️ React
+import { useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
-import { ToggleButton } from "@mui/material"
-import EditIcon from "@mui/icons-material/Edit"
+
+// 🏪 Redux
 import { setIsCheckTransactionsEditWindowVisible } from "../../store/features/parametersSlice"
+
+// 🧩 Components
+import CustomToggleButton from "../SubComponents/CustomToggleButton/CustomToggleButton"
+import SmartCheck from "../SmartCheck/SmartCheck"
 
 const CheckTransactionsToolBar = () => {
   const dispatch = useDispatch()
+
+  const [isSmartCheckOpen, setIsSmartCheckOpen] = useState(false)
+
   const isCheckTransactionsEditWindowVisible = useSelector(
-    (state) => state.parameters.isCheckTransactionsEditWindowVisible
+    (state) => state.parameters.isCheckTransactionsEditWindowVisible,
   )
+
   return (
     <section className="container__checkTransactions--toolbar">
-      <ToggleButton
-        value="edit"
+      {/** Magic button */}
+      <CustomToggleButton
+        iconStyle="magic"
+        ariaLabel="Magic button"
+        onClick={() => setIsSmartCheckOpen(true)}
+      />
+
+      {/** Edit button */}
+      <CustomToggleButton
         selected={isCheckTransactionsEditWindowVisible}
         onChange={() =>
           dispatch(
             setIsCheckTransactionsEditWindowVisible(
-              !isCheckTransactionsEditWindowVisible
-            )
+              !isCheckTransactionsEditWindowVisible,
+            ),
           )
         }
-        className={`toggle-edit-btn ${
-          isCheckTransactionsEditWindowVisible ? "active" : ""
-        }`}
-        size="small"
-      >
-        <EditIcon fontSize="small" />
-      </ToggleButton>
+        iconStyle="edit"
+      />
+
+      {/** Smart modal */}
+      <SmartCheck
+        open={isSmartCheckOpen}
+        onClose={() => setIsSmartCheckOpen(false)}
+      />
     </section>
   )
 }

@@ -57,8 +57,6 @@ const Login = () => {
     })
   }
 
-  console.log("error", error?.message)
-
   return (
     <section className="container__login">
       <form onSubmit={handleSubmit} noValidate>
