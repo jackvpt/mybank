@@ -60,7 +60,7 @@ export const formatAmount = (value)=>{
  * @param {Date} value - The date to format.
  * @returns {string|null} The formatted date string or null if invalid.
  */
-export const dateToCustom = (value) => {
+export const dateToCustomDDMMYYHHMM = (value) => {
   if (!value) return null
 
   const date = value instanceof Date ? value : new Date(value)
@@ -73,4 +73,17 @@ export const dateToCustom = (value) => {
   const minutes = String(date.getMinutes()).padStart(2, "0")
 
   return `${day}/${month}/${year} ${hours}:${minutes}`
+}
+
+export const dateToCustomDDMMYYYY  = (value) => {
+  if (!value) return null
+
+  const date = value instanceof Date ? value : new Date(value)
+  if (isNaN(date)) return null
+
+  const day = String(date.getDate()).padStart(2, "0")
+  const month = String(date.getMonth() + 1).padStart(2, "0") // Janvier = 0
+  const year = date.getFullYear()
+
+  return `${day}/${month}/${year}`
 }

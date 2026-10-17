@@ -1,4 +1,4 @@
-import { dateToCustom } from "../utils/formatNumber"
+import { dateToCustomDDMMYYHHMM } from "../utils/formatNumber"
 
 /**
  * Represents a user
@@ -37,7 +37,7 @@ export default class UserModel {
     this.role = data.role
 
     /** @type {Date|null} */
-    this.lastConnection = dateToCustom(data.lastConnection)
+    this.lastConnection = dateToCustomDDMMYYHHMM(data.lastConnection)
 
     /** @type {Date} */
     this.createdAt = new Date(data.createdAt)

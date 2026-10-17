@@ -1,5 +1,8 @@
+@use "../../styles/utils/variables" as *;
+@use "../../styles/utils/mixins" as *;
+
 .container__smartCheck {
-  &--backdrop {
+  &-backdrop {
     position: fixed;
     inset: 0;
     z-index: 1000;
@@ -9,33 +12,35 @@
     background: rgba(0, 0, 0, 0.5);
   }
 
-  &--dialog {
+  &-dialog {
     display: flex;
     flex-direction: column;
     width: 90vw;
     height: 90vh;
     height: 90dvh;
-    overflow: hidden; // le border-radius coupe aussi le header et le contenu
-    border-radius: 12px;
+    overflow: hidden;
+    border-radius: 6px;
     background: #fff;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   }
 
-  &--header {
+  &-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
-    padding: 1rem 1.5rem;
+    padding: 0.75rem 1rem;
+    background-color: $primary-color-2;
+    color: $text-color-2;
     border-bottom: 1px solid #e5e5e5;
 
     h2 {
       margin: 0;
-      font-size: 1.25rem;
+      font-size: 1rem;
     }
   }
 
-  &--close {
+  &-close {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -60,10 +65,25 @@
     }
   }
 
-  &--content {
-    flex: 1;
-    min-height: 0; // sans ça, overflow: auto ne fonctionne pas toujours dans un parent flex
-    overflow: auto;
-    padding: 1.5rem;
+  &-content {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap:1rem;
+
+    &-reportSummary {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 0.5rem 1rem;
+      border: 1px solid gray;
+      border-radius: 4px;
+        width: fit-content;
+
+      p {
+        font-size: 0.9rem;
+      }
+    }
   }
 }
