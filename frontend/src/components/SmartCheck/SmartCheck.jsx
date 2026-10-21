@@ -89,19 +89,55 @@ const SmartCheck = ({ open, onClose }) => {
             </div>
             {accountReport && (
               <div className="container__smartCheck-content-firstPart-reportSummary">
-                <p>Relevé N° {accountReport.releve.numero}</p>
                 <p>
-                  Du {dateToCustomDDMMYYYY(accountReport.releve.periode.du)}
+                  Relevé N°{" "}
+                  <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                    {accountReport.releve.numero}
+                  </span>
                 </p>
                 <p>
-                  Au {dateToCustomDDMMYYYY(accountReport.releve.periode.au)}
+                  Du{" "}
+                  <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                    {dateToCustomDDMMYYYY(accountReport.releve.periode.du)}
+                  </span>{" "}
+                  au{" "}
+                  <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                    {dateToCustomDDMMYYYY(accountReport.releve.periode.au)}
+                  </span>
+                </p>
+
+                <p>
+                  Solde initial : <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                    {accountReport.compte.ancien_solde.montant}
+                  </span>
                 </p>
                 <p>
-                  Solde initial: {accountReport.compte.ancien_solde.montant}
+                  Solde final : <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                    {accountReport.compte.nouveau_solde.montant}
+                  </span>
                 </p>
-                <p>Solde final: {accountReport.compte.nouveau_solde.montant}</p>
-                <p>Nombre de transactions: {reportAllTransactions.length}</p>
+                <p>
+                  Nombre de transactions trouvées :{" "}
+                 <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                    {reportAllTransactions.length}
+                  </span>
+                </p>
               </div>
+            )}
+          </div>
+          <div className="container__smartCheck-content-table">
+            { reportAllTransactions.length > 0 ? (
+              reportAllTransactions.map((transaction, index) => (
+                <div
+                  key={index}
+                  >
+                  <p>{transaction.formattedDate}</p>
+                  <p>{transaction.label}</p>
+                  <p>{transaction.amount}</p>
+                </div>
+              ))
+            ) : (
+              <p>Aucune transaction trouvée.</p>
             )}
           </div>
         </div>
