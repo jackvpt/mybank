@@ -69,20 +69,25 @@
     display: flex;
     flex-direction: column;
     padding: 1rem;
-    gap:1rem;
+    gap: 1rem;
 
-    &-reportSummary {
+    &-firstPart {
       display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: flex-start;
-      padding: 0.5rem 1rem;
-      border: 1px solid gray;
-      border-radius: 4px;
+      flex-direction: row;
+      gap: 1rem;
+      &-reportSummary {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 0.5rem 1rem;
+        border: 1px solid gray;
+        border-radius: 4px;
         width: fit-content;
 
-      p {
-        font-size: 0.9rem;
+        p {
+          font-size: 0.8rem;
+        }
       }
     }
   }

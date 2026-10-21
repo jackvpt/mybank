@@ -55,11 +55,21 @@ const SmartCheck = ({ open, onClose }) => {
 
   if (!open) return null
 
-  const reportTransactions =
-    accountReport?.transactions?.map(
+  const reportAccountTransactions =
+    accountReport?.compte?.operations?.map(
       (transaction) => new AccountReportTransactionModel(transaction),
     ) ?? []
-  console.log("reportTransactions", reportTransactions)
+
+  const reportCarTransctions =
+    accountReport?.carte?.operations?.map(
+      (transaction) => new AccountReportTransactionModel(transaction),
+    ) ?? []
+
+  const reportAllTransactions = [
+    ...reportAccountTransactions,
+    ...reportCarTransctions,
+  ]
+
   return createPortal(
     <div className="container__smartCheck-backdrop">
       <div
@@ -73,19 +83,27 @@ const SmartCheck = ({ open, onClose }) => {
           <CustomCloseButton onClick={onClose} ref={closeRef} />
         </div>
         <div className="container__smartCheck-content">
-          <div className="container__smartCheck-content-filePicker">
-            <CustomFilePicker onFileLoaded={handleFileLoaded} />
-          </div>
-          {accountReport && (
-            <div className="container__smartCheck-content-reportSummary">
-              <p>Relevé N° {accountReport.releve}</p>
-              <p>Du {dateToCustomDDMMYYYY(accountReport.periode.du)}</p>
-              <p>Au {dateToCustomDDMMYYYY(accountReport.periode.au)}</p>
-              <p>Solde initial: {accountReport.solde_initial}</p>
-              <p>Solde final: {accountReport.solde_final}</p>
-              <p>Nombre de transactions: {accountReport.transactions.length}</p>
+          <div className="container__smartCheck-content-firstPart">
+            <div className="container__smartCheck-content-firstPart-filePicker">
+              <CustomFilePicker onFileLoaded={handleFileLoaded} />
             </div>
-          )}
+            {accountReport && (
+              <div className="container__smartCheck-content-firstPart-reportSummary">
+                <p>Relevé N° {accountReport.releve.numero}</p>
+                <p>
+                  Du {dateToCustomDDMMYYYY(accountReport.releve.periode.du)}
+                </p>
+                <p>
+                  Au {dateToCustomDDMMYYYY(accountReport.releve.periode.au)}
+                </p>
+                <p>
+                  Solde initial: {accountReport.compte.ancien_solde.montant}
+                </p>
+                <p>Solde final: {accountReport.compte.nouveau_solde.montant}</p>
+                <p>Nombre de transactions: {reportAllTransactions.length}</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>,

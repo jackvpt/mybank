@@ -13,7 +13,7 @@ export default class AccountReportTransactionModel {
    */
   constructor(data) {
     /** @type {Date} */
-    this.date = new Date(data.date)
+    this.date = new Date(data.date_operation)
 
     /** @type {string} */
     this.formattedDate = this.date.toLocaleDateString("fr-FR", {
@@ -25,8 +25,14 @@ export default class AccountReportTransactionModel {
     /** @type {string} */
     this.label = data.libelle
 
+    /** @type {string} */
+    this.sens = data.sens
+
     /** @type {number} */
     this.amount = data.montant
+    if (this.sens !== "credit") {
+      this.amount = -this.amount
+    }
 
     /** @type {string} */
     this.type = data.type

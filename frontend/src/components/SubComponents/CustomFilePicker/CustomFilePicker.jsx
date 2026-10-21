@@ -192,22 +192,38 @@ const CustomFilePicker = ({ onFileLoaded }) => {
 
         {file ? (
           <div className="container__filePicker-file">
-            <div className="container__filePicker-name">{file.name}</div>
-            <div className="container__filePicker-size">
-              {(file.size / 1024).toFixed(1)} Ko
+            <div className="container__filePicker-file-nameSize">
+              <div
+                className="container__filePicker-file-nameSize-name"
+                title={file.name}
+              >
+                {file.name}
+              </div>
+              <div className="container__filePicker-file-nameSize-size">
+                {(file.size / 1024).toFixed(1)} Ko
+              </div>
             </div>
             <CustomButton action="reset" onClick={handleReset}>
               Retirer
             </CustomButton>
           </div>
         ) : (
-          <>
-            <p>Fichier JSON</p>
-            <CustomButton
-              action="file"
-              onClick={() => inputRef.current?.click()}
-            ></CustomButton>
-          </>
+          <div className="container__filePicker-file">
+            <div className="container__filePicker-file-nameSize">
+              <div className="container__filePicker-file-nameSize-name">
+                Fichier JSON
+              </div>
+              <div className="container__filePicker-file-nameSize-size">
+                (5 Mo max)
+              </div>
+            </div>
+            <div className="container__filePicker-file-button">
+              <CustomButton
+                action="file"
+                onClick={() => inputRef.current?.click()}
+              ></CustomButton>
+            </div>
+          </div>
         )}
       </div>
 
