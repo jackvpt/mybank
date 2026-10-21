@@ -1,0 +1,48 @@
+@use "../../styles/utils/variables" as *;
+@use "../../styles/utils/mixins" as *;
+
+.container__smartCheckTable {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+
+  &-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 0.5rem;
+    border-bottom: 1px solid #e5e5e5;
+
+    &:nth-child(odd) {
+      background-color: $primary-color-4;
+    }
+
+    &-date {
+      width: 10%;
+      font-size: 0.7rem;
+    }
+    &-label {
+      width: 80%;
+      font-size: 0.7rem;
+    }
+    &-amount {
+      width: 10%;
+      font-size: 0.7rem;
+      text-align: right;
+    }
+  }
+
+  &-noTransactions {
+    font-size: 0.8rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 800;
+    background-color: $primary-color-2;
+    color: $text-color-2;
+    padding: 0.25rem 0.5rem;
+  }
+}

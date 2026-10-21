@@ -8,6 +8,7 @@ import { createPortal } from "react-dom"
 // 🧩 Components
 import CustomFilePicker from "../SubComponents/CustomFilePicker/CustomFilePicker"
 import CustomCloseButton from "../SubComponents/CustomCloseButton/CustomCloseButton"
+import SmartCheckTable from "./SmartCheckTable"
 
 import { dateToCustomDDMMYYYY } from "../../utils/formatNumber"
 import AccountReportTransactionModel from "../../models/accountReportTransactionModel"
@@ -60,14 +61,14 @@ const SmartCheck = ({ open, onClose }) => {
       (transaction) => new AccountReportTransactionModel(transaction),
     ) ?? []
 
-  const reportCarTransctions =
+  const reportCardTransactions =
     accountReport?.carte?.operations?.map(
       (transaction) => new AccountReportTransactionModel(transaction),
     ) ?? []
 
   const reportAllTransactions = [
     ...reportAccountTransactions,
-    ...reportCarTransctions,
+    ...reportCardTransactions,
   ]
 
   return createPortal(
@@ -107,37 +108,41 @@ const SmartCheck = ({ open, onClose }) => {
                 </p>
 
                 <p>
-                  Solde initial : <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                  Solde initial :{" "}
+                  <span className="container__smartCheck-content-firstPart-reportSummary-value">
                     {accountReport.compte.ancien_solde.montant}
                   </span>
                 </p>
                 <p>
-                  Solde final : <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                  Solde final :{" "}
+                  <span className="container__smartCheck-content-firstPart-reportSummary-value">
                     {accountReport.compte.nouveau_solde.montant}
                   </span>
                 </p>
                 <p>
                   Nombre de transactions trouvées :{" "}
-                 <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                  <span className="container__smartCheck-content-firstPart-reportSummary-value">
                     {reportAllTransactions.length}
                   </span>
                 </p>
               </div>
             )}
           </div>
-          <div className="container__smartCheck-content-table">
-            { reportAllTransactions.length > 0 ? (
-              reportAllTransactions.map((transaction, index) => (
-                <div
-                  key={index}
-                  >
-                  <p>{transaction.formattedDate}</p>
-                  <p>{transaction.label}</p>
-                  <p>{transaction.amount}</p>
-                </div>
-              ))
-            ) : (
-              <p>Aucune transaction trouvée.</p>
+          <div className="container__smartCheck-content-tables">
+            {/** Transactions from card */}
+            {accountReport && (
+              <SmartCheckTable
+                reportTransactions={reportCardTransactions}
+                title="Carte de crédit"
+              />
+            )}
+
+            {/** Transactions from account */}
+            {accountReport && (
+              <SmartCheckTable
+                reportTransactions={reportAccountTransactions}
+                title="Compte bancaire"
+              />
             )}
           </div>
         </div>

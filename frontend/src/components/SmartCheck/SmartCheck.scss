@@ -68,12 +68,15 @@
   &-content {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    min-height: 0;
     padding: 1rem;
     gap: 1rem;
 
     &-firstPart {
       display: flex;
       flex-direction: row;
+      flex-shrink: 0;
       gap: 1rem;
 
       &-reportSummary {
@@ -91,10 +94,50 @@
           font-size: 0.8rem;
           font-weight: 800;
         }
-        
+
         p {
           font-size: 0.8rem;
           font-weight: 400;
+        }
+      }
+    }
+
+    &-tables {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      gap: 1.5rem;
+      > * {
+        flex-shrink: 0;
+      }
+
+      &-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        flex-shrink: 0;
+        margin-left: 0.5rem;
+        padding: 0 0.25rem;
+        border-bottom: 1px solid #e5e5e5;
+
+        &:nth-child(odd) {
+          background-color: $primary-color-4;
+        }
+
+        &-date {
+          width: 10%;
+          font-size: 0.7rem;
+        }
+        &-label {
+          width: 80%;
+          font-size: 0.7rem;
+        }
+        &-amount {
+          width: 10%;
+          font-size: 0.7rem;
+          text-align: right;
         }
       }
     }
