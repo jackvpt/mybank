@@ -38,7 +38,7 @@ export default class AccountReportTransactionModel {
     this.type = data.type
 
     /** @type {string} */
-    this.detail = data.detail
+    this.details = data.details
   }
 }
 

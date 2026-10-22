@@ -9,24 +9,111 @@
   &-row {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: baseline;
     flex-shrink: 0;
     margin-left: 0.5rem;
+    min-height: 1.5rem;
     border-bottom: 1px solid #e5e5e5;
+    gap: 1rem;
 
     &:nth-child(odd) {
       background-color: $primary-color-4;
     }
 
+    &-reportTransaction {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: baseline;
+      width: 60%;
+    }
+
+    &-matchedTransaction {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: baseline;
+      width: 35%;
+
+      &-yesIcon,
+      &-noIcon {
+        flex-shrink: 0;
+        width: 1em;
+        height: 1em;
+        position: relative;
+        top: 0.25em;
+      }
+      &-yesIcon {
+        color: green;
+      }
+
+      &-noIcon {
+        color: red;
+      }
+
+      &-date {
+        width: 20%;
+        font-size: 0.7rem;
+        padding: 0 0.5rem;
+      }
+
+      &-label {
+        width:80%;
+        font-size: 0.7rem;
+      }
+    }
+
     &-date {
       width: 10%;
       font-size: 0.7rem;
+      padding: 0 0.5rem;
     }
+
+    &-disregard {
+      width: 5%;
+      display: flex;
+      justify-content: center;
+    }
+
+    &-disregardIcon {
+      color: $secondary-color-4;
+      font-size: 0.8rem;
+
+      &:hover {
+        cursor: pointer;
+        color: darken-custom($secondary-color-4);
+      }
+    }
+
     &-label {
-      width: 80%;
-      font-size: 0.7rem;
+      width: 65%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+
+      &-description {
+        font-size: 0.7rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+
+        &-icon {
+          color: $primary-color-3;
+          &:hover {
+            cursor: pointer;
+            color: darken-custom($primary-color-3);
+          }
+        }
+      }
+
+      &-details {
+        font-size: 0.6rem;
+      }
     }
+
     &-amount {
       width: 10%;
       font-size: 0.7rem;
@@ -44,5 +131,22 @@
     background-color: $primary-color-2;
     color: $text-color-2;
     padding: 0.25rem 0.5rem;
+  }
+
+  &-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0.25rem;
+    background-color: $primary-color-3;
+
+    &-total {
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+  }
+
+  .row--disregarded {
+    background-color: $primary-color-5;
   }
 }
