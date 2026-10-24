@@ -43,8 +43,6 @@ exports.updateTransaction = async (req, res) => {
   const transactionObject = req.body
 
   try {
-    const transaction = await Transaction.findOne({ _id: req.params.id })
-
     const updatedTransaction = await Transaction.findByIdAndUpdate(
       req.params.id,
       { ...transactionObject, _id: req.params.id },
@@ -56,6 +54,34 @@ exports.updateTransaction = async (req, res) => {
     )
   } catch (error) {
     res.status(401).json({ error })
+  }
+}
+
+/** PATCH Update Transactions Status */
+exports.updateTransactionsStatus = async (req, res) => {
+  const { ids, status } = req.body
+
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ error: "ids must be a non-empty array" })
+  }
+
+  if (!["pointed", ""].includes(status)) {
+    return res.status(400).json({ error: "Invalid status" })
+  }
+
+  try {
+    const result = await Transaction.updateMany(
+      { _id: { $in: ids } },
+      { $set: { status } }
+    )
+    const updatedTransactions = await Transaction.find({ _id: { $in: ids } })
+
+    res.status(200).json(updatedTransactions)
+    console.log(
+      `Transactions status updated: ${result.modifiedCount} -> "${status}"`
+    )
+  } catch (error) {
+    res.status(500).json({ error })
   }
 }
 

@@ -60,6 +60,23 @@ export const updateTransaction = async ({ id, updatedData }) => {
 }
 
 /**
+ * Updates the status of several transactions at once.
+ * @param {Object} params
+ * @param {string[]} params.ids - IDs of the transactions to update.
+ * @param {string} params.status - New status ("pointed" or "").
+ * @returns {Promise<Object[]>} updated transactions
+ */
+export const updateTransactionsStatus = async ({ ids, status }) => {
+  try {
+    const { data } = await api.patch("status", { ids, status })
+    return data
+  } catch (error) {
+    console.error("Error updating transactions status:", error.message)
+    throw error
+  }
+}
+
+/**
  * Deletes a transaction by ID.
  * @param {string} id - The ID of the transaction to delete.
  * @returns {Promise<Object>} - The response data from the API.

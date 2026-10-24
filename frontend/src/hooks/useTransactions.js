@@ -9,6 +9,7 @@ import {
   deleteTransaction,
   deleteTransactions,
   validateTransactions,
+  updateTransactionsStatus,
 } from "../api/transactions.api"
 
 // 🧬 Models
@@ -135,6 +136,20 @@ export const useUpdateTransaction = () =>
     },
     successMessage: "Transaction mise à jour",
     errorMessage: "Erreur lors de la mise à jour",
+  })
+
+// ----------------------------
+// Update the status of several transactions
+// ----------------------------
+export const useUpdateTransactionsStatus = () =>
+  useTransactionMutation({
+    // Destructuring keeps extra variables (like `silent`) out of the API call.
+    mutationFn: async ({ ids, status }) => {
+      const updated = await updateTransactionsStatus({ ids, status })
+      return updated.map((transaction) => new TransactionModel(transaction))
+    },
+    successMessage: "Statuts des transactions mis à jour",
+    errorMessage: "Erreur lors de la mise à jour des statuts",
   })
 
 // ----------------------------

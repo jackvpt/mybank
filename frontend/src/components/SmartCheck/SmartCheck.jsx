@@ -5,6 +5,9 @@ import "./SmartCheck.scss"
 import { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
 
+// 🪝 Hooks
+import { useGetAllTransactions } from "../../hooks/useTransactions"
+
 // 🧩 Components
 import CustomFilePicker from "../SubComponents/CustomFilePicker/CustomFilePicker"
 import CustomCloseButton from "../SubComponents/CustomCloseButton/CustomCloseButton"
@@ -16,6 +19,13 @@ import AccountReportTransactionModel from "../../models/accountReportTransaction
 const SmartCheck = ({ open, onClose }) => {
   const closeRef = useRef(null)
   const onCloseRef = useRef(onClose)
+
+  // Get all transactions using the custom hook
+  const { data: transactions = [] } = useGetAllTransactions()
+
+  const notValidatedTransactions = transactions.filter((transaction) => {
+    return transaction.status !== "validated"
+  })
 
   /** @type {[import("../../utils/parseStatement").ParsedStatement | null, Function]} */
   const [accountReport, setAccountReport] = useState(null)
@@ -71,6 +81,20 @@ const SmartCheck = ({ open, onClose }) => {
     ...reportCardTransactions,
   ]
 
+  const matchedTransactions = (reportTransactions) => {
+    return reportTransactions
+      .map((reportTransaction) => {
+        return notValidatedTransactions.find(
+          (transaction) => transaction.amount === reportTransaction.amount,
+        )
+      })
+      .filter((transaction) => !!transaction)
+  }
+
+  const pointedTransactions = transactions.filter((transaction) => {
+    return transaction.status === "pointed"
+  })
+
   return createPortal(
     <div className="container__smartCheck-backdrop">
       <div
@@ -89,59 +113,100 @@ const SmartCheck = ({ open, onClose }) => {
               <CustomFilePicker onFileLoaded={handleFileLoaded} />
             </div>
             {accountReport && (
-              <div className="container__smartCheck-content-firstPart-reportSummary">
-                <p>
-                  Relevé N°{" "}
-                  <span className="container__smartCheck-content-firstPart-reportSummary-value">
-                    {accountReport.releve.numero}
-                  </span>
-                </p>
-                <p>
-                  Du{" "}
-                  <span className="container__smartCheck-content-firstPart-reportSummary-value">
-                    {dateToCustomDDMMYYYY(accountReport.releve.periode.du)}
-                  </span>{" "}
-                  au{" "}
-                  <span className="container__smartCheck-content-firstPart-reportSummary-value">
-                    {dateToCustomDDMMYYYY(accountReport.releve.periode.au)}
-                  </span>
-                </p>
+              <>
+                <div className="container__smartCheck-content-firstPart-reportSummary">
+                  <p>
+                    Relevé N°{" "}
+                    <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                      {accountReport.releve.numero}
+                    </span>
+                  </p>
+                  <p>
+                    Du{" "}
+                    <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                      {dateToCustomDDMMYYYY(accountReport.releve.periode.du)}
+                    </span>{" "}
+                    au{" "}
+                    <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                      {dateToCustomDDMMYYYY(accountReport.releve.periode.au)}
+                    </span>
+                  </p>
 
-                <p>
-                  Solde initial :{" "}
-                  <span className="container__smartCheck-content-firstPart-reportSummary-value">
-                    {accountReport.compte.ancien_solde.montant}
-                  </span>
-                </p>
-                <p>
-                  Solde final :{" "}
-                  <span className="container__smartCheck-content-firstPart-reportSummary-value">
-                    {accountReport.compte.nouveau_solde.montant}
-                  </span>
-                </p>
-                <p>
-                  Nombre de transactions trouvées :{" "}
-                  <span className="container__smartCheck-content-firstPart-reportSummary-value">
-                    {reportAllTransactions.length}
-                  </span>
-                </p>
-              </div>
+                  <p>
+                    Solde initial :{" "}
+                    <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                      {accountReport.compte.ancien_solde.montant.toFixed(2)}
+                    </span>
+                  </p>
+                  <p>
+                    Solde final :{" "}
+                    <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                      {accountReport.compte.nouveau_solde.montant.toFixed(2)}
+                    </span>
+                  </p>
+                  <p>
+                    Nombre de transactions :{" "}
+                    <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                      {reportAllTransactions.length}
+                    </span>
+                  </p>
+                </div>
+                <div className="container__smartCheck-content-firstPart-reportSummary">
+                  <p>
+                    Différence du relevé :{" "}
+                    <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                      {(
+                        accountReport.compte.nouveau_solde.montant -
+                        accountReport.compte.ancien_solde.montant
+                      ).toFixed(2)}
+                    </span>
+                  </p>
+                  <p>
+                    Bilan du pointage :{" "}
+                    <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                      {pointedTransactions
+                        .reduce(
+                          (sum, transaction) => sum + transaction.amount,
+                          0,
+                        )
+                        .toFixed(2)}
+                    </span>
+                  </p>
+                </div>
+              </>
             )}
           </div>
           <div className="container__smartCheck-content-tables">
             {/** Transactions from card */}
             {accountReport && (
               <SmartCheckTable
-                reportTransactions={reportCardTransactions}
                 title="Carte de crédit"
+                reportTransactions={reportCardTransactions}
+                matchedTransactions={matchedTransactions(
+                  reportCardTransactions,
+                )}
               />
             )}
 
             {/** Transactions from account */}
             {accountReport && (
               <SmartCheckTable
-                reportTransactions={reportAccountTransactions}
                 title="Compte bancaire"
+                reportTransactions={reportAccountTransactions}
+                matchedTransactions={matchedTransactions(
+                  reportAccountTransactions,
+                )}
+              />
+            )}
+
+            {/** Transactions not matched */}
+            {accountReport && (
+              <SmartCheckTable
+                title="Transactions non correspondantes"
+                reportTransactions={reportAllTransactions.filter(
+                  (transaction) => !transaction.matched,
+                )}
+                matchedTransactions={[]}
               />
             )}
           </div>

@@ -12,18 +12,19 @@ import { faSquareXmark } from "@fortawesome/free-solid-svg-icons"
 import { faBan } from "@fortawesome/free-solid-svg-icons"
 
 // 🪝 Hooks
-import { useGetAllTransactions } from "../../hooks/useTransactions"
+import {
+  useUpdateTransaction,
+  useUpdateTransactionsStatus,
+} from "../../hooks/useTransactions"
 
-const SmartCheckTable = ({ reportTransactions, title }) => {
-  // Get all transactions using the custom hook
-  const { data: transactions = [] } = useGetAllTransactions()
-
-  const notValidatedTransactions = transactions.filter((transaction) => {
-    return transaction.status !== "validated"
-  })
+const SmartCheckTable = ({title, reportTransactions, matchedTransactions }) => {
+  // 🔄 Mutations (toasts and "transactions" query invalidation are handled
+  // inside useTransactions via useMutationWithNotification)
+  const { mutate: updateTransaction } = useUpdateTransaction()
+  const { mutate: updateTransactionsStatus } = useUpdateTransactionsStatus()
 
   const matchedTransaction = (reportTransaction) => {
-    const matchedTransaction = notValidatedTransactions.find(
+    const matchedTransaction = matchedTransactions.find(
       (transaction) => transaction.amount === reportTransaction.amount,
     )
     if (matchedTransaction) {
@@ -53,10 +54,47 @@ const SmartCheckTable = ({ reportTransactions, title }) => {
     })
   }
 
+  const handleToggleTransactionStatus = (transaction) => {
+    const newStatus = transaction.status === "pointed" ? "" : "pointed"
+    transaction.status = newStatus
+
+    updateTransaction({
+      id: transaction.id,
+      updatedData: transaction,
+      silent: true,
+    })
+  }
+
+const handleUpdateTransactionsStatus = (transactions, newStatus) => {
+  const ids = transactions
+    .filter((transaction) => transaction.status !== newStatus)
+    .map((transaction) => transaction.id)
+
+  if (ids.length === 0) return
+
+  updateTransactionsStatus({ ids, status: newStatus, silent: true })
+}
+
   return (
     <div className="container__smartCheckTable">
-      {/** Title */}
-      <h3>{title}</h3>
+      {/** Header */}
+      <div className="container__smartCheckTable-header">
+        <h3>{title}</h3>
+        <div className="container__smartCheckTable-header-toolBox">
+          <div
+            className="container__smartCheckTable-row-matchedTransaction-status-indicator pointed"
+            onClick={() => {
+              handleUpdateTransactionsStatus(matchedTransactions, "pointed")
+            }}
+          ></div>
+          <div
+            className="container__smartCheckTable-row-matchedTransaction-status-indicator"
+            onClick={() => {
+              handleUpdateTransactionsStatus(matchedTransactions, "")
+            }}
+          ></div>
+        </div>
+      </div>
       {reportTransactions.length > 0 ? (
         reportTransactions.map((reportTransaction, index) => (
           // Row
@@ -121,6 +159,16 @@ const SmartCheckTable = ({ reportTransactions, title }) => {
                   </div>
                   <div className="container__smartCheckTable-row-matchedTransaction-label">
                     {matchedTransaction(reportTransaction).label}
+                  </div>
+                  <div className="container__smartCheckTable-row-matchedTransaction-status">
+                    <div
+                      className={`container__smartCheckTable-row-matchedTransaction-status-indicator ${matchedTransaction(reportTransaction).status === "pointed" ? "pointed" : ""}`}
+                      onClick={() => {
+                        handleToggleTransactionStatus(
+                          matchedTransaction(reportTransaction),
+                        )
+                      }}
+                    ></div>
                   </div>
                 </>
               ) : (
