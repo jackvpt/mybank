@@ -93,11 +93,14 @@ const SmartCheck = ({ open, onClose }) => {
 
   const notMatchedTransactions = () => {
     const matchedIds = new Set(
-      matchedTransactions(reportAllTransactions).map((transaction) => transaction.id),
+      matchedTransactions(reportAllTransactions).map(
+        (transaction) => transaction.id,
+      ),
     )
-    
-    const notMatched = notValidatedTransactions.filter((t) => !matchedIds.has(t.id))
-    console.log("notMatched:", notMatched)
+
+    const notMatched = notValidatedTransactions.filter(
+      (t) => !matchedIds.has(t.id),
+    )
     return notMatched
   }
 

@@ -41,6 +41,13 @@ export default class TransactionModel {
     this.date = new Date(data.date)
 
     /** @type {string} */
+    this.formattedDate = this.date.toLocaleDateString("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })
+
+    /** @type {string} */
     this.type = data.type
 
     /** @type {string | undefined} */

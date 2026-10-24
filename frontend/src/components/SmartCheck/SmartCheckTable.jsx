@@ -17,7 +17,11 @@ import {
   useUpdateTransactionsStatus,
 } from "../../hooks/useTransactions"
 
-const SmartCheckTable = ({title, reportTransactions, matchedTransactions }) => {
+const SmartCheckTable = ({
+  title,
+  reportTransactions,
+  matchedTransactions,
+}) => {
   // 🔄 Mutations (toasts and "transactions" query invalidation are handled
   // inside useTransactions via useMutationWithNotification)
   const { mutate: updateTransaction } = useUpdateTransaction()
@@ -65,15 +69,15 @@ const SmartCheckTable = ({title, reportTransactions, matchedTransactions }) => {
     })
   }
 
-const handleUpdateTransactionsStatus = (transactions, newStatus) => {
-  const ids = transactions
-    .filter((transaction) => transaction.status !== newStatus)
-    .map((transaction) => transaction.id)
+  const handleUpdateTransactionsStatus = (transactions, newStatus) => {
+    const ids = transactions
+      .filter((transaction) => transaction.status !== newStatus)
+      .map((transaction) => transaction.id)
 
-  if (ids.length === 0) return
+    if (ids.length === 0) return
 
-  updateTransactionsStatus({ ids, status: newStatus, silent: true })
-}
+    updateTransactionsStatus({ ids, status: newStatus, silent: true })
+  }
 
   return (
     <div className="container__smartCheckTable">
@@ -171,11 +175,11 @@ const handleUpdateTransactionsStatus = (transactions, newStatus) => {
                     ></div>
                   </div>
                 </>
-              ) : (
+              ) : (matchedTransactions.length > 0 && (
                 <FontAwesomeIcon
                   className="container__smartCheckTable-row-matchedTransaction-noIcon"
                   icon={faSquareXmark}
-                />
+                />)
               )}
             </div>
           </div>
