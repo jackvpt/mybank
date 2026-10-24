@@ -21,6 +21,7 @@ const SmartCheckTable = ({
   title,
   reportTransactions,
   matchedTransactions,
+  matchingMode = true,
 }) => {
   // 🔄 Mutations (toasts and "transactions" query invalidation are handled
   // inside useTransactions via useMutationWithNotification)
@@ -69,8 +70,8 @@ const SmartCheckTable = ({
     })
   }
 
-  const handleUpdateTransactionsStatus = (transactions, newStatus) => {
-    const ids = transactions
+  const handleUpdateAllTransactionsStatus = (newStatus) => {
+    const ids = (matchingMode ? matchedTransactions : reportTransactions)
       .filter((transaction) => transaction.status !== newStatus)
       .map((transaction) => transaction.id)
 
@@ -84,21 +85,27 @@ const SmartCheckTable = ({
       {/** Header */}
       <div className="container__smartCheckTable-header">
         <h3>{title}</h3>
+        {/** Tools Box */}
+
         <div className="container__smartCheckTable-header-toolBox">
+          {/** Point all */}
           <div
             className="container__smartCheckTable-row-matchedTransaction-status-indicator pointed"
             onClick={() => {
-              handleUpdateTransactionsStatus(matchedTransactions, "pointed")
+              handleUpdateAllTransactionsStatus("pointed")
             }}
           ></div>
+
+          {/** Unpoint all */}
           <div
             className="container__smartCheckTable-row-matchedTransaction-status-indicator"
             onClick={() => {
-              handleUpdateTransactionsStatus(matchedTransactions, "")
+              handleUpdateAllTransactionsStatus("")
             }}
           ></div>
         </div>
       </div>
+
       {reportTransactions.length > 0 ? (
         reportTransactions.map((reportTransaction, index) => (
           // Row
@@ -114,13 +121,15 @@ const SmartCheckTable = ({
               </div>
 
               {/** Ban icon for disregarding the transaction */}
-              <div className="container__smartCheckTable-row-disregard">
-                <FontAwesomeIcon
-                  className="container__smartCheckTable-row-disregardIcon"
-                  icon={faBan}
-                  onClick={() => toggleDisregard(index)}
-                />
-              </div>
+              {matchingMode && (
+                <div className="container__smartCheckTable-row-disregard">
+                  <FontAwesomeIcon
+                    className="container__smartCheckTable-row-disregardIcon"
+                    icon={faBan}
+                    onClick={() => toggleDisregard(index)}
+                  />
+                </div>
+              )}
 
               {/** Label and details */}
               <div className="container__smartCheckTable-row-label">
@@ -149,11 +158,26 @@ const SmartCheckTable = ({
               </div>
             </div>
 
+            {/** Not matching mode */}
+            {!matchingMode && (
+              <div className="container__smartCheckTable-row-matchedTransaction">
+                <div className="container__smartCheckTable-row-matchedTransaction-noIcon">
+                  <div className="container__smartCheckTable-row-matchedTransaction-status">
+                    <div
+                      className={`container__smartCheckTable-row-matchedTransaction-status-indicator ${reportTransaction.status}`}
+                      onClick={() => {
+                        handleToggleTransactionStatus(reportTransaction)
+                      }}
+                    ></div>
+                  </div>{" "}
+                </div>
+              </div>
+            )}
+
             {/** Matched transaction */}
             <div className="container__smartCheckTable-row-matchedTransaction">
               {matchedTransaction(reportTransaction) ? (
                 <>
-                  {/** Match status */}
                   <FontAwesomeIcon
                     className="container__smartCheckTable-row-matchedTransaction-yesIcon"
                     icon={faSquareCheck}
@@ -164,9 +188,10 @@ const SmartCheckTable = ({
                   <div className="container__smartCheckTable-row-matchedTransaction-label">
                     {matchedTransaction(reportTransaction).label}
                   </div>
+
                   <div className="container__smartCheckTable-row-matchedTransaction-status">
                     <div
-                      className={`container__smartCheckTable-row-matchedTransaction-status-indicator ${matchedTransaction(reportTransaction).status === "pointed" ? "pointed" : ""}`}
+                      className={`container__smartCheckTable-row-matchedTransaction-status-indicator ${matchedTransaction(reportTransaction).status}`}
                       onClick={() => {
                         handleToggleTransactionStatus(
                           matchedTransaction(reportTransaction),
@@ -175,11 +200,13 @@ const SmartCheckTable = ({
                     ></div>
                   </div>
                 </>
-              ) : (matchedTransactions.length > 0 && (
-                <FontAwesomeIcon
-                  className="container__smartCheckTable-row-matchedTransaction-noIcon"
-                  icon={faSquareXmark}
-                />)
+              ) : (
+                matchedTransactions.length > 0 && (
+                  <FontAwesomeIcon
+                    className="container__smartCheckTable-row-matchedTransaction-noIcon"
+                    icon={faSquareXmark}
+                  />
+                )
               )}
             </div>
           </div>

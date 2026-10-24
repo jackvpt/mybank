@@ -34,6 +34,9 @@ export default class AccountReportTransactionModel {
       this.amount = -this.amount
     }
 
+    /** @type {string | null} */
+    this.status = data.status ?? null
+
     /** @type {string} */
     this.type = data.type
 

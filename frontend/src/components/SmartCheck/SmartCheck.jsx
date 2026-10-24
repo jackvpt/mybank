@@ -193,7 +193,7 @@ const SmartCheck = ({ open, onClose }) => {
             {/** Transactions from card */}
             {accountReport && (
               <SmartCheckTable
-                title="Carte de crédit"
+                title="Relevé - Carte de crédit"
                 reportTransactions={reportCardTransactions}
                 matchedTransactions={matchedTransactions(
                   reportCardTransactions,
@@ -204,7 +204,7 @@ const SmartCheck = ({ open, onClose }) => {
             {/** Transactions from account */}
             {accountReport && (
               <SmartCheckTable
-                title="Compte bancaire"
+                title="Relevé - Compte bancaire"
                 reportTransactions={reportAccountTransactions}
                 matchedTransactions={matchedTransactions(
                   reportAccountTransactions,
@@ -215,9 +215,10 @@ const SmartCheck = ({ open, onClose }) => {
             {/** Transactions not matched */}
             {accountReport && (
               <SmartCheckTable
-                title="Transactions non correspondantes"
+                title="Transactions non relevées"
                 reportTransactions={notMatchedTransactions()}
                 matchedTransactions={[]}
+                matchingMode={false}
               />
             )}
           </div>
