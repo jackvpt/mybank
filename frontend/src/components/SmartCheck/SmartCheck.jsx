@@ -91,6 +91,16 @@ const SmartCheck = ({ open, onClose }) => {
       .filter((transaction) => !!transaction)
   }
 
+  const notMatchedTransactions = () => {
+    const matchedIds = new Set(
+      matchedTransactions(reportAllTransactions).map((transaction) => transaction.id),
+    )
+    
+    const notMatched = notValidatedTransactions.filter((t) => !matchedIds.has(t.id))
+    console.log("notMatched:", notMatched)
+    return notMatched
+  }
+
   const pointedTransactions = transactions.filter((transaction) => {
     return transaction.status === "pointed"
   })
@@ -203,9 +213,7 @@ const SmartCheck = ({ open, onClose }) => {
             {accountReport && (
               <SmartCheckTable
                 title="Transactions non correspondantes"
-                reportTransactions={reportAllTransactions.filter(
-                  (transaction) => !transaction.matched,
-                )}
+                reportTransactions={notMatchedTransactions()}
                 matchedTransactions={[]}
               />
             )}

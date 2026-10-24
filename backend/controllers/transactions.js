@@ -78,7 +78,7 @@ exports.updateTransactionsStatus = async (req, res) => {
 
     res.status(200).json(updatedTransactions)
     console.log(
-      `Transactions status updated: ${result.modifiedCount} -> "${status}"`
+      `Transactions status updated -> "${status}"`
     )
   } catch (error) {
     res.status(500).json({ error })
