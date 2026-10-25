@@ -42,6 +42,9 @@ export default class AccountReportTransactionModel {
 
     /** @type {string} */
     this.details = data.details
+
+    /** @type {string | number | null} */
+    this.matchedTransactionId = data.matchedTransactionId ?? null
   }
 }
 

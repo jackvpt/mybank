@@ -133,7 +133,7 @@ const CheckTransactionsPage = () => {
     updateTransaction({
       id: transaction.id,
       updatedData: transaction,
-      silent:true
+      silent: true,
     })
 
     updateCheckCurrentAmount()
@@ -144,16 +144,12 @@ const CheckTransactionsPage = () => {
       (transaction) => transaction.status === "pointed",
     )
 
-    const totalDebit = pointedTransactions.reduce(
-      (sum, transaction) => sum + (transaction.debit || 0),
+    const total = pointedTransactions.reduce(
+      (sum, transaction) => sum + (transaction.amount || 0),
       0,
     )
-    const totalCredit = pointedTransactions.reduce(
-      (sum, transaction) => sum + (transaction.credit || 0),
-      0,
-    )
-    const currentAmount =
-      parseFloat(checkInitialAmount) + totalCredit - totalDebit
+
+    const currentAmount = parseFloat(checkInitialAmount) + total
 
     dispatch(setCheckingCurrentAmount(currentAmount))
 
@@ -237,10 +233,14 @@ const CheckTransactionsPage = () => {
                         </TableCell>
                         <TableCell>{transaction.label}</TableCell>
                         <TableCell align="right">
-                          {transaction.debit ? transaction.debit.toFixed(2) : ""}
+                          {transaction.debit
+                            ? transaction.debit.toFixed(2)
+                            : ""}
                         </TableCell>
                         <TableCell align="right">
-                          {transaction.credit ? transaction.credit.toFixed(2) : ""}
+                          {transaction.credit
+                            ? transaction.credit.toFixed(2)
+                            : ""}
                         </TableCell>
 
                         {visibleColumns.find(

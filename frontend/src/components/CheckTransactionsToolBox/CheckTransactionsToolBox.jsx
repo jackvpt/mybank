@@ -15,15 +15,22 @@ import { formatAmount } from "../../utils/formatNumber"
 import CustomDatePicker from "../SubComponents/CustomDatePicker/CustomDatePicker"
 import CustomTextField from "../SubComponents/CustomTextField/CustomTextField"
 import CustomButton from "../SubComponents/CustomButton/CustomButton"
-import { useValidateTransactions } from "../../hooks/useTransactions"
+import {
+  useGetAllTransactions,
+  useValidateTransactions,
+} from "../../hooks/useTransactions"
 
 const CheckTransactionsToolBox = () => {
+  const { data: transactions = [] } = useGetAllTransactions()
+
+  const totalPointedTransactions = transactions
+    .filter((transaction) => transaction.status === "pointed")
+    .reduce((sum, transaction) => sum + (transaction.amount || 0), 0)
+
+  console.log("totalPointedTransactions", totalPointedTransactions)
   const dispatch = useDispatch()
 
   // 🏪 Redux state
-  const noneTransactionChecked = useSelector(
-    (state) => state.parameters.checking.noneTransactionChecked,
-  )
   const stateCheckDate = new Date(
     useSelector((state) => state.parameters.checking.date),
   )
@@ -38,9 +45,7 @@ const CheckTransactionsToolBox = () => {
   const [checkFinalAmount, setCheckFinalAmount] = useState(
     useSelector((state) => state.parameters.checking.finalAmount).toFixed(2),
   )
-  const checkCurrentAmount = useSelector(
-    (state) => state.parameters.checking.currentAmount,
-  ).toFixed(2)
+
 
   const handleValidateCheck = () => {
     validateMutation.mutate(undefined, {
@@ -91,7 +96,9 @@ const CheckTransactionsToolBox = () => {
       <CustomTextField
         id="checkCurrentAmount"
         label="Solde actuel"
-        value={checkCurrentAmount}
+        value={(
+          parseFloat(checkInitialAmount) + parseFloat(totalPointedTransactions)
+        ).toFixed(2)}
         clearField={false}
         copy={false}
         floating={true}
@@ -103,7 +110,11 @@ const CheckTransactionsToolBox = () => {
       <CustomTextField
         id="checkDifference"
         label="Différence"
-        value={(checkCurrentAmount - checkFinalAmount).toFixed(2)}
+        value={(
+          parseFloat(checkFinalAmount) -
+          parseFloat(checkInitialAmount) -
+          parseFloat(totalPointedTransactions)
+        ).toFixed(2)}
         clearField={false}
         copy={false}
         floating={true}
@@ -116,7 +127,8 @@ const CheckTransactionsToolBox = () => {
         action="none"
         onClick={handleValidateCheck}
         disabled={
-          checkCurrentAmount !== checkFinalAmount || noneTransactionChecked
+          parseFloat(checkFinalAmount) !==
+          parseFloat(checkInitialAmount) + parseFloat(totalPointedTransactions)
         }
         children="Valider"
       />

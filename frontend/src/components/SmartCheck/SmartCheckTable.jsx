@@ -13,6 +13,7 @@ import { faBan } from "@fortawesome/free-solid-svg-icons"
 
 // 🪝 Hooks
 import {
+  useGetAllTransactions,
   useUpdateTransaction,
   useUpdateTransactionsStatus,
 } from "../../hooks/useTransactions"
@@ -20,23 +21,25 @@ import {
 const SmartCheckTable = ({
   title,
   reportTransactions,
-  matchedTransactions,
   matchingMode = true,
 }) => {
+  // Get all transactions using the custom hook
+  const { data: transactions = [] } = useGetAllTransactions()
+
   // 🔄 Mutations (toasts and "transactions" query invalidation are handled
   // inside useTransactions via useMutationWithNotification)
   const { mutate: updateTransaction } = useUpdateTransaction()
   const { mutate: updateTransactionsStatus } = useUpdateTransactionsStatus()
 
-  const matchedTransaction = (reportTransaction) => {
-    const matchedTransaction = matchedTransactions.find(
-      (transaction) => transaction.amount === reportTransaction.amount,
-    )
-    if (matchedTransaction) {
-      return matchedTransaction
-    }
-    return null
-  }
+  // const matchedTransaction = (reportTransaction) => {
+  //   const matchedTransaction = matchedTransactions.find(
+  //     (transaction) => transaction.amount === reportTransaction.amount,
+  //   )
+  //   if (matchedTransaction) {
+  //     return matchedTransaction
+  //   }
+  //   return null
+  // }
 
   // Local state
   const [isDetailsVisible, setIsDetailsVisible] = useState([])
@@ -71,14 +74,25 @@ const SmartCheckTable = ({
   }
 
   const handleUpdateAllTransactionsStatus = (newStatus) => {
-    const ids = (matchingMode ? matchedTransactions : reportTransactions)
+    // Get the IDs of the transactions to update
+    const ids = allMatchedTransactions
       .filter((transaction) => transaction.status !== newStatus)
-      .map((transaction) => transaction.id)
+      .map((transaction) => transaction.matchedTransactionId)
 
     if (ids.length === 0) return
-
     updateTransactionsStatus({ ids, status: newStatus, silent: true })
   }
+
+  const matchedTransaction = (reportTransaction) => {
+    return transactions.find(
+      (transaction) =>
+        transaction.id === reportTransaction.matchedTransactionId,
+    )
+  }
+
+  const allMatchedTransactions = reportTransactions.filter(
+    (reportTransaction) => reportTransaction.matchedTransactionId !== null,
+  )
 
   return (
     <div className="container__smartCheckTable">
@@ -201,7 +215,7 @@ const SmartCheckTable = ({
                   </div>
                 </>
               ) : (
-                matchedTransactions.length > 0 && (
+                (allMatchedTransactions.length > 0 && matchingMode) && (
                   <FontAwesomeIcon
                     className="container__smartCheckTable-row-matchedTransaction-noIcon"
                     icon={faSquareXmark}

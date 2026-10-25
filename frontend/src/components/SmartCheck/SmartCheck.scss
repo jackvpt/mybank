@@ -90,6 +90,33 @@
         width: fit-content;
         background-color: $primary-color-4;
 
+        &-reportStatus {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1rem;
+          width: 100%;
+
+          &-validate{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            margin-top:0.5rem;
+            padding:0.25rem 0.5rem;
+            width:100%;
+            background-color:$secondary-color-2;
+            color:$text-color-2;
+            border-radius:0.5rem;
+            font-size:0.8rem;
+
+            &:hover{
+              cursor:pointer;
+              background-color:darken-custom($secondary-color-2);
+            }
+          }
+        }
+
         &-value {
           font-size: 0.8rem;
           font-weight: 800;

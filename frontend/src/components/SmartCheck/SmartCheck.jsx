@@ -23,11 +23,10 @@ const SmartCheck = ({ open, onClose }) => {
   // Get all transactions using the custom hook
   const { data: transactions = [] } = useGetAllTransactions()
 
-  const notValidatedTransactions = transactions.filter((transaction) => {
+  const notValidatedTransactions = transactions?.filter((transaction) => {
     return transaction.status !== "validated"
   })
 
-  /** @type {[import("../../utils/parseStatement").ParsedStatement | null, Function]} */
   const [accountReport, setAccountReport] = useState(null)
 
   /**
@@ -66,15 +65,48 @@ const SmartCheck = ({ open, onClose }) => {
 
   if (!open) return null
 
+  const notUsedTransactions = [...notValidatedTransactions]
+
   const reportAccountTransactions =
-    accountReport?.compte?.operations?.map(
-      (transaction) => new AccountReportTransactionModel(transaction),
-    ) ?? []
+    accountReport?.compte?.operations?.map((transaction) => {
+      const reportAccountTransaction = new AccountReportTransactionModel(
+        transaction,
+      )
+
+      const matchedTransaction = notUsedTransactions.find(
+        (notUsedTransaction) =>
+          notUsedTransaction.amount === reportAccountTransaction.amount,
+      )
+      if (matchedTransaction) {
+        reportAccountTransaction.matchedTransactionId = matchedTransaction.id
+        notUsedTransactions.splice(
+          notUsedTransactions.indexOf(matchedTransaction),
+          1,
+        )
+      }
+
+      return reportAccountTransaction
+    }) ?? []
 
   const reportCardTransactions =
-    accountReport?.carte?.operations?.map(
-      (transaction) => new AccountReportTransactionModel(transaction),
-    ) ?? []
+    accountReport?.carte?.operations?.map((transaction) => {
+      const reportCardTransaction = new AccountReportTransactionModel(
+        transaction,
+      )
+
+      const matchedTransaction = notUsedTransactions.find(
+        (notUsedTransaction) =>
+          notUsedTransaction.amount === reportCardTransaction.amount,
+      )
+      if (matchedTransaction) {
+        reportCardTransaction.matchedTransactionId = matchedTransaction.id
+        notUsedTransactions.splice(
+          notUsedTransactions.indexOf(matchedTransaction),
+          1,
+        )
+      }
+      return reportCardTransaction
+    }) ?? []
 
   const reportAllTransactions = [
     ...reportAccountTransactions,
@@ -82,13 +114,19 @@ const SmartCheck = ({ open, onClose }) => {
   ]
 
   const matchedTransactions = (reportTransactions) => {
+    const used = new Set()
+
     return reportTransactions
       .map((reportTransaction) => {
-        return notValidatedTransactions.find(
-          (transaction) => transaction.amount === reportTransaction.amount,
+        const match = notValidatedTransactions.find(
+          (transaction) =>
+            !used.has(transaction) &&
+            transaction.amount === reportTransaction.amount,
         )
+        if (match) used.add(match)
+        return match
       })
-      .filter((transaction) => !!transaction)
+      .filter(Boolean)
   }
 
   const notMatchedTransactions = () => {
@@ -165,26 +203,29 @@ const SmartCheck = ({ open, onClose }) => {
                   </p>
                 </div>
                 <div className="container__smartCheck-content-firstPart-reportSummary">
-                  <p>
-                    Différence du relevé :{" "}
-                    <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                  <div className="container__smartCheck-content-firstPart-reportSummary-reportStatus">
+                    <p>Différence du relevé :</p>
+                    <div className="container__smartCheck-content-firstPart-reportSummary-value">
                       {(
                         accountReport.compte.nouveau_solde.montant -
                         accountReport.compte.ancien_solde.montant
                       ).toFixed(2)}
-                    </span>
-                  </p>
-                  <p>
-                    Bilan du pointage :{" "}
-                    <span className="container__smartCheck-content-firstPart-reportSummary-value">
+                    </div>
+                  </div>
+                  <div className="container__smartCheck-content-firstPart-reportSummary-reportStatus">
+                    <p>Bilan du pointage :</p>
+                    <div className="container__smartCheck-content-firstPart-reportSummary-value">
                       {pointedTransactions
                         .reduce(
                           (sum, transaction) => sum + transaction.amount,
                           0,
                         )
                         .toFixed(2)}
-                    </span>
-                  </p>
+                    </div>
+                  </div>
+                  <div className="container__smartCheck-content-firstPart-reportSummary-reportStatus-validate">
+                        Valider
+                  </div>
                 </div>
               </>
             )}
@@ -195,9 +236,6 @@ const SmartCheck = ({ open, onClose }) => {
               <SmartCheckTable
                 title="Relevé - Carte de crédit"
                 reportTransactions={reportCardTransactions}
-                matchedTransactions={matchedTransactions(
-                  reportCardTransactions,
-                )}
               />
             )}
 
@@ -206,9 +244,6 @@ const SmartCheck = ({ open, onClose }) => {
               <SmartCheckTable
                 title="Relevé - Compte bancaire"
                 reportTransactions={reportAccountTransactions}
-                matchedTransactions={matchedTransactions(
-                  reportAccountTransactions,
-                )}
               />
             )}
 
@@ -217,7 +252,6 @@ const SmartCheck = ({ open, onClose }) => {
               <SmartCheckTable
                 title="Transactions non relevées"
                 reportTransactions={notMatchedTransactions()}
-                matchedTransactions={[]}
                 matchingMode={false}
               />
             )}
