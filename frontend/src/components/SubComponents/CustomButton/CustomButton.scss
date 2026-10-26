@@ -3,6 +3,7 @@
   --color-button-update: #1976d2;
   --color-button-delete: red;
   --color-button-reset: #757575;
+  --color-button-validate: #2e7d32;
 }
 
 .custom-btn {
@@ -25,10 +26,28 @@
   transition: all 0.2s ease;
 }
 
-.custom-btn--create { --btn-color: var(--color-button-add); }
-.custom-btn--update { --btn-color: var(--color-button-update); }
-.custom-btn--delete { --btn-color: var(--color-button-delete); }
-.custom-btn--reset  { --btn-color: var(--color-button-reset); }
+.small {
+  width: 100px;
+  height: 30px;
+  padding: 0 12px;
+  font-size: 0.8rem;
+}
+
+.custom-btn--create {
+  --btn-color: var(--color-button-add);
+}
+.custom-btn--update {
+  --btn-color: var(--color-button-update);
+}
+.custom-btn--delete {
+  --btn-color: var(--color-button-delete);
+}
+.custom-btn--reset {
+  --btn-color: var(--color-button-reset);
+}
+.custom-btn--validate {
+  --btn-color: var(--color-button-validate);
+}
 
 .custom-btn:hover:not(:disabled) {
   background-color: color-mix(in srgb, var(--btn-color), black 20%);
@@ -58,5 +77,7 @@
 }
 
 @keyframes custom-btn-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

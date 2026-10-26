@@ -1,6 +1,10 @@
 // 🎨 Styles
 import "./SmartCheck.scss"
 
+// 🖼️ Images
+import creditAgricoleLogo from "../../assets/images/logo_ca.webp"
+import americanExpressLogo from "../../assets/images/logo_amex.webp"
+
 // ⚛️ React
 import { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
@@ -9,11 +13,12 @@ import { createPortal } from "react-dom"
 import { useGetAllTransactions } from "../../hooks/useTransactions"
 
 // 🧩 Components
+import CustomButton from "../SubComponents/CustomButton/CustomButton"
 import CustomFilePicker from "../SubComponents/CustomFilePicker/CustomFilePicker"
 import CustomCloseButton from "../SubComponents/CustomCloseButton/CustomCloseButton"
 import SmartCheckTable from "./SmartCheckTable"
 
-import { dateToCustomDDMMYYYY } from "../../utils/formatNumber"
+import { dateToCustomDDMMYYYY, toCents } from "../../utils/formatNumber"
 import AccountReportTransactionModel from "../../models/accountReportTransactionModel"
 
 const SmartCheck = ({ open, onClose }) => {
@@ -27,7 +32,8 @@ const SmartCheck = ({ open, onClose }) => {
     return transaction.status !== "validated"
   })
 
-  const [accountReport, setAccountReport] = useState(null)
+  const [firstAccountReport, setFirstAccountReport] = useState(null)
+  const [secondAccountReport, setSecondAccountReport] = useState(null)
 
   /**
    * Receives the parsed statement from the picker.
@@ -36,8 +42,19 @@ const SmartCheck = ({ open, onClose }) => {
    * @param {File | null} file - Selected file, null on reset or rejection.
    * @param {import("../../utils/parseStatement").ParsedStatement | null} result - Parsed statement.
    */
-  const handleFileLoaded = (file, result) => {
-    setAccountReport(result)
+  const handleFirstFileLoaded = (file, result) => {
+    setFirstAccountReport(result)
+  }
+
+  /**
+   * Receives the parsed statement from the picker.
+   * Called with (null, null) when the selection is cleared.
+   *
+   * @param {File | null} file - Selected file, null on reset or rejection.
+   * @param {import("../../utils/parseStatement").ParsedStatement | null} result - Parsed statement.
+   */
+  const handleSecondFileLoaded = (file, result) => {
+    setSecondAccountReport(result)
   }
 
   useEffect(() => {
@@ -67,50 +84,35 @@ const SmartCheck = ({ open, onClose }) => {
 
   const notUsedTransactions = [...notValidatedTransactions]
 
-  const reportAccountTransactions =
-    accountReport?.compte?.operations?.map((transaction) => {
-      const reportAccountTransaction = new AccountReportTransactionModel(
-        transaction,
-      )
+  const matchOperations = (operations = []) =>
+    operations.map((operation) => {
+      const reportTransaction = new AccountReportTransactionModel(operation)
 
-      const matchedTransaction = notUsedTransactions.find(
-        (notUsedTransaction) =>
-          notUsedTransaction.amount === reportAccountTransaction.amount,
+      const index = notUsedTransactions.findIndex(
+        (transaction) => transaction.amount === reportTransaction.amount,
       )
-      if (matchedTransaction) {
-        reportAccountTransaction.matchedTransactionId = matchedTransaction.id
-        notUsedTransactions.splice(
-          notUsedTransactions.indexOf(matchedTransaction),
-          1,
-        )
+      if (index !== -1) {
+        reportTransaction.matchedTransactionId = notUsedTransactions[index].id
+        notUsedTransactions.splice(index, 1)
       }
 
-      return reportAccountTransaction
-    }) ?? []
+      return reportTransaction
+    })
 
-  const reportCardTransactions =
-    accountReport?.carte?.operations?.map((transaction) => {
-      const reportCardTransaction = new AccountReportTransactionModel(
-        transaction,
-      )
-
-      const matchedTransaction = notUsedTransactions.find(
-        (notUsedTransaction) =>
-          notUsedTransaction.amount === reportCardTransaction.amount,
-      )
-      if (matchedTransaction) {
-        reportCardTransaction.matchedTransactionId = matchedTransaction.id
-        notUsedTransactions.splice(
-          notUsedTransactions.indexOf(matchedTransaction),
-          1,
-        )
-      }
-      return reportCardTransaction
-    }) ?? []
+  const reportFirstAccountTransactions = matchOperations(
+    firstAccountReport?.compte?.operations,
+  )
+  const reportFirstAccountCardTransactions = matchOperations(
+    firstAccountReport?.carte?.operations,
+  )
+  const reportSecondAccountTransactions = [
+    ...matchOperations(secondAccountReport?.operations),
+  ]
 
   const reportAllTransactions = [
-    ...reportAccountTransactions,
-    ...reportCardTransactions,
+    ...reportFirstAccountTransactions,
+    ...reportFirstAccountCardTransactions,
+    ...reportSecondAccountTransactions,
   ]
 
   const matchedTransactions = (reportTransactions) => {
@@ -146,6 +148,19 @@ const SmartCheck = ({ open, onClose }) => {
     return transaction.status === "pointed"
   })
 
+  const reportBalance =
+    firstAccountReport?.compte.nouveau_solde.montant -
+    firstAccountReport?.compte.ancien_solde.montant
+
+  const pointedTransactionBalance = pointedTransactions.reduce(
+    (sum, transaction) => sum + transaction.amount,
+    0,
+  )
+
+  const isReportBalanced =
+    firstAccountReport != null &&
+    toCents(reportBalance).result === toCents(pointedTransactionBalance).result
+
   return createPortal(
     <div className="container__smartCheck-backdrop">
       <div
@@ -161,38 +176,65 @@ const SmartCheck = ({ open, onClose }) => {
         <div className="container__smartCheck-content">
           <div className="container__smartCheck-content-firstPart">
             <div className="container__smartCheck-content-firstPart-filePicker">
-              <CustomFilePicker onFileLoaded={handleFileLoaded} />
+              <img
+                src={creditAgricoleLogo}
+                alt="Crédit Agricole Logo"
+                className="container__smartCheck-content-firstPart-filePicker-logo"
+              />
+              <CustomFilePicker
+                title="Crédit Agricole"
+                onFileLoaded={handleFirstFileLoaded}
+              />
             </div>
-            {accountReport && (
+            <div className="container__smartCheck-content-firstPart-filePicker">
+              <img
+                src={americanExpressLogo}
+                alt="American Express Logo"
+                className="container__smartCheck-content-firstPart-filePicker-logo"
+              />
+              <CustomFilePicker
+                title="American Express"
+                onFileLoaded={handleSecondFileLoaded}
+              />
+            </div>
+            {firstAccountReport && (
               <>
                 <div className="container__smartCheck-content-firstPart-reportSummary">
                   <p>
                     Relevé N°{" "}
                     <span className="container__smartCheck-content-firstPart-reportSummary-value">
-                      {accountReport.releve.numero}
+                      {firstAccountReport.releve.numero}
                     </span>
                   </p>
                   <p>
                     Du{" "}
                     <span className="container__smartCheck-content-firstPart-reportSummary-value">
-                      {dateToCustomDDMMYYYY(accountReport.releve.periode.du)}
+                      {dateToCustomDDMMYYYY(
+                        firstAccountReport.releve.periode.du,
+                      )}
                     </span>{" "}
                     au{" "}
                     <span className="container__smartCheck-content-firstPart-reportSummary-value">
-                      {dateToCustomDDMMYYYY(accountReport.releve.periode.au)}
+                      {dateToCustomDDMMYYYY(
+                        firstAccountReport.releve.periode.au,
+                      )}
                     </span>
                   </p>
 
                   <p>
                     Solde initial :{" "}
                     <span className="container__smartCheck-content-firstPart-reportSummary-value">
-                      {accountReport.compte.ancien_solde.montant.toFixed(2)}
+                      {firstAccountReport.compte.ancien_solde.montant.toFixed(
+                        2,
+                      )}
                     </span>
                   </p>
                   <p>
                     Solde final :{" "}
                     <span className="container__smartCheck-content-firstPart-reportSummary-value">
-                      {accountReport.compte.nouveau_solde.montant.toFixed(2)}
+                      {firstAccountReport.compte.nouveau_solde.montant.toFixed(
+                        2,
+                      )}
                     </span>
                   </p>
                   <p>
@@ -206,49 +248,56 @@ const SmartCheck = ({ open, onClose }) => {
                   <div className="container__smartCheck-content-firstPart-reportSummary-reportStatus">
                     <p>Différence du relevé :</p>
                     <div className="container__smartCheck-content-firstPart-reportSummary-value">
-                      {(
-                        accountReport.compte.nouveau_solde.montant -
-                        accountReport.compte.ancien_solde.montant
-                      ).toFixed(2)}
+                      {toCents(reportBalance).text}
                     </div>
                   </div>
                   <div className="container__smartCheck-content-firstPart-reportSummary-reportStatus">
                     <p>Bilan du pointage :</p>
                     <div className="container__smartCheck-content-firstPart-reportSummary-value">
-                      {pointedTransactions
-                        .reduce(
-                          (sum, transaction) => sum + transaction.amount,
-                          0,
-                        )
-                        .toFixed(2)}
+                      {toCents(pointedTransactionBalance).text}
                     </div>
                   </div>
-                  <div className="container__smartCheck-content-firstPart-reportSummary-reportStatus-validate">
-                        Valider
+                  <div className="container__smartCheck-content-firstPart-reportSummary-validateButton">
+                    <CustomButton
+                      className="small"
+                      action="validate"
+                      disabled={!isReportBalanced}
+                      onClick={onClose}
+                    >
+                      Valider
+                    </CustomButton>
                   </div>
                 </div>
               </>
             )}
           </div>
           <div className="container__smartCheck-content-tables">
-            {/** Transactions from card */}
-            {accountReport && (
+            {/** Transactions from first accountcard */}
+            {firstAccountReport && (
               <SmartCheckTable
-                title="Relevé - Carte de crédit"
-                reportTransactions={reportCardTransactions}
+                title="Relevé - Carte de crédit CA"
+                reportTransactions={reportFirstAccountCardTransactions}
               />
             )}
 
-            {/** Transactions from account */}
-            {accountReport && (
+            {/** Transactions from first account */}
+            {firstAccountReport && (
               <SmartCheckTable
-                title="Relevé - Compte bancaire"
-                reportTransactions={reportAccountTransactions}
+                title="Relevé - Crédit Agricole"
+                reportTransactions={reportFirstAccountTransactions}
+              />
+            )}
+
+            {/** Transactions from secondaccount */}
+            {firstAccountReport && (
+              <SmartCheckTable
+                title="Relevé - American Express"
+                reportTransactions={reportSecondAccountTransactions}
               />
             )}
 
             {/** Transactions not matched */}
-            {accountReport && (
+            {firstAccountReport && (
               <SmartCheckTable
                 title="Transactions non relevées"
                 reportTransactions={notMatchedTransactions()}

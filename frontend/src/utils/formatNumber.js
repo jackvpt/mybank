@@ -44,13 +44,13 @@ export const entityToAmount = (value) => {
 /**
  * Formats a string or number as a monetary amount with 2 decimal places.
  * Returns an empty string if the value is null or cannot be converted to a number.
- * @param {string|number} value 
+ * @param {string|number} value
  * @returns {string} A string representation of the amount with 2 decimal places, or an empty string if the value is null or cannot be converted to a number.
  * @example
  * formatAmount("1234.5")      // "1234.50"
  */
-export const formatAmount = (value)=>{
-  const amount=entityToAmount(value)
+export const formatAmount = (value) => {
+  const amount = entityToAmount(value)
   return !amount ? "" : amount.toFixed(2)
 }
 
@@ -75,7 +75,13 @@ export const dateToCustomDDMMYYHHMM = (value) => {
   return `${day}/${month}/${year} ${hours}:${minutes}`
 }
 
-export const dateToCustomDDMMYYYY  = (value) => {
+/**
+ * Formats a Date object to a custom string format (DD/MM/YYYY).
+ *
+ * @param {Date} value - The date to format.
+ * @returns {string|null} The formatted date string or null if invalid.
+ */
+export const dateToCustomDDMMYYYY = (value) => {
   if (!value) return null
 
   const date = value instanceof Date ? value : new Date(value)
@@ -86,4 +92,15 @@ export const dateToCustomDDMMYYYY  = (value) => {
   const year = date.getFullYear()
 
   return `${day}/${month}/${year}`
+}
+
+/**
+ * Converts a number to cents (multiplies by 100 and rounds).
+ * @param {Number || String} value 
+ * @returns {{result: number, text: string}} An object with the result and text representations of the value in cents.
+ */
+export const toCents = (value) => {
+  const result = Math.round(Number(value) * 100)
+  const text = (result / 100).toFixed(2)
+  return { result, text }
 }

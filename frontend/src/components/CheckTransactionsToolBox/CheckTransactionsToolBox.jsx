@@ -27,7 +27,6 @@ const CheckTransactionsToolBox = () => {
     .filter((transaction) => transaction.status === "pointed")
     .reduce((sum, transaction) => sum + (transaction.amount || 0), 0)
 
-  console.log("totalPointedTransactions", totalPointedTransactions)
   const dispatch = useDispatch()
 
   // 🏪 Redux state

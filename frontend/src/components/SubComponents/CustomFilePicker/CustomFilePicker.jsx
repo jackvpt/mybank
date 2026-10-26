@@ -63,9 +63,10 @@ const getExtension = (fileName) =>
  * @param {(file: File | null, result: ParsedStatement | null) => void} [props.onFileLoaded]
  *   Called with the selected file and its parsed statement, or `(null, null)`
  *   when the selection is cleared (reset or rejected file).
+ * @param {string} [props.title] - The title to display above the file picker.
  * @returns {JSX.Element}
  */
-const CustomFilePicker = ({ onFileLoaded }) => {
+const CustomFilePicker = ({title="JSON", onFileLoaded }) => {
   const inputRef = useRef(null)
   const [isDragging, setIsDragging] = useState(false)
   const [file, setFile] = useState(null)
@@ -211,7 +212,7 @@ const CustomFilePicker = ({ onFileLoaded }) => {
           <div className="container__filePicker-file">
             <div className="container__filePicker-file-nameSize">
               <div className="container__filePicker-file-nameSize-name">
-                Fichier JSON
+                {title}
               </div>
               <div className="container__filePicker-file-nameSize-size">
                 (5 Mo max)
