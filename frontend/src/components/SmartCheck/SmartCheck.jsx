@@ -10,7 +10,10 @@ import { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
 
 // 🪝 Hooks
-import { useGetAllTransactions } from "../../hooks/useTransactions"
+import {
+  useGetAllTransactions,
+  useValidateTransactions,
+} from "../../hooks/useTransactions"
 
 // 🧩 Components
 import CustomButton from "../SubComponents/CustomButton/CustomButton"
@@ -27,6 +30,9 @@ const SmartCheck = ({ open, onClose }) => {
 
   // Get all transactions using the custom hook
   const { data: transactions = [] } = useGetAllTransactions()
+
+  // Mutations
+  const { mutate: validateAllPointedMutation } = useValidateTransactions()
 
   const notValidatedTransactions = transactions?.filter((transaction) => {
     return transaction.status !== "validated"
@@ -271,7 +277,7 @@ const SmartCheck = ({ open, onClose }) => {
                       className="small"
                       action="validate"
                       disabled={!isReportBalanced}
-                      onClick={onClose}
+                      onClick={validateAllPointedMutation}
                     >
                       Valider
                     </CustomButton>
@@ -280,34 +286,36 @@ const SmartCheck = ({ open, onClose }) => {
               </>
             )}
           </div>
-          {(firstAccountReport || secondAccountReport) && (
-            <div className="container__smartCheck-content-tables">
-              {/** Transactions from first accountcard */}
-              <SmartCheckTable
-                title="Relevé - Carte de crédit CA"
-                reportTransactions={reportFirstAccountCardTransactions}
-              />
+          <div className="container__smartCheck-content-tables">
+            {(firstAccountReport || secondAccountReport) && (
+              <>
+                {/** Transactions from first accountcard */}
+                <SmartCheckTable
+                  title="Relevé - Carte de crédit CA"
+                  reportTransactions={reportFirstAccountCardTransactions}
+                />
 
-              {/** Transactions from first account */}
-              <SmartCheckTable
-                title="Relevé - Crédit Agricole"
-                reportTransactions={reportFirstAccountTransactions}
-              />
+                {/** Transactions from first account */}
+                <SmartCheckTable
+                  title="Relevé - Crédit Agricole"
+                  reportTransactions={reportFirstAccountTransactions}
+                />
 
-              {/** Transactions from secondaccount */}
-              <SmartCheckTable
-                title="Relevé - American Express"
-                reportTransactions={reportSecondAccountTransactions}
-              />
+                {/** Transactions from secondaccount */}
+                <SmartCheckTable
+                  title="Relevé - American Express"
+                  reportTransactions={reportSecondAccountTransactions}
+                />
+              </>
+            )}
 
-              {/** Transactions not matched */}
-              <SmartCheckTable
-                title="Transactions non relevées"
-                reportTransactions={notMatchedTransactions()}
-                matchingMode={false}
-              />
-            </div>
-          )}
+            {/** Transactions not matched */}
+            <SmartCheckTable
+              title="Transactions non relevées"
+              reportTransactions={notMatchedTransactions()}
+              matchingMode={false}
+            />
+          </div>
         </div>
       </div>
     </div>,
