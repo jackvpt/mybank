@@ -1,4 +1,9 @@
 import "./RecurringToolBar.scss"
+
+// FontAwesome
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faPen, faCalendar, faPlus } from "@fortawesome/free-solid-svg-icons"
+
 import { useSelector, useDispatch } from "react-redux"
 import {
   Alert,
@@ -10,9 +15,6 @@ import {
   TextField,
   ToggleButton,
 } from "@mui/material"
-import EditIcon from "@mui/icons-material/Edit"
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth"
-import ListAddIcon from "@mui/icons-material/PlaylistAdd"
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { updateRecurringTransaction } from "../../api/recurringTransactions.api"
@@ -163,7 +165,7 @@ const RecurringToolBar = () => {
   return (
     <section className="container-recurring-toolbar">
       <div className="toolbar-insert">
-        <CalendarMonthIcon />
+        <FontAwesomeIcon icon={faCalendar} />
 
         {/* MONTH SELECT */}
         <FormControl
@@ -242,7 +244,7 @@ const RecurringToolBar = () => {
           size="small"
           onClick={handleAddRecurring}
         >
-          <ListAddIcon fontSize="small" />
+          <FontAwesomeIcon icon={faPlus} />
         </Button>
       </div>
       <ToggleButton
@@ -258,7 +260,7 @@ const RecurringToolBar = () => {
         }`}
         size="small"
       >
-        <EditIcon fontSize="small" />
+        <FontAwesomeIcon icon={faPen} />
       </ToggleButton>
 
       {/* Toast notification for success messages */}

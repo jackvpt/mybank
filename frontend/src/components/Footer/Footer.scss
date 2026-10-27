@@ -14,15 +14,23 @@ footer {
     color: $text-color-2;
     cursor: pointer;
 
+    &-icon {
+      font-size: 1.5rem;
+      color: $text-color-2;
+    }
+
     &.active {
-      background-color: $text-color-2;
-      color: $text-color-1;
+      background-color: $primary-color-3;
+      * {
+        color: $text-color-1;
+      }
     }
 
     &:hover {
       background-color: $primary-color-3;
     }
   }
+
   .disabled {
     pointer-events: none;
     opacity: 0.5;

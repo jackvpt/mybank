@@ -1,13 +1,17 @@
 import "./TransactionsToolBar.scss"
 import { useSelector, useDispatch } from "react-redux"
 import { ToggleButton } from "@mui/material"
-import EditIcon from "@mui/icons-material/Edit"
+
+// FontAwesome
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faPen } from "@fortawesome/free-solid-svg-icons"
+
 import { setIsTransactionEditWindowVisible } from "../../store/features/parametersSlice"
 
-const RecurringToolBar = () => {
+const TransactionsToolBar = () => {
   const dispatch = useDispatch()
   const isTransactionEditWindowVisible = useSelector(
-    (state) => state.parameters.isTransactionEditWindowVisible
+    (state) => state.parameters.isTransactionEditWindowVisible,
   )
   return (
     <section className="container-toolbar">
@@ -16,7 +20,7 @@ const RecurringToolBar = () => {
         selected={isTransactionEditWindowVisible}
         onChange={() =>
           dispatch(
-            setIsTransactionEditWindowVisible(!isTransactionEditWindowVisible)
+            setIsTransactionEditWindowVisible(!isTransactionEditWindowVisible),
           )
         }
         className={`toggle-edit-btn ${
@@ -24,10 +28,10 @@ const RecurringToolBar = () => {
         }`}
         size="small"
       >
-        <EditIcon fontSize="small" />
+        <FontAwesomeIcon icon={faPen} />
       </ToggleButton>
     </section>
   )
 }
 
-export default RecurringToolBar
+export default TransactionsToolBar
