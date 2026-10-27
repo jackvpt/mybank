@@ -157,9 +157,12 @@ const SmartCheck = ({ open, onClose }) => {
     0,
   )
 
+  const differenceReportPointed = toCents(
+    reportBalance - pointedTransactionBalance,
+  )
+
   const isReportBalanced =
-    firstAccountReport != null &&
-    toCents(reportBalance).result === toCents(pointedTransactionBalance).result
+    firstAccountReport != null && differenceReportPointed.result === 0
 
   return createPortal(
     <div className="container__smartCheck-backdrop">
@@ -257,6 +260,12 @@ const SmartCheck = ({ open, onClose }) => {
                       {toCents(pointedTransactionBalance).text}
                     </div>
                   </div>
+                  <div className="container__smartCheck-content-firstPart-reportSummary-reportStatus">
+                    <p>Ecart :</p>
+                    <div className="container__smartCheck-content-firstPart-reportSummary-value">
+                      {differenceReportPointed.text}
+                    </div>
+                  </div>
                   <div className="container__smartCheck-content-firstPart-reportSummary-validateButton">
                     <CustomButton
                       className="small"
@@ -271,40 +280,34 @@ const SmartCheck = ({ open, onClose }) => {
               </>
             )}
           </div>
-          <div className="container__smartCheck-content-tables">
-            {/** Transactions from first accountcard */}
-            {firstAccountReport && (
+          {(firstAccountReport || secondAccountReport) && (
+            <div className="container__smartCheck-content-tables">
+              {/** Transactions from first accountcard */}
               <SmartCheckTable
                 title="Relevé - Carte de crédit CA"
                 reportTransactions={reportFirstAccountCardTransactions}
               />
-            )}
 
-            {/** Transactions from first account */}
-            {firstAccountReport && (
+              {/** Transactions from first account */}
               <SmartCheckTable
                 title="Relevé - Crédit Agricole"
                 reportTransactions={reportFirstAccountTransactions}
               />
-            )}
 
-            {/** Transactions from secondaccount */}
-            {firstAccountReport && (
+              {/** Transactions from secondaccount */}
               <SmartCheckTable
                 title="Relevé - American Express"
                 reportTransactions={reportSecondAccountTransactions}
               />
-            )}
 
-            {/** Transactions not matched */}
-            {firstAccountReport && (
+              {/** Transactions not matched */}
               <SmartCheckTable
                 title="Transactions non relevées"
                 reportTransactions={notMatchedTransactions()}
                 matchingMode={false}
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>,

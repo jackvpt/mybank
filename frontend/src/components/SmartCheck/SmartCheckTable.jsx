@@ -31,16 +31,6 @@ const SmartCheckTable = ({
   const { mutate: updateTransaction } = useUpdateTransaction()
   const { mutate: updateTransactionsStatus } = useUpdateTransactionsStatus()
 
-  // const matchedTransaction = (reportTransaction) => {
-  //   const matchedTransaction = matchedTransactions.find(
-  //     (transaction) => transaction.amount === reportTransaction.amount,
-  //   )
-  //   if (matchedTransaction) {
-  //     return matchedTransaction
-  //   }
-  //   return null
-  // }
-
   // Local state
   const [isDetailsVisible, setIsDetailsVisible] = useState([])
   const [isDisregard, setIsDisregard] = useState([])
@@ -99,25 +89,27 @@ const SmartCheckTable = ({
       {/** Header */}
       <div className="container__smartCheckTable-header">
         <h3>{title}</h3>
+
         {/** Tools Box */}
+        {(reportTransactions.length > 0 && matchingMode) && (
+          <div className="container__smartCheckTable-header-toolBox">
+            {/** Point all */}
+            <div
+              className="container__smartCheckTable-row-matchedTransaction-status-indicator pointed"
+              onClick={() => {
+                handleUpdateAllTransactionsStatus("pointed")
+              }}
+            ></div>
 
-        <div className="container__smartCheckTable-header-toolBox">
-          {/** Point all */}
-          <div
-            className="container__smartCheckTable-row-matchedTransaction-status-indicator pointed"
-            onClick={() => {
-              handleUpdateAllTransactionsStatus("pointed")
-            }}
-          ></div>
-
-          {/** Unpoint all */}
-          <div
-            className="container__smartCheckTable-row-matchedTransaction-status-indicator"
-            onClick={() => {
-              handleUpdateAllTransactionsStatus("")
-            }}
-          ></div>
-        </div>
+            {/** Unpoint all */}
+            <div
+              className="container__smartCheckTable-row-matchedTransaction-status-indicator"
+              onClick={() => {
+                handleUpdateAllTransactionsStatus("")
+              }}
+            ></div>
+          </div>
+        )}
       </div>
 
       {reportTransactions.length > 0 ? (
@@ -215,7 +207,8 @@ const SmartCheckTable = ({
                   </div>
                 </>
               ) : (
-                (allMatchedTransactions.length > 0 && matchingMode) && (
+                allMatchedTransactions.length > 0 &&
+                matchingMode && (
                   <FontAwesomeIcon
                     className="container__smartCheckTable-row-matchedTransaction-noIcon"
                     icon={faSquareXmark}
@@ -231,26 +224,28 @@ const SmartCheckTable = ({
         </div>
       )}
 
-      {/** Footer with total amounts */}
-      <div className="container__smartCheckTable-footer">
-        <div className="container__smartCheckTable-footer-total">
-          Total:{" "}
-          {reportTransactions
-            .reduce((sum, transaction) => sum + transaction.amount, 0)
-            .toFixed(2)}{" "}
-          (Débits:{" "}
-          {reportTransactions
-            .filter((t) => t.amount < 0)
-            .reduce((sum, transaction) => sum + transaction.amount, 0)
-            .toFixed(2)}{" "}
-          | Crédits:{" "}
-          {reportTransactions
-            .filter((t) => t.amount > 0)
-            .reduce((sum, transaction) => sum + transaction.amount, 0)
-            .toFixed(2)}
-          )
+      {/* Footer with total amount, debits, and credits */}
+      {reportTransactions.length > 0 && (
+        <div className="container__smartCheckTable-footer">
+          <div className="container__smartCheckTable-footer-total">
+            Total:{" "}
+            {reportTransactions
+              .reduce((sum, transaction) => sum + transaction.amount, 0)
+              .toFixed(2)}{" "}
+            (Débits:{" "}
+            {reportTransactions
+              .filter((t) => t.amount < 0)
+              .reduce((sum, transaction) => sum + transaction.amount, 0)
+              .toFixed(2)}{" "}
+            | Crédits:{" "}
+            {reportTransactions
+              .filter((t) => t.amount > 0)
+              .reduce((sum, transaction) => sum + transaction.amount, 0)
+              .toFixed(2)}
+            )
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
