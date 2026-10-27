@@ -52,6 +52,8 @@ const SmartCheckTable = ({
     })
   }
 
+    const isFuture = (date) => new Date(date) > new Date()
+
   const handleToggleTransactionStatus = (transaction) => {
     const newStatus = transaction.status === "pointed" ? "" : "pointed"
     transaction.status = newStatus
@@ -91,7 +93,7 @@ const SmartCheckTable = ({
         <h3>{title}</h3>
 
         {/** Tools Box */}
-        {(reportTransactions.length > 0 && matchingMode) && (
+        {reportTransactions.length > 0 && matchingMode && (
           <div className="container__smartCheckTable-header-toolBox">
             {/** Point all */}
             <div
@@ -117,7 +119,7 @@ const SmartCheckTable = ({
           // Row
           <div
             key={index}
-            className={`container__smartCheckTable-row ${isDisregard[index] ? "row--disregarded" : ""}`}
+            className={`container__smartCheckTable-row ${isDisregard[index] ? "row--disregarded" : ""} ${isFuture(reportTransaction.date) ? "isFuture" : ""}`}
           >
             {/** Report transaction */}
             <div className="container__smartCheckTable-row-reportTransaction">

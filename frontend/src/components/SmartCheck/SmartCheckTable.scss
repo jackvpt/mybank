@@ -191,4 +191,8 @@
   .row--disregarded {
     background-color: $primary-color-5;
   }
+
+  .isFuture {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1));
+  }
 }

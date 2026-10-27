@@ -32,19 +32,7 @@ const Dashboard = () => {
   return (
     <section className="container-dashboard">
       {bankAccounts.map((account) => {
-        const accountTransactions =
-          transactions?.filter((t) => t.account === account.name) || []
-        const lastTransaction =
-          accountTransactions
-            .slice()
-            .sort((a, b) => new Date(b.date) - new Date(a.date))[0] || null
-        return (
-          <BankAccountCard
-            key={account._id}
-            account={account}
-            lastTransaction={lastTransaction}
-          />
-        )
+        return <BankAccountCard key={account._id} account={account} />
       })}
     </section>
   )

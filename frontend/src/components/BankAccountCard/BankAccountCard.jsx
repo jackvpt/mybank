@@ -3,7 +3,7 @@ import "./BankAccountCard.scss"
 import { useDispatch } from "react-redux"
 import { setBankAccount } from "../../store/features/parametersSlice"
 
-const BankAccountCard = ({ account, lastTransaction }) => {
+const BankAccountCard = ({ account }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -16,7 +16,7 @@ const BankAccountCard = ({ account, lastTransaction }) => {
     <article className="container-bankAccountCard" onClick={handleClick}>
       <h2 className="bankAccountName">{account.name}</h2>
       <div className="container-bankAccountCard__amount">
-        <p className="balanceDate">Solde au {lastTransaction?.shortDate} : </p>
+        <p className="balanceDate">Solde : </p>
         <p className="currentBalance">
           {account.currentBalance.toLocaleString("fr-FR", {
             style: "currency",
@@ -24,11 +24,7 @@ const BankAccountCard = ({ account, lastTransaction }) => {
           })}
         </p>
       </div>
-      <div className="container-bankAccountCard__details">
-        <p className="details-label">Dernière opération : </p>
-        <p className="details-name">{lastTransaction?.label}</p>
-        <p className="details-amount">{lastTransaction?.amountSummary}</p>
-      </div>
+
     </article>
   )
 }

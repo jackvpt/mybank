@@ -147,7 +147,7 @@ const SmartCheck = ({ open, onClose }) => {
     const notMatched = notValidatedTransactions.filter(
       (t) => !matchedIds.has(t.id),
     )
-    return notMatched
+    return notMatched.sort((a, b) => new Date(a.date) - new Date(b.date))
   }
 
   const pointedTransactions = transactions.filter((transaction) => {

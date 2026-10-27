@@ -47,7 +47,7 @@
 
       @include responsive-tablet {
         justify-content: flex-end;
-        width:auto;
+        width: auto;
       }
     }
 
@@ -95,5 +95,9 @@
     .MuiTableCell-root {
       color: white !important;
     }
+  }
+
+  .isFuture {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1));
   }
 }

@@ -173,6 +173,9 @@ const TransactionsPage = () => {
     })
   }, [transactionsData, bankAccountId])
 
+  // 🗓️ Check if a date is today
+  const isFuture = (date) => new Date(date) > new Date()
+
   // 🔎 Filtered then sorted transactions (what the table displays)
   const sortedTransactions = useMemo(() => {
     const today = new Date()
@@ -354,11 +357,14 @@ const TransactionsPage = () => {
                     if (el) transactionRefs.current[transaction.id] = el
                   }}
                   onClick={(e) => handleRowClick(e, transaction, index)}
-                  className={
-                    selectedTransactionIds.includes(transaction.id)
-                      ? "transaction-row rowSelected"
-                      : "transaction-row"
-                  }
+                  className={[
+                    "transaction-row",
+                    selectedTransactionIds.includes(transaction.id) &&
+                      "rowSelected",
+                    isFuture(transaction.date) && "isFuture",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                 >
                   <TableCell align="center">
                     {new Date(transaction.date).toLocaleDateString()}
