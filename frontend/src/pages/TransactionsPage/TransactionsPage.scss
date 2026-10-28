@@ -23,6 +23,7 @@
   flex: 1;
   min-height: 0;
   height: 100%;
+  overflow:auto;
 
   &__tools {
     display: flex;
@@ -68,6 +69,28 @@
     .date-form-control .MuiSelect-root {
       font-size: 0.8rem;
       height: 34px;
+    }
+  }
+
+  &-table {
+    display: none;
+
+    @include responsive-tablet {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+  }
+
+  &-cards{
+    display: flex;
+    flex-direction: column;
+    flex:1;
+    min-height: 0;
+
+    @include responsive-tablet {
+      display: none;
     }
   }
 

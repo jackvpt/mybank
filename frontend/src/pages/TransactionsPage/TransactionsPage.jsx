@@ -22,11 +22,7 @@ import {
 // 🧱 MUI components
 import {
   Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
   Paper,
-  Select,
   Table,
   TableBody,
   TableCell,
@@ -42,6 +38,8 @@ import {
 import TransactionsToolBar from "../../components/TransactionsToolBar/TransactionsToolBar"
 import TransactionEdit from "../../components/TransactionEdit/TransactionEdit"
 import Loader from "../../components/Loader/Loader"
+import CustomSelect from "../../components/SubComponents/CustomSelect/CustomSelect"
+import DailyTransactionsCard from "../../components/DailyTransactionsCard/DailyTransactionsCard"
 
 // 📱 Screens narrower than 768px use the compact layout
 const MOBILE_QUERY = "(max-width:767.95px)"
@@ -207,8 +205,8 @@ const TransactionsPage = () => {
   }
 
   // 📅 Change the date filter
-  const handleDateFilterChange = (e) => {
-    setDateFilter(e.target.value)
+  const handleDateFilterChange = (value) => {
+    setDateFilter(value)
     setLastSelectedIndex(null) // indexes change with the filter
   }
 
@@ -282,23 +280,21 @@ const TransactionsPage = () => {
         <h1>{bankAccountName}</h1>
         <div className="toggle-tools">
           <TransactionsToolBar />
-          <FormControl className="date-form-control" size="small">
-            <InputLabel id="date-filter-label">Dates</InputLabel>
-            <Select
-              labelId="date-filter-label"
-              value={dateFilter}
-              label="Dates"
-              onChange={handleDateFilterChange}
-            >
-              <MenuItem value="all">Toutes</MenuItem>
-              <MenuItem value="currentYear">Année en cours</MenuItem>
-              <MenuItem value="lastYear">Année dernière</MenuItem>
-              <MenuItem value="last12months">12 derniers mois</MenuItem>
-              <MenuItem value="currentMonth">Mois en cours</MenuItem>
-              <MenuItem value="previousMonth">Mois précédent</MenuItem>
-              <MenuItem value="last3months">3 derniers mois</MenuItem>
-            </Select>
-          </FormControl>
+          <CustomSelect
+            label="Dates"
+            value={dateFilter}
+            onChange={(value) => handleDateFilterChange(value)}
+            options={[
+              { value: "all", label: "Toutes" },
+              { value: "currentYear", label: "Année en cours" },
+              { value: "lastYear", label: "Année dernière" },
+              { value: "last12months", label: "12 derniers mois" },
+              { value: "currentMonth", label: "Mois en cours" },
+              { value: "previousMonth", label: "Mois précédent" },
+              { value: "last3months", label: "3 derniers mois" },
+            ]}
+            size={180}
+          />
         </div>
       </div>
 
@@ -306,7 +302,7 @@ const TransactionsPage = () => {
       {isTransactionEditWindowVisible && <TransactionEdit />}
 
       {/* 📊 Transactions table */}
-      <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
+      <div className="container__transactions-table">
         <TableContainer
           component={Paper}
           ref={tableContainerRef}
@@ -413,7 +409,25 @@ const TransactionsPage = () => {
             </Typography>
           )}
         </TableContainer>
-      </Box>
+      </div>
+
+      <div className="container__transactions-cards">
+        {[
+          ...Map.groupBy(sortedTransactions, (transaction) =>
+            new Date(transaction.date).toISOString().slice(0, 10),
+          ),
+        ]
+          .reverse()
+          .map(([date, transactions]) => {
+            return (
+              <DailyTransactionsCard
+                key={date}
+                date={date}
+                transactions={transactions}
+              />
+            )
+          })}
+      </div>
     </section>
   )
 }

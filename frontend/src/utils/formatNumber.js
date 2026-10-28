@@ -95,6 +95,23 @@ export const dateToCustomDDMMYYYY = (value) => {
 }
 
 /**
+ * Formats a Date object to a custom string format (DD MMMM YYYY).
+ *
+ * @param {Date} value - The date to format.
+ * @returns {string|null} The formatted date string or null if invalid.
+ */
+export const dateToCustomDDMMMMYYYY = (value) => {
+  if (!value) return null
+  const date = value instanceof Date ? value : new Date(value)
+  if (isNaN(date)) return null
+
+  const day = String(date.getDate()).padStart(2, "0")
+  const month = date.toLocaleString("fr-FR", { month: "long" })
+  const year = date.getFullYear()
+  return `${day} ${month} ${year}`
+}
+
+/**
  * Converts a number to cents (multiplies by 100 and rounds).
  * @param {Number || String} value 
  * @returns {{result: number, text: string}} An object with the result and text representations of the value in cents.
@@ -104,3 +121,16 @@ export const toCents = (value) => {
   const text = (result / 100).toFixed(2)
   return { result, text }
 }
+
+/**
+ * Formats a number as a Euro currency string using the French locale.
+ * @param {number} value - The number to format.
+ * @returns {string} The formatted Euro currency string.
+ * @example
+ * euro.format(1234.56) // "1_234,56_€"
+ */
+export const euro = new Intl.NumberFormat("fr-FR", {
+  style: "currency",
+  currency: "EUR",
+  signDisplay: "exceptZero",
+})

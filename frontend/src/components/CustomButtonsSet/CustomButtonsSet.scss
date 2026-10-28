@@ -1,7 +1,18 @@
+@use "../../styles/utils/variables" as *;
+@use "../../styles/utils/mixins" as *;
+
 .container__customButtonsSet {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
+
+  > * {
+    width: 100%;
+  }
+
+  @include responsive-tablet {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
 }
