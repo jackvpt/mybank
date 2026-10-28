@@ -523,6 +523,7 @@ const TransactionEdit = () => {
           copy={false}
           floating={true}
           size={120}
+          inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
         />
 
         {/* 🗂️ CATEGORY SELECT */}
