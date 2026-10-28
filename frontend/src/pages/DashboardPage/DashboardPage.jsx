@@ -30,7 +30,7 @@ const Dashboard = () => {
     return <p>Erreur transactions : {transactions.message}</p>
 
   return (
-    <section className="container-dashboard">
+    <section className="container__dashboard">
       {bankAccounts.map((account) => {
         return <BankAccountCard key={account._id} account={account} />
       })}

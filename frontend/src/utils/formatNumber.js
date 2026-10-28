@@ -95,6 +95,22 @@ export const dateToCustomDDMMYYYY = (value) => {
 }
 
 /**
+ * Converts a Date object to a custom string format (MM/YY).
+ *
+ * @param {Date} value - The date to format.
+ * @returns {string|null} The formatted date string or null if invalid.
+ */
+export const dateToCustomMMYY = (value) => {
+  if (!value) return null
+  const date = value instanceof Date ? value : new Date(value)
+  if (isNaN(date)) return null
+
+  const month = String(date.getMonth() + 1).padStart(2, "0") // Janvier = 0
+  const year = date.getFullYear().toString().slice(-2)
+  return `${month}/${year}`
+}
+
+/**
  * Formats a Date object to a custom string format (DD MMMM YYYY).
  *
  * @param {Date} value - The date to format.
