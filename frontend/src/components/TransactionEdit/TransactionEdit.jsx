@@ -319,14 +319,14 @@ const TransactionEdit = () => {
 
     shortcutAmount = formatAmount(shortcutAmount)
 
-    setFormData((prev) => ({
-      ...prev,
+    setFormData({
+      ...getInitialFormData(),
       type: shortcut.type,
       label: shortcut.label,
       amount: shortcutAmount,
       category: shortcut.category,
       subCategory: shortcut.subCategory,
-    }))
+    })
   }
 
   // ➕ Create the transaction (a transfer creates a debit and a credit)
