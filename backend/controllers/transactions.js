@@ -1,8 +1,6 @@
 /** Imports */
 const Transaction = require("../models/Transaction")
-const BankAccount = require("../models/BankAccount")
-
-const fs = require("fs")
+const { recomputeAccountBalance } = require("../utils/balance")
 
 /** GET All Transactions */
 exports.getAllTransactions = async (req, res) => {
@@ -28,9 +26,13 @@ exports.createTransaction = async (req, res) => {
     })
 
     await transaction.save()
+
+    // Update the balance of the affected account
+    await recomputeAccountBalance(transaction.accountId)
+
     res.status(201).json(transaction)
     console.log(
-      `Transaction created: ${transaction._id} - ${transaction.label}`
+      `Transaction created: ${transaction._id} - ${transaction.label}`,
     )
   } catch (error) {
     res
@@ -44,14 +46,26 @@ exports.updateTransaction = async (req, res) => {
   const transactionObject = req.body
 
   try {
+    const oldTransaction = await Transaction.findById(req.params.id)
+    if (!oldTransaction) {
+      return res.status(404).json({ error: "Transaction not found" })
+    }
+
     const updatedTransaction = await Transaction.findByIdAndUpdate(
       req.params.id,
       { ...transactionObject, _id: req.params.id },
-      { new: true }
+      { new: true, runValidators: true },
     )
+
+    // Recompute the new account, and the old one if the transaction was moved
+    await recomputeAccountBalance(updatedTransaction.accountId)
+    if (oldTransaction.accountId !== updatedTransaction.accountId) {
+      await recomputeAccountBalance(oldTransaction.accountId)
+    }
+
     res.status(200).json(updatedTransaction)
     console.log(
-      `Transaction updated: ${updatedTransaction._id} - ${updatedTransaction.label}`
+      `Transaction updated: ${updatedTransaction._id} - ${updatedTransaction.label}`,
     )
   } catch (error) {
     res.status(401).json({ error })
@@ -73,14 +87,12 @@ exports.updateTransactionsStatus = async (req, res) => {
   try {
     const result = await Transaction.updateMany(
       { _id: { $in: ids } },
-      { $set: { status } }
+      { $set: { status } },
     )
     const updatedTransactions = await Transaction.find({ _id: { $in: ids } })
 
     res.status(200).json(updatedTransactions)
-    console.log(
-      `Transactions status updated -> "${status}"`
-    )
+    console.log(`Transactions status updated -> "${status}"`)
   } catch (error) {
     res.status(500).json({ error })
   }
@@ -89,7 +101,14 @@ exports.updateTransactionsStatus = async (req, res) => {
 /** DELETE One Transaction */
 exports.deleteTransaction = async (req, res) => {
   try {
-    await Transaction.deleteOne({ _id: req.params.id })
+    // Delete first, then use the returned document to know which account to recompute
+    const deletedTransaction = await Transaction.findByIdAndDelete(
+      req.params.id,
+    )
+    if (deletedTransaction) {
+      await recomputeAccountBalance(deletedTransaction.accountId)
+    }
+
     res.status(200).json({ message: "Transaction deleted successfully!" })
     console.log(`Transaction deleted: ${req.params.id}`)
   } catch (error) {
@@ -110,15 +129,21 @@ exports.deleteTransactions = async (req, res) => {
   }
 
   try {
+    // Collect the affected accounts before the transactions disappear
+    const accountIds = await Transaction.distinct("accountId", {
+      _id: { $in: ids },
+    })
+
     const result = await Transaction.deleteMany({ _id: { $in: ids } })
 
+    await Promise.all(accountIds.map((id) => recomputeAccountBalance(id)))
     res.status(200).json({
       message: "Transactions deleted successfully!",
       deletedCount: result.deletedCount,
     })
 
     console.log(
-      `Deleted ${result.deletedCount} transactions: ${ids.join(", ")}`
+      `Deleted ${result.deletedCount} transactions: ${ids.join(", ")}`,
     )
   } catch (error) {
     res.status(500).json({
@@ -132,7 +157,7 @@ exports.validateTransactions = async (req, res) => {
   try {
     const result = await Transaction.updateMany(
       { status: "pointed" },
-      { $set: { status: "validated" } }
+      { $set: { status: "validated" } },
     )
 
     res.status(200).json({

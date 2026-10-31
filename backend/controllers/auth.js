@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken")
 const createLog = require("../utils/Logger")
 const { decodeExp } = require("../utils/dateTools")
 const { isErrorPassword } = require("../utils/authTools")
+const { recomputeBalances } = require("../utils/balance")
 
 /** SIGNUP new User + Auth */
 exports.signup = async (req, res) => {
@@ -99,7 +100,7 @@ exports.login = async (req, res) => {
     /** Success: return token & user data */
     console.log(
       "Access granted :>> ",
-      `${user.firstName} ${user.lastName} - ${user.role}`
+      `${user.firstName} ${user.lastName} - ${user.role}`,
     )
 
     await createLog(req.body.email, "Logged in")
@@ -115,7 +116,7 @@ exports.login = async (req, res) => {
           role: user.role,
         },
         process.env.SECRET_TOKEN,
-        { expiresIn: process.env.TOKEN_EXPIRATION || "7d" }
+        { expiresIn: process.env.TOKEN_EXPIRATION || "7d" },
       ),
     })
   } catch (error) {
@@ -167,6 +168,9 @@ exports.validate = async (req, res) => {
     // Update last connection date
     user.lastConnection = new Date()
     await user.save()
+
+    // Recompute account balances on each session start
+    await recomputeBalances()
 
     await createLog(user.email, "Token validated")
 
@@ -225,7 +229,7 @@ exports.updatePassword = async (req, res) => {
     // Check if current password is valid
     const isCurrentPasswordValid = await bcrypt.compare(
       currentPassword,
-      auth.passwordHash
+      auth.passwordHash,
     )
     if (!isCurrentPasswordValid) {
       return res.status(401).json({ message: "Current password is incorrect" })
@@ -270,13 +274,13 @@ exports.requestPasswordReset = async (req, res) => {
 
     console.log(
       `Password reset token (valid until ${expiryDate.toISOString()}): `,
-      token
+      token,
     )
 
     // Generate the full link for the frontend
     const resetLink = new URL(
       `/reset-password/${token}`,
-      process.env.FRONTEND_URL
+      process.env.FRONTEND_URL,
     ).toString()
 
     // Initialize Brevo SDK
@@ -311,7 +315,7 @@ exports.requestPasswordReset = async (req, res) => {
   } catch (error) {
     console.error(
       "Password reset request failed:",
-      error.response?.body || error.message
+      error.response?.body || error.message,
     )
     res.status(500).json({ message: "Server error" })
   }
