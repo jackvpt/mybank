@@ -11,11 +11,14 @@ import {
   InputLabel,
   OutlinedInput,
 } from "@mui/material"
-import { Visibility, VisibilityOff } from "@mui/icons-material"
 import { useLogin } from "../../hooks/useLogin"
 
 // Custom functions
 import { messageConverter } from "../../utils/messageConverter"
+
+// FontAwesome
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons"
 
 const Login = () => {
   const { mutate: loginMutation, error } = useLogin()
@@ -102,7 +105,11 @@ const Login = () => {
                   edge="end"
                   aria-label="toggle password visibility"
                 >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                  {showPassword ? (
+                    <FontAwesomeIcon icon={faEyeSlash} />
+                  ) : (
+                    <FontAwesomeIcon icon={faEye} />
+                  )}
                 </IconButton>
               </InputAdornment>
             }
