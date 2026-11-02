@@ -24,6 +24,14 @@ export const shortcuts = [
     subCategory: "Carburant",
   },
   {
+    text: "Retrait",
+    type: "card",
+    label: "Retrait",
+    amount: "last",
+    category: "Courses",
+    subCategory: "",
+  },
+  {
     text: "Salaire HH",
     type: "directdeposit",
     label: "Salaire HeliHolland",

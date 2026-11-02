@@ -14,13 +14,14 @@
   }
 
   &--shortcuts {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
     gap: 0.5rem;
     margin-bottom: 1rem;
 
     @include responsive-tablet {
+      display: flex;
+      flex-direction: row;
       justify-content: flex-start;
     }
 
